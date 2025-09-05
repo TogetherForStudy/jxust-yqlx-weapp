@@ -5,3 +5,25 @@ deploy_versions/
 node_modules/
 .DS_Store
 .swc
+# Logs
+logs
+*.log
+npm-debug.log*
+
+coverage
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/launch.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+package-lock.json
+.VSCodeCounter
