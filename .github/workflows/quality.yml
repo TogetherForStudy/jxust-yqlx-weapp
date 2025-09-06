@@ -17,25 +17,25 @@ on:
       - 'package.json'
 
 jobs:
-    build:
-        # The type of runner that the job will run on
-        runs-on: ubuntu-latest
-        if: github.event_name != 'pull_request' || (!github.event.pull_request.draft && !contains(github.event.pull_request.title, 'WIP'))
-        strategy:
-        matrix:
-            node: ['22.x','24.x']
-        # Steps represent a sequence of tasks that will be executed as part of the job
-        steps:
-        - uses: actions/setup-node@v5
-            with:
-              node-version: ${{ matrix.node }}
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || (!github.event.pull_request.draft && !contains(github.event.pull_request.title, 'WIP'))
+    strategy:
+      matrix:
+        node-version: ['22.x','24.x']
 
-        # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-        - uses: actions/checkout@v5
+    steps:
+      - uses: actions/checkout@v5
 
-        - name: Install Dependencies
-            run: npm install
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
 
-        - name: Run Build
-            run: npm run build:weapp
+      - name: Install Dependencies
+        run: npm install
 
+      - name: Run Build
+          run: npm run build:weapp
