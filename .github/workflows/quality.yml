@@ -28,7 +28,7 @@ jobs:
         steps:
         - uses: actions/setup-node@v5
             with:
-            node-version: ${{ matrix.node }}
+              node-version: ${{ matrix.node }}
 
         # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
         - uses: actions/checkout@v5
