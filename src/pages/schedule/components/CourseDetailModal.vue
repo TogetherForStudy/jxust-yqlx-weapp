@@ -1,6 +1,6 @@
 <template>
   <view class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" @tap="handleOverlayClick">
-    <view class="bg-white rounded-xl shadow-xl max-w-sm w-full max-h-96 overflow-hidden" @tap.stop style="animation: modal-enter 0.3s ease-out;">
+    <view class="bg-white rounded-xl shadow-xl max-w-sm w-full max-h-[85vh] flex flex-col overflow-hidden" @tap.stop style="animation: modal-enter 0.3s ease-out;">
              <!-- 头部 -->
        <view class="flex items-center justify-between px-4 py-2 border-b border-gray-200">
          <view class="font-semibold text-gray-900 flex-1 pr-4" style="display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
@@ -15,7 +15,7 @@
        </view>
 
        <!-- 内容 -->
-       <view class="p-4 space-y-4 max-h-80 overflow-y-auto">
+       <view class="flex-1 p-4 space-y-4 overflow-y-auto">
          <!-- 多课程切换 -->
          <view v-if="course.hasMultipleCourses" class="flex flex-wrap gap-2 mb-4">
            <view
@@ -83,8 +83,32 @@
                  {{ scheduleStore.isCourseInCurrentWeek(currentCourse.week) ? '本周有课' : '本周无课' }}
                </view>
              </view>
-           </view>
-         </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 底部操作按钮 -->
+      <view class="flex-shrink-0 px-4 pb-4 pt-2 border-t border-gray-100">
+        <view class="flex gap-2">
+          <view
+            @tap="handleAddNew"
+            class="flex-1 bg-gray-100 text-gray-700 text-center py-3 rounded-lg active:bg-gray-200 transition-colors"
+          >
+            新增
+          </view>
+          <view
+            @tap="handleEdit"
+            class="flex-1 bg-blue-100 text-blue-700 text-center py-3 rounded-lg active:bg-blue-200 transition-colors"
+          >
+            编辑
+          </view>
+          <view
+            @tap="handleDelete"
+            class="flex-1 bg-red-100 text-red-700 text-center py-3 rounded-lg active:bg-red-200 transition-colors"
+          >
+            删除
+          </view>
+        </view>
       </view>
     </view>
   </view>
@@ -102,7 +126,7 @@
    }
  })
 
- const emit = defineEmits(['close'])
+ const emit = defineEmits(['close', 'edit', 'delete', 'add-new'])
 
  const scheduleStore = useScheduleStore()
 
@@ -136,11 +160,11 @@ const handleOverlayClick = () => {
  // 复制课程信息
  const copyInfo = () => {
    const info = `课程：${currentCourse.value.course}
- 时间：${props.course.dayName} 第${props.course.period}节 (${props.course.time})
- 教室：${currentCourse.value.classroom}
- 教师：${currentCourse.value.teacher}
- ${currentCourse.value.class ? `班级：${currentCourse.value.class}` : ''}
- 周次：${currentCourse.value.week}`
+时间：${props.course.dayName} 第${props.course.period}节 (${props.course.time})
+教室：${currentCourse.value.classroom}
+教师：${currentCourse.value.teacher}
+${currentCourse.value.class ? `班级：${currentCourse.value.class}` : ''}
+周次：${currentCourse.value.week}`
 
   Taro.setClipboardData({
     data: info,
@@ -149,6 +173,52 @@ const handleOverlayClick = () => {
         title: '已复制到剪贴板',
         icon: 'success'
       })
+    }
+  })
+}
+
+// 处理编辑课程
+const handleEdit = () => {
+  emit('edit', {
+    course: currentCourse.value,
+    timeInfo: {
+      period: props.course.period,
+      dayIndex: props.course.dayIndex,
+      dayName: props.course.dayName,
+      time: props.course.time
+    }
+  })
+}
+
+// 处理添加新课程
+const handleAddNew = () => {
+  emit('add-new', {
+    timeInfo: {
+      period: props.course.period,
+      dayIndex: props.course.dayIndex,
+      dayName: props.course.dayName,
+      time: props.course.time
+    }
+  })
+}
+
+// 处理删除课程
+const handleDelete = () => {
+  Taro.showModal({
+    title: '确认删除',
+    content: `确定要删除课程"${currentCourse.value.course}"吗？`,
+    success: (res) => {
+      if (res.confirm) {
+        emit('delete', {
+          course: currentCourse.value,
+          timeInfo: {
+            period: props.course.period,
+            dayIndex: props.course.dayIndex,
+            dayName: props.course.dayName,
+            time: props.course.time
+          }
+        })
+      }
     }
   })
 }

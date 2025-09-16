@@ -15,8 +15,12 @@
 
     <!-- 个人信息卡片 -->
     <view v-if="authStore.isLoggedIn" class="px-4 -mt-6">
-      <view class="bg-white rounded-xl p-4 shadow-sm mb-6">
+      <view class="bg-white rounded-xl p-4 shadow-sm mb-4">
         <view class="space-y-3">
+          <view class="flex justify-between items-center">
+            <text class="text-gray-600">账号</text>
+            <text class="text-gray-800">{{ userInfo?.id || "无" }}</text>
+          </view>
           <view class="flex justify-between items-center">
             <text class="text-gray-600">班级</text>
             <text class="text-gray-800">{{ userInfo?.class_id || "无" }}</text>
@@ -26,7 +30,7 @@
     </view>
 
     <!-- 功能菜单 -->
-    <view class="p-4">
+    <view class="px-4" :class="authStore.isLoggedIn ? '' : 'mt-4'">
       <!-- 我的功能 -->
       <view class="bg-white rounded-xl mb-4 overflow-hidden">
         <view
@@ -63,6 +67,39 @@
           <view class="flex items-center space-x-3">
             <text class="i-lucide-star"></text>
             <text class="text-gray-800">评价管理</text>
+          </view>
+          <text class="i-lucide-chevron-right text-gray-400"></text>
+        </view>
+
+        <view
+          class="px-4 py-3 border-b border-gray-100 text-base flex items-center justify-between active:bg-gray-50"
+          @tap="goToHeroManagement"
+        >
+          <view class="flex items-center space-x-3">
+            <text class="i-lucide-trophy"></text>
+            <text class="text-gray-800">英雄管理</text>
+          </view>
+          <text class="i-lucide-chevron-right text-gray-400"></text>
+        </view>
+
+        <view
+          class="px-4 py-3 border-b border-gray-100 text-base flex items-center justify-between active:bg-gray-50"
+          @tap="goToConfigManagement"
+        >
+          <view class="flex items-center space-x-3">
+            <text class="i-lucide-settings"></text>
+            <text class="text-gray-800">配置管理</text>
+          </view>
+          <text class="i-lucide-chevron-right text-gray-400"></text>
+        </view>
+
+        <view
+          class="px-4 py-3 text-base flex items-center justify-between active:bg-gray-50"
+          @tap="goToResetBindCount"
+        >
+          <view class="flex items-center space-x-3">
+            <text class="i-lucide-refresh-ccw"></text>
+            <text class="text-gray-800">重置绑定</text>
           </view>
           <text class="i-lucide-chevron-right text-gray-400"></text>
         </view>
@@ -105,6 +142,7 @@
 import { ref, computed, onMounted } from "vue";
 import { useAuthStore } from "../../stores/auth";
 import Taro from "@tarojs/taro";
+import { courseTableAPI } from "../../api/index";
 
 const authStore = useAuthStore();
 
@@ -118,6 +156,56 @@ const goToLogin = () => {
 
 const goToReviewManagement = () => {
   Taro.navigateTo({ url: "/pages/admin/teacher-reviews/index" });
+};
+
+const goToHeroManagement = () => {
+  Taro.navigateTo({ url: "/pages/admin/heroes/index" });
+};
+
+const goToConfigManagement = () => {
+  Taro.navigateTo({ url: "/pages/admin/config/index" });
+};
+
+const goToResetBindCount = () => {
+  Taro.showModal({
+    title: "重置绑定",
+    editable: true,
+    placeholderText: "用户ID",
+    success: (res) => {
+      if (res.confirm && res.content && res.content.trim() !== "") {
+        const userId = res.content.trim();
+        // 延迟执行，避免与modal关闭冲突
+        setTimeout(async () => {
+          // 显示加载中
+          Taro.showLoading({
+            title: "处理中...",
+            mask: true
+          });
+
+          try {
+            await courseTableAPI.resetBindCount(userId);
+            Taro.hideLoading();
+            // 使用modal显示结果，避免toast冲突
+            Taro.showModal({
+              title: "操作成功",
+              content: "重置绑定成功！",
+              showCancel: false,
+              confirmText: "确定"
+            });
+          } catch (error) {
+            Taro.hideLoading();
+            // 使用modal显示错误，避免toast冲突
+            Taro.showModal({
+              title: "操作失败",
+              content: error.message || "重置绑定失败，请重试",
+              showCancel: false,
+              confirmText: "确定"
+            });
+          }
+        }, 300);
+      }
+    },
+  });
 };
 
 const handleLogout = () => {

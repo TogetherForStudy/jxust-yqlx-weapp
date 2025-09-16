@@ -42,27 +42,23 @@ export const useAuthStore = defineStore('auth', {
 
     // 微信登录
     async wechatLogin() {
-      console.log('wechatLogin')
+
       try {
         // 获取微信登录code
         const { code } = await Taro.login()
-        console.log('code', code)
         if (!code) {
           throw new Error('获取微信登录code失败')
         }
 
         // 调用后端登录接口
         const result = await authAPI.wechatLogin(code)
-        console.log('result', result)
         if (result.token && result.user_info) {
           // 保存认证信息
           this.setAuth(result.token, result.user_info)
-          console.log('setAuth')
           Taro.showToast({
             title: '登录成功',
             icon: 'success'
           })
-          console.log('showToast')
           return result
         } else {
           throw new Error('登录响应数据异常')
@@ -112,6 +108,19 @@ export const useAuthStore = defineStore('auth', {
       } catch (error) {
         console.error('退出登录失败:', error)
       }
+    },
+
+    expireToken() {
+      this.token = null
+      this.userInfo = null
+      this.isLoggedIn = false
+      Taro.removeStorageSync('token')
+      Taro.removeStorageSync('userInfo')
+      Taro.showToast({
+        title: '请重新登录',
+        icon: 'none'
+      })
+      Taro.navigateTo({ url: '/pages/login/index' })
     },
 
     // 更新用户信息

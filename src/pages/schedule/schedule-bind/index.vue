@@ -76,8 +76,9 @@
 
     <!-- 搜索提示 -->
     <view v-if="!hasSearched && !isLoading" class="bg-white rounded-lg shadow-sm p-8 text-center">
+      <view class="text-gray-500">仅有 2 次绑定机会</view>
       <view class="text-gray-500">请输入班级名称进行搜索</view>
-      <view class="text-sm text-gray-400 mt-2">如：20软件开发3班</view>
+      <view class="text-sm text-gray-400 mt-2">如：25软件1班</view>
     </view>
 
     <!-- 确认绑定弹窗 -->
@@ -242,13 +243,15 @@ const confirmBind = async () => {
 
     // 延迟返回上一页
     setTimeout(() => {
+      // 传递消息通知课表页刷新
+      Taro.eventCenter.trigger('reloadSchedule')
       Taro.navigateBack()
     }, 1500)
 
   } catch (error) {
     console.error('绑定班级失败:', error)
     Taro.showToast({
-      title: '绑定失败，请重试',
+      title: '请联系客服',
       icon: 'none'
     })
   } finally {
