@@ -5,9 +5,19 @@ export default {
     'pages/discover/index',
     'pages/profile/index',
     'pages/login/index',
+    'pages/calendar/index',
+    'pages/achieveprint/index',
+    'pages/map/index',
     'pages/teacher-reviews/index',
     'pages/admin/teacher-reviews/index',
-    'pages/terms-of-service/index'
+    'pages/admin/heroes/index',
+    'pages/admin/config/index',
+    'pages/terms-of-service/index',
+    'pages/webview/index',
+    'pages/hero/index',
+    'pages/failrate/index',
+    'pages/groupchat/index',
+    'pages/address/index'
   ],
   window: {
     backgroundTextStyle: 'light',

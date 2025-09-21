@@ -1,5 +1,16 @@
 import { REVIEW_ATTITUDES, REVIEW_STATUS, USER_ROLES } from './constants'
 
+// 导出图片相关工具方法
+export {
+  getSignedImageUrl,
+  getBatchSignedImageUrls,
+  clearImageCache,
+  isImageExpiring,
+  preloadImageUrls,
+  getLocalCacheStats,
+  cleanExpiredLocalCache
+} from './image'
+
 /**
  * 格式化日期
  * @param {string|Date} dateString

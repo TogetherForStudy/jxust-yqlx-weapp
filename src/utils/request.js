@@ -1,4 +1,5 @@
 import Taro from '@tarojs/taro'
+import { useAuthStore } from '../stores/auth'
 
 // API基础配置
 const BASE_URL = '' // 请根据实际情况修改
@@ -34,9 +35,7 @@ const interceptors = {
         return data.Result
       } else if (data.StatusCode === 401) {
         // token过期或无效，跳转到登录页
-        Taro.removeStorageSync('token')
-        Taro.removeStorageSync('userInfo')
-        Taro.navigateTo({ url: '/pages/login/index' })
+        useAuthStore().expireToken()
         return Promise.reject(new Error(data.StatusMessage || '登录已过期'))
       } else {
         return Promise.reject(new Error(data.StatusMessage || '请求失败'))

@@ -94,6 +94,16 @@
       </view>
     </view>
 
+    <!-- 默认状态 -->
+    <view v-if="searchKeyword && !hasSearched" class="p-4">
+      <view class="flex flex-col items-center justify-center py-12">
+        <text
+          class="i-lucide-search w-12 h-12 text-gray-300 mb-4 block mx-auto"
+        ></text>
+        <text class="text-gray-500 mb-4">请输入教师姓名回车搜索</text>
+      </view>
+    </view>
+
     <!-- 教师评价详情 -->
     <view v-if="currentTeacher" class="flex-1 flex flex-col min-h-0">
       <!-- 教师信息头部 -->
@@ -437,7 +447,8 @@ const formatDate = (dateStr) => {
   return `${Math.floor(days / 365)}年前`;
 };
 
-const onSearchInput = () => {
+const onSearchInput = (e) => {
+  searchKeyword.value = e.detail.value;
   // 清空搜索状态
   hasSearched.value = false;
   searchResult.value = null;

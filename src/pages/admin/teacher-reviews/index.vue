@@ -116,7 +116,6 @@
 
             <!-- 操作按钮 -->
             <view
-              v-if="review.status === REVIEW_STATUS.PENDING"
               class="px-4 py-2 border-t border-gray-100"
             >
               <view class="flex space-x-3">
@@ -132,18 +131,6 @@
                 >
                   通过
                 </view>
-                <view
-                  @tap="showDeleteConfirm(review)"
-                  class="py-2 px-4 bg-gray-50 text-gray-600 rounded-lg text-center text-sm"
-                >
-                  删除
-                </view>
-              </view>
-            </view>
-
-            <!-- 已审核状态的操作 -->
-            <view v-else class="px-4 py-2 border-t border-gray-100">
-              <view class="flex justify-end">
                 <view
                   @tap="showDeleteConfirm(review)"
                   class="py-2 px-4 bg-gray-50 text-gray-600 rounded-lg text-center text-sm"
@@ -315,6 +302,12 @@ const selectedStatus = ref(null);
 const refreshing = ref(false);
 const searchTimer = ref(null);
 
+// 搜索和筛选状态
+const currentSearchParams = ref({
+  teacher_name: '',
+  status: null
+});
+
 // 弹窗状态
 const showApprove = ref(false);
 const showReject = ref(false);
@@ -351,28 +344,8 @@ const adminReviews = computed(() => reviewsStore.adminReviews);
 const adminReviewsTotal = computed(() => reviewsStore.adminReviewsTotal);
 const reviewsLoading = computed(() => reviewsStore.adminReviewsLoading);
 
-const filteredReviews = computed(() => {
-  let reviews = adminReviews.value;
-
-  // 状态筛选
-  if (selectedStatus.value !== null) {
-    reviews = reviews.filter(
-      (review) => review.status === selectedStatus.value
-    );
-  }
-
-  // 关键词搜索
-  if (searchKeyword.value.trim()) {
-    const keyword = searchKeyword.value.toLowerCase();
-    reviews = reviews.filter(
-      (review) =>
-        review.teacher_name.toLowerCase().includes(keyword) ||
-        review.course_name.toLowerCase().includes(keyword)
-    );
-  }
-
-  return reviews;
-});
+// 由于使用API搜索，不再需要本地过滤
+const filteredReviews = computed(() => adminReviews.value);
 
 const hasMoreReviews = computed(() => {
   return adminReviews.value.length < adminReviewsTotal.value;
@@ -418,22 +391,54 @@ const formatDate = (dateStr) => {
   return `${Math.floor(days / 365)}年前`;
 };
 
-const onSearchInput = () => {
+const onSearchInput = (e) => {
+  searchKeyword.value = e.detail.value;
   // 防抖搜索
   if (searchTimer.value) {
     clearTimeout(searchTimer.value);
   }
-  searchTimer.value = setTimeout(() => {
-    // 搜索在filteredReviews计算属性中处理
+  searchTimer.value = setTimeout(async () => {
+    // 更新搜索参数
+    currentSearchParams.value.teacher_name = searchKeyword.value.trim();
+    // 调用API搜索
+    try {
+      await loadReviews(true, 1);
+    } catch (error) {
+      console.error("搜索失败:", error);
+      Taro.showToast({
+        title: "搜索失败",
+        icon: "none",
+      });
+    }
   }, 300);
 };
 
-const clearSearch = () => {
+const clearSearch = async () => {
   searchKeyword.value = "";
+  currentSearchParams.value.teacher_name = '';
+  // 清除搜索后重新加载数据
+  try {
+    await loadReviews(true, 1);
+  } catch (error) {
+    console.error("清除搜索失败:", error);
+  }
 };
 
-const selectStatusFilter = (status) => {
-  selectedStatus.value = selectedStatus.value === status ? null : status;
+const selectStatusFilter = async (status) => {
+  const newStatus = selectedStatus.value === status ? null : status;
+  selectedStatus.value = newStatus;
+  currentSearchParams.value.status = newStatus;
+
+  // 状态筛选后重新加载数据
+  try {
+    await loadReviews(true, 1);
+  } catch (error) {
+    console.error("筛选失败:", error);
+    Taro.showToast({
+      title: "筛选失败",
+      icon: "none",
+    });
+  }
 };
 
 const refreshData = async () => {
@@ -451,9 +456,23 @@ const refreshData = async () => {
   }
 };
 
-const loadReviews = async () => {
+// 统一加载评价数据的方法
+const loadReviews = async (resetData = true, page = 1) => {
   try {
-    await reviewsStore.fetchAllReviews();
+    const searchParams = {
+      ...currentSearchParams.value,
+      page,
+      size: 10
+    };
+
+    // 过滤掉空值参数
+    Object.keys(searchParams).forEach(key => {
+      if (searchParams[key] === '' || searchParams[key] === null || searchParams[key] === undefined) {
+        delete searchParams[key];
+      }
+    });
+
+    await reviewsStore.fetchAllReviews(searchParams, page, 10);
   } catch (error) {
     console.error("加载评价列表失败:", error);
     throw error;
@@ -466,14 +485,9 @@ const loadMoreReviews = async () => {
   try {
     // 计算当前页码，这里使用实际的每页大小
     const currentPage = Math.floor(adminReviews.value.length / 10) + 1;
-    console.log(
-      "加载更多评价，当前页码:",
-      currentPage,
-      "当前数据量:",
-      adminReviews.value.length
-    );
 
-    await reviewsStore.fetchAllReviews({}, currentPage, 10);
+    // 使用当前搜索参数加载更多数据
+    await loadReviews(false, currentPage);
   } catch (error) {
     console.error("加载更多评价失败:", error);
     Taro.showToast({
