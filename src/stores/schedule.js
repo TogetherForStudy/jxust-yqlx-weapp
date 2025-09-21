@@ -78,11 +78,16 @@ export const useScheduleStore = defineStore('schedule', {
     },
 
     // 周数列表
-    weekOptions: () => {
-      return Array.from({ length: 20 }, (_, i) => ({
-        value: i + 1,
-        label: `第${i + 1}周`
-      }))
+    weekOptions: (state) => {
+      return Array.from({ length: 20 }, (_, i) => {
+        const weekNum = i + 1
+        const isCurrentWeek = weekNum === state.currentWeekNumber
+        return {
+          value: weekNum,
+          label: `第${weekNum}周`,
+          isCurrentWeek
+        }
+      })
     }
   },
 
@@ -196,6 +201,61 @@ export const useScheduleStore = defineStore('schedule', {
     getCourseDetail(day, period) {
       const courseIndex = day * 5 + period
       return this.courseData[courseIndex.toString()] || null
+    },
+
+    // 编辑课程格子（添加、编辑、删除）
+    async editCourseCell(semester, index, courseData, operationType = 'add', originalCourse = null) {
+      try {
+        // 获取当前格子的所有课程数据
+        const currentCourses = this.courseData[index.toString()] || []
+        const coursesArray = Array.isArray(currentCourses) ? [...currentCourses] : []
+
+        let updatedCourses = []
+
+        if (operationType === 'add') {
+          // 添加课程：保留所有现有课程，添加新课程
+          updatedCourses = [...coursesArray, courseData]
+        } else if (operationType === 'edit') {
+          // 编辑课程：替换特定课程，保留其他课程
+          updatedCourses = coursesArray.map(course => {
+            if (this.isSameCourse(course, originalCourse)) {
+              return courseData
+            }
+            return course
+          })
+        } else if (operationType === 'delete') {
+          // 删除课程：移除特定课程，保留其他课程
+          updatedCourses = coursesArray.filter(course =>
+            !this.isSameCourse(course, originalCourse)
+          )
+        }
+
+        await courseTableAPI.editCourseCell({
+          semester: semester || this.semester,
+          index: index.toString(),
+          value: updatedCourses
+        })
+
+        // 刷新课程表数据
+        await this.fetchCourseTable(semester)
+      } catch (error) {
+        console.error('编辑课程格子失败:', error)
+        throw error
+      }
+    },
+
+    // 判断是否是同一个课程（用于编辑和删除时定位课程）
+    isSameCourse(course1, course2) {
+      if (!course1 || !course2) return false
+      return course1.course === course2.course &&
+             course1.teacher === course2.teacher &&
+             course1.week === course2.week &&
+             course1.classroom === course2.classroom
+    },
+
+    // 计算课程格子索引（从1开始）
+    calculateCourseIndex(dayIndex, period) {
+      return dayIndex * 5 + period
     }
   }
 })

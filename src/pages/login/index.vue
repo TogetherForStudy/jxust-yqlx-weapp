@@ -70,7 +70,6 @@ const goToTermsOfService = () => {
 
 // 微信登录
 const handleWechatLogin = async () => {
-  console.log('handleWechatLogin')
   if (isLoading.value) return
 
   try {

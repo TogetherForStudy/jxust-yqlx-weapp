@@ -63,7 +63,7 @@ export const reviewAPI = {
 export const courseTableAPI = {
   // 获取用户课程表
   getCourseTable(params) {
-    return get('/api/v0/coursetable/', params)
+    return get('/api/v0/coursetable', params)
   },
 
   // 搜索班级
@@ -74,6 +74,96 @@ export const courseTableAPI = {
   // 更新用户班级
   updateClass(data) {
     return put('/api/v0/coursetable/class', data)
+  },
+
+  // 编辑个人课表单个格子
+  editCourseCell(data) {
+    return put('/api/v0/coursetable', data)
+  },
+
+  // 重置用户绑定
+  resetBindCount(userId) {
+    return post(`/api/v0/coursetable/reset/${userId}`)
+  }
+}
+
+// 挂科率相关API
+export const failRateAPI = {
+  // 搜索挂科率数据
+  search(params) {
+    return get('/api/v0/failrate/search', params)
+  },
+
+  // 随机获取10条挂科率数据
+  getRandom() {
+    return get('/api/v0/failrate/rand')
+  }
+}
+
+// 英雄榜相关API
+export const heroAPI = {
+  // 获取英雄榜名单
+  getHeroes() {
+    return get('/api/v0/heroes/')
+  },
+
+  // 搜索英雄（管理员）
+  searchHeroes(params) {
+    return get('/api/v0/heroes/search', params)
+  },
+
+  // 创建英雄（管理员）
+  createHero(data) {
+    return post('/api/v0/heroes/', data)
+  },
+
+  // 更新英雄（管理员）
+  updateHero(id, data) {
+    return put(`/api/v0/heroes/${id}`, data)
+  },
+
+  // 删除英雄（管理员）
+  deleteHero(id) {
+    return del(`/api/v0/heroes/${id}`)
+  }
+}
+
+// 系统配置相关API
+export const configAPI = {
+  // 公开读取配置
+  getConfig(key) {
+    return get(`/api/v0/config/${key}`)
+  },
+
+  // 搜索配置（管理员）
+  searchConfig(params) {
+    return get('/api/v0/config/search', params)
+  },
+
+  // 创建配置（管理员）
+  createConfig(data) {
+    return post('/api/v0/config/', data)
+  },
+
+  // 更新配置（管理员）
+  updateConfig(key, data) {
+    return put(`/api/v0/config/${key}`, data)
+  },
+
+  // 删除配置（管理员）
+  deleteConfig(key) {
+    return del(`/api/v0/config/${key}`)
+  }
+}
+
+// OSS相关API
+export const ossAPI = {
+  // 获取又拍云访问token
+  getToken(uri, expireSeconds = 600) {
+    return post('/api/v0/oss/token', {
+      uri,
+      expire_seconds: expireSeconds
+    })
   }
 }
 
