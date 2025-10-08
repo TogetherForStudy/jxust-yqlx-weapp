@@ -1,4 +1,5 @@
 import { REVIEW_ATTITUDES, REVIEW_STATUS, USER_ROLES } from './constants'
+import { formatDateTime } from './time'
 
 // 导出图片相关工具方法
 export {
@@ -40,11 +41,11 @@ export const formatDate = (dateString, format = 'relative') => {
     } else if (diffDays < 7) {
       return `${diffDays}天前`
     } else {
-      return date.toLocaleDateString('zh-CN')
+      return formatDateTime(date, 'yyyy-MM-dd HH:mm')
     }
   }
 
-  return date.toLocaleDateString('zh-CN')
+  return formatDateTime(date, 'yyyy-MM-dd HH:mm')
 }
 
 /**

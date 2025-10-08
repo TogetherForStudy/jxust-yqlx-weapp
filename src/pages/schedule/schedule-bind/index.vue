@@ -246,7 +246,7 @@ const confirmBind = async () => {
       // 传递消息通知课表页刷新
       Taro.eventCenter.trigger('reloadSchedule')
       Taro.navigateBack()
-    }, 1500)
+    }, 1000)
 
   } catch (error) {
     console.error('绑定班级失败:', error)

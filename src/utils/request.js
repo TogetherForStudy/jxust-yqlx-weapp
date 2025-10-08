@@ -2,7 +2,7 @@ import Taro from '@tarojs/taro'
 import { useAuthStore } from '../stores/auth'
 
 // API基础配置
-const BASE_URL = '' // 请根据实际情况修改
+const BASE_URL = 'https://wx.ntrun.com' // 请根据实际情况修改
 
 // 请求拦截器
 const interceptors = {
@@ -74,10 +74,33 @@ export const request = (options) => {
 
 // GET请求
 export const get = (url, data) => {
+  // 处理数组参数（如categories），转换为多个同名参数
+  let processedData = { ...data }
+  let urlParams = new URLSearchParams()
+
+  Object.keys(processedData).forEach(key => {
+    const value = processedData[key]
+    if (Array.isArray(value)) {
+      // 数组参数：添加多个同名参数
+      value.forEach(item => {
+        urlParams.append(key, item)
+      })
+      delete processedData[key] // 从data中删除，避免重复处理
+    } else if (value !== undefined && value !== null && value !== '') {
+      urlParams.append(key, value)
+      delete processedData[key] // 从data中删除，避免重复处理
+    }
+  })
+
+  // 如果有URL参数，添加到URL中
+  if (urlParams.toString()) {
+    url += (url.includes('?') ? '&' : '?') + urlParams.toString()
+  }
+
   return request({
     url,
     method: 'GET',
-    data
+    data: {} // 传空对象，参数已经在URL中
   })
 }
 
@@ -106,4 +129,63 @@ export const del = (url, data) => {
     method: 'DELETE',
     data
   })
+}
+
+// ============ 倒数日相关接口 ============
+
+// 获取用户倒数日列表
+export const getCountdowns = () => {
+  return get('/api/v0/countdowns')
+}
+
+// 获取倒数日详情
+export const getCountdownDetail = (id) => {
+  return get(`/api/v0/countdowns/${id}`)
+}
+
+// 创建倒数日
+export const createCountdown = (data) => {
+  return post('/api/v0/countdowns', data)
+}
+
+// 更新倒数日
+export const updateCountdown = (id, data) => {
+  return put(`/api/v0/countdowns/${id}`, data)
+}
+
+// 删除倒数日
+export const deleteCountdown = (id) => {
+  return del(`/api/v0/countdowns/${id}`)
+}
+
+// ============ 学习任务相关接口 ============
+
+// 获取学习任务列表
+export const getStudyTasks = (params) => {
+  return get('/api/v0/study-tasks', params)
+}
+
+// 获取学习任务详情
+export const getStudyTaskDetail = (id) => {
+  return get(`/api/v0/study-tasks/${id}`)
+}
+
+// 创建学习任务
+export const createStudyTask = (data) => {
+  return post('/api/v0/study-tasks', data)
+}
+
+// 更新学习任务
+export const updateStudyTask = (id, data) => {
+  return put(`/api/v0/study-tasks/${id}`, data)
+}
+
+// 删除学习任务
+export const deleteStudyTask = (id) => {
+  return del(`/api/v0/study-tasks/${id}`)
+}
+
+// 获取学习任务统计
+export const getStudyTaskStats = () => {
+  return get('/api/v0/study-tasks/stats')
 }
