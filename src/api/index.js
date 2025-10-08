@@ -167,6 +167,122 @@ export const ossAPI = {
   }
 }
 
+// 通知相关API
+export const notificationAPI = {
+  // 获取通知列表（公开）
+  getNotifications(params) {
+    return get('/api/v0/notifications', params)
+  },
+
+  // 获取通知详情（公开）
+  getNotificationDetail(id) {
+    return get(`/api/v0/notifications/${id}`)
+  },
+
+  // 创建通知（运营专用）
+  createNotification(data) {
+    return post('/api/v0/admin/notifications', data)
+  },
+
+  // 更新通知（运营专用）
+  updateNotification(id, data) {
+    return put(`/api/v0/admin/notifications/${id}`, data)
+  },
+
+  // 发布通知（运营专用）
+  publishNotification(id) {
+    return post(`/api/v0/admin/notifications/${id}/publish`)
+  },
+
+  // 管理员直通发布通知（管理员专用）
+  publishAdminNotification(id) {
+    return post(`/api/v0/admin/notifications/${id}/publish-admin`)
+  },
+
+  // 删除通知（运营专用）
+  deleteNotification(id) {
+    return del(`/api/v0/admin/notifications/${id}`)
+  },
+
+  // 审核通知（管理员专用）
+  approveNotification(id, data) {
+    return post(`/api/v0/admin/notifications/${id}/approve`, data)
+  },
+
+  // 获取管理员通知列表（管理员专用）
+  getAdminNotifications(params) {
+    return get('/api/v0/admin/notifications', params)
+  },
+
+  // 获取管理员通知详情（管理员专用）
+  getAdminNotificationDetail(id) {
+    return get(`/api/v0/admin/notifications/${id}`)
+  },
+
+  // 获取通知分类列表（公开）
+  getCategories() {
+    return get('/api/v0/categories')
+  },
+
+  // 创建通知分类（管理员专用）
+  createCategory(data) {
+    return post('/api/v0/admin/categories', data)
+  },
+
+  // 更新通知分类（管理员专用）
+  updateCategory(id, data) {
+    return put(`/api/v0/admin/categories/${id}`, data)
+  },
+
+  // 转换通知为日程（需认证）
+  convertToSchedule(id, data) {
+    return post(`/api/v0/admin/notifications/${id}/schedule`, data)
+  },
+
+  // 获取通知统计信息（管理员专用）
+  getNotificationStats() {
+    return get('/api/v0/admin/notifications/stats')
+  },
+
+  // 置顶通知（管理员专用）
+  pinNotification(id) {
+    return post(`/api/v0/admin/notifications/${id}/pin`)
+  },
+
+  // 取消置顶通知（管理员专用）
+  unpinNotification(id) {
+    return post(`/api/v0/admin/notifications/${id}/unpin`)
+  }
+}
+
+// 用户投稿相关API
+export const contributionAPI = {
+  // 创建投稿（需认证）
+  createContribution(data) {
+    return post('/api/v0/contributions', data)
+  },
+
+  // 获取投稿列表（需认证）
+  getContributions(params) {
+    return get('/api/v0/contributions', params)
+  },
+
+  // 获取投稿详情（需认证）
+  getContributionDetail(id) {
+    return get(`/api/v0/contributions/${id}`)
+  },
+
+  // 审核投稿（运营/管理员专用）
+  reviewContribution(id, data) {
+    return post(`/api/v0/contributions/${id}/review`, data)
+  },
+
+  // 获取用户投稿统计（需认证）
+  getContributionStats() {
+    return get('/api/v0/contributions/stats')
+  }
+}
+
 // 系统相关API
 export const systemAPI = {
   // 健康检查

@@ -14,6 +14,10 @@ export const useAuthStore = defineStore('auth', {
       return state.userInfo?.role === 2
     },
 
+    isOperator: (state) => {
+      return state.userInfo?.role === 3
+    },
+
     userId: (state) => {
       return state.userInfo?.id
     },

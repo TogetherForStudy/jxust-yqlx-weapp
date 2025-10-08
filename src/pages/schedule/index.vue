@@ -460,12 +460,15 @@ const showHelpGuide = () => {
 const loadCourseData = async () => {
   if (authStore.userClass && !scheduleStore.isLoading) {
     try {
-      await authStore.fetchUserInfo()
-      await scheduleStore.fetchCourseTable()
-      // 设置当前周为系统计算的当前周
-      scheduleStore.setCurrentWeek(scheduleStore.currentWeekNumber)
-      // 显示功能指示弹窗（包含离线数据提醒）
-      showHelpGuide()
+      if (Object.keys(scheduleStore.courseData).length === 0) {
+        await authStore.fetchUserInfo()
+        await scheduleStore.fetchCourseTable()
+
+        // 设置当前周为系统计算的当前周
+        scheduleStore.setCurrentWeek(scheduleStore.currentWeekNumber)
+        // 显示功能指示弹窗（包含离线数据提醒）
+        showHelpGuide()
+      }
     } catch (error) {
       if (error.message && error.message.includes('未设置班级')) {
         // 用户未绑定班级，显示绑定提示
@@ -482,7 +485,6 @@ const loadCourseData = async () => {
 
 // 页面加载时初始化
 onMounted(async () => {
-  await loadCourseData()
   // 监听 reloadSchedule 事件，收到后刷新课表
   Taro.eventCenter.on('reloadSchedule', () => {
     loadCourseData()
@@ -491,12 +493,7 @@ onMounted(async () => {
 
 // 页面显示时检查是否需要重新加载数据
 Taro.useDidShow(async () => {
-  // 等待2秒后再执行
-  await new Promise(resolve => setTimeout(resolve, 2000))
-  // 如果用户有班级信息但课程表数据为空，则重新加载
-  if (authStore.userClass && Object.keys(scheduleStore.courseData).length === 0) {
     await loadCourseData()
-  }
 })
 </script>
 
