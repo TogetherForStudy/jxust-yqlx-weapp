@@ -97,12 +97,12 @@
             </view>
           </view>
 
-          <!-- 四、内容规范与课程表使用规则 -->
+          <!-- 四、内容规范与服务使用规则 -->
           <view class="space-y-3">
-            <text class="text-lg font-semibold text-gray-800 block">四、内容规范与课程表使用规则</text>
+            <text class="text-lg font-semibold text-gray-800 block">四、内容规范与服务使用规则</text>
             <view class="pl-3 space-y-2">
               <text class="text-sm text-gray-700 block leading-relaxed">
-                1. 本条所指内容包括但不限于用户在本小程序注册时提交的信息（头像、姓名、学号、院系等）、用户在课程选课、评价、上传的文字、语音、图片、视频、链接等一切行为产生的内容（统称{{ quot }}用户内容{{ quot }}）。
+                1. 本条所指内容包括但不限于用户在本小程序提交的信息、用户在服务使用过程中上传的文字、语音、图片、视频、链接等一切行为产生的内容（统称{{ quot }}用户内容{{ quot }}）。
               </text>
               <text class="text-sm text-gray-700 block leading-relaxed">
                 2. 您不得利用本小程序制作、上传、发布、传播以下法律法规禁止的内容：
@@ -251,7 +251,7 @@
       <!-- 底部提示 -->
       <view class="text-center py-6">
         <text class="text-xs text-gray-500">
-          本协议最后更新时间：2025-09-02
+          本协议最后更新时间：2025-10-09
         </text>
       </view>
     </view>
