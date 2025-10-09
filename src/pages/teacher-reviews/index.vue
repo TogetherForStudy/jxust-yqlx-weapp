@@ -517,7 +517,7 @@ const selectTeacher = async (teacherName) => {
     console.error("获取教师评价失败:", error);
     Taro.showToast({
       title: "获取评价失败",
-      icon: "none",
+      icon: "error",
     });
   }
 };
@@ -609,7 +609,7 @@ const submitReview = async () => {
   } catch (error) {
     Taro.showToast({
       title: error.message || "提交失败",
-      icon: "none",
+      icon: "error",
     });
   } finally {
     submitting.value = false;

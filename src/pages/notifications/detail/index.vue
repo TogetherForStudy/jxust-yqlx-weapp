@@ -415,7 +415,7 @@ const fetchNotificationDetail = async () => {
     console.error('获取信息详情失败:', error)
     Taro.showToast({
       title: '加载失败',
-      icon: 'none'
+      icon: 'error'
     })
   } finally {
     isLoading.value = false
@@ -551,7 +551,7 @@ const convertToSchedule = async () => {
   if (!scheduleForm.value.title.trim()) {
     Taro.showToast({
       title: '请输入日程标题',
-      icon: 'none'
+      icon: 'error'
     })
     return
   }
@@ -561,7 +561,7 @@ const convertToSchedule = async () => {
   if (validTimeSlots.length === 0) {
     Taro.showToast({
       title: '请至少添加一个时间段',
-      icon: 'none'
+      icon: 'error'
     })
     return
   }
@@ -572,14 +572,14 @@ const convertToSchedule = async () => {
     if (!slot.startDate) {
       Taro.showToast({
         title: `请设置时间段${i + 1}的开始日期`,
-        icon: 'none'
+        icon: 'error'
       })
       return
     }
     if (!slot.isAllDay && !slot.startTime) {
       Taro.showToast({
         title: `请设置时间段${i + 1}的开始时间`,
-        icon: 'none'
+        icon: 'error'
       })
       return
     }
@@ -617,7 +617,7 @@ const convertToSchedule = async () => {
     console.error('转换为日程失败:', error)
     Taro.showToast({
       title: '添加失败',
-      icon: 'none'
+      icon: 'error'
     })
   }
 }

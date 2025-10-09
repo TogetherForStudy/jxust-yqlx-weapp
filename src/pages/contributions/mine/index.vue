@@ -37,7 +37,7 @@
     <view class="p-4 flex-1 h-[1px]">
       <scroll-view :scroll-y="true" class="h-full" @scrolltolower="loadMore" :lower-threshold="100">
         <!-- 加载状态 -->
-        <view v-if="notificationStore.isLoading && contributions.length === 0" class="mt-4">
+        <view v-if="notificationStore.isLoading && contributions.length === 0">
           <view class="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
             <view class="flex items-center justify-center">
               <text class="text-gray-500 text-sm">加载中...</text>
@@ -46,7 +46,7 @@
         </view>
 
         <!-- 空状态 -->
-        <view v-else-if="contributions.length === 0" class="mt-4">
+        <view v-else-if="contributions.length === 0">
           <view class="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
             <view class="flex flex-col items-center justify-center">
               <text class="i-lucide-file-text text-gray-300 text-4xl mb-2"></text>
@@ -239,7 +239,7 @@ const initPage = async () => {
     console.error('初始化页面失败:', error)
     Taro.showToast({
       title: '加载失败',
-      icon: 'none'
+      icon: 'error'
     })
   }
 }
@@ -275,7 +275,7 @@ const refreshStats = async () => {
     console.error('刷新统计失败:', error)
     Taro.showToast({
       title: '刷新失败',
-      icon: 'none'
+      icon: 'error'
     })
   }
 }

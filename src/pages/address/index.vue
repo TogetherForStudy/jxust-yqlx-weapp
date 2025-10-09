@@ -98,7 +98,7 @@ const copyText = (text, type) => {
     fail: () => {
       Taro.showToast({
         title: "复制失败",
-        icon: "none",
+        icon: "error",
         duration: 2000
       });
     }

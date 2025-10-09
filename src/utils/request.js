@@ -64,7 +64,7 @@ export const request = (options) => {
       // 显示错误提示
       Taro.showToast({
         title: error.message || '网络错误',
-        icon: 'none',
+        icon: 'error',
         duration: 2000
       })
 

@@ -139,7 +139,7 @@ const initPage = async () => {
     console.error('初始化页面失败:', error)
     Taro.showToast({
       title: '加载失败',
-      icon: 'none'
+      icon: 'error'
     })
   }
 }
@@ -190,7 +190,7 @@ const submitContribution = async () => {
   if (!validateForm()) {
     Taro.showToast({
       title: '请检查表单信息',
-      icon: 'none'
+      icon: 'error'
     })
     return
   }
@@ -220,7 +220,7 @@ const submitContribution = async () => {
     console.error('提交投稿失败:', error)
     Taro.showToast({
       title: error.message || '提交失败',
-      icon: 'none'
+      icon: 'error'
     })
   } finally {
     isSubmitting.value = false

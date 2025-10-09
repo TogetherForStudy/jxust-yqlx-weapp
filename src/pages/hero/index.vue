@@ -77,7 +77,7 @@ const fetchHeroes = async () => {
     console.error('获取英雄名单失败:', error)
     Taro.showToast({
       title: '获取英雄名单失败',
-      icon: 'none',
+      icon: 'error',
       duration: 2000
     })
     heroes.value = []

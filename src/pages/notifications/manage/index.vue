@@ -47,7 +47,7 @@
     <view class="p-4 flex-1 h-[1px]">
       <scroll-view :scroll-y="true" class="h-full" @scrolltolower="loadMore" :lower-threshold="100">
         <!-- 加载状态 -->
-        <view v-if="notificationStore.isLoading && notifications.length === 0" class="mt-4">
+        <view v-if="notificationStore.isLoading && notifications.length === 0">
           <view class="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
             <view class="flex items-center justify-center">
               <text class="text-gray-500 text-sm">加载中...</text>
@@ -56,7 +56,7 @@
         </view>
 
         <!-- 空状态 -->
-        <view v-else-if="notifications.length === 0" class="mt-4">
+        <view v-else-if="notifications.length === 0">
           <view class="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
             <view class="flex flex-col items-center justify-center">
               <text class="i-lucide-bell-off text-gray-300 text-4xl mb-2"></text>
@@ -434,7 +434,7 @@ onMounted(async () => {
   if (!isAdmin.value && !isOperator.value) {
     Taro.showToast({
       title: '权限不足',
-      icon: 'none'
+      icon: 'error'
     })
     setTimeout(() => {
       Taro.navigateBack()
@@ -470,7 +470,7 @@ const initPage = async () => {
     console.error('初始化页面失败:', error)
     Taro.showToast({
       title: '加载失败',
-      icon: 'none'
+      icon: 'error'
     })
   }
 }
@@ -663,7 +663,7 @@ const publishNotification = async (id) => {
       console.error('发布信息失败:', error)
       Taro.showToast({
         title: '发布失败',
-        icon: 'none'
+        icon: 'error'
       })
     }
   }
@@ -690,7 +690,7 @@ const publishAdminNotification = async (id) => {
       console.error('直通失败:', error)
       Taro.showToast({
         title: '发布失败',
-        icon: 'none'
+        icon: 'error'
       })
     }
   }
@@ -717,7 +717,7 @@ const deleteNotification = async (id) => {
       console.error('删除信息失败:', error)
       Taro.showToast({
         title: '删除失败',
-        icon: 'none'
+        icon: 'error'
       })
     }
   }
@@ -736,7 +736,7 @@ const submitApproval = async () => {
   if (approvalForm.value.status === 2 && !approvalForm.value.note.trim()) {
     Taro.showToast({
       title: '请填写拒绝原因',
-      icon: 'none'
+      icon: 'error'
     })
     return
   }
@@ -758,7 +758,7 @@ const submitApproval = async () => {
     console.error('审核信息失败:', error)
     Taro.showToast({
       title: '操作失败',
-      icon: 'none'
+      icon: 'error'
     })
   }
 }
@@ -791,7 +791,7 @@ const togglePin = async (notification) => {
       console.error(`${actionText}信息失败:`, error)
       Taro.showToast({
         title: `${actionText}失败`,
-        icon: 'none'
+        icon: 'error'
       })
     }
   }

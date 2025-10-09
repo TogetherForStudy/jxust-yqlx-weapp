@@ -622,7 +622,7 @@ const goToGroupChat = () => {
 const goToNoticeToZLK = () => {
   Taro.showToast({
     title: "请在资料库查找",
-    icon: "none",
+    icon: "success",
   });
 };
 

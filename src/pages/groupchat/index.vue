@@ -93,7 +93,7 @@ const loadGroupChatConfig = async () => {
     groupChatList.value = [];
     Taro.showToast({
       title: "加载失败",
-      icon: "none",
+      icon: "error",
     });
   } finally {
     loading.value = false;
@@ -116,7 +116,7 @@ const copyGroupId = async (groupId, groupName) => {
     console.error("复制失败:", error);
     Taro.showToast({
       title: "复制失败",
-      icon: "none",
+      icon: "error",
     });
   }
 };

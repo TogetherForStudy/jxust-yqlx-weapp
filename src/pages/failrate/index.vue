@@ -149,7 +149,7 @@ const loadRandomData = async () => {
     console.error("获取随机挂科率数据失败:", error);
     Taro.showToast({
       title: "加载失败",
-      icon: "none",
+      icon: "error",
     });
   } finally {
     loading.value = false;
@@ -185,7 +185,7 @@ const searchFailRate = async (keyword, page = 1) => {
     console.error("搜索挂科率数据失败:", error);
     Taro.showToast({
       title: "搜索失败",
-      icon: "none",
+      icon: "error",
     });
   } finally {
     loading.value = false;
