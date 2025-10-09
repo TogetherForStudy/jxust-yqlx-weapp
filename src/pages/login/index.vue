@@ -16,11 +16,35 @@
         <text class="text-gray-600">学习生活信息共享交流平台</text>
       </view>
 
+      <!-- 条款同意 -->
+      <view class="bg-white rounded-xl p-4 mb-4 shadow-sm">
+        <view class="flex items-center">
+          <view
+            class="flex-shrink-0 w-5 h-5 border-2 rounded flex items-center justify-center mr-3"
+            :class="isTermsAgreed ? 'bg-blue-500 border-blue-500' : 'border-gray-300'"
+            @tap="toggleTermsAgreement"
+          >
+            <text v-if="isTermsAgreed" class="text-white text-xs">✓</text>
+          </view>
+          <view class="flex-1">
+            <text class="text-sm text-gray-700">
+              我已阅读并同意
+            </text>
+            <text @tap="goToTermsOfService" class="text-sm text-blue-500 underline">
+              《用户协议与法律协议》
+            </text>
+          </view>
+        </view>
+      </view>
+
       <!-- 登录按钮 -->
       <view class="space-y-4">
         <view
-          class="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-4 px-6 rounded-xl font-bold shadow-lg active:scale-95 transition-transform duration-200 text-center"
-          :class="{ 'opacity-50': isLoading }"
+          class="w-full py-4 px-6 rounded-xl font-bold shadow-lg transition-all duration-200 text-center"
+          :class="[
+            isLoading ? 'opacity-50' : '',
+            canLogin ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white active:scale-95' : 'bg-gray-300 text-gray-500'
+          ]"
           @tap="handleWechatLogin"
         >
           <text v-if="!isLoading">
@@ -29,12 +53,9 @@
           <text v-else>登录中...</text>
         </view>
 
-        <view class="text-center">
-          <text class="text-xs text-gray-500 mt-4">
-            登录即表示同意
-          </text>
-          <text @tap="goToTermsOfService" class="text-xs underline text-blue-500 mt-4">
-            使用条款
+        <view v-if="!isTermsAgreed" class="text-center">
+          <text class="text-xs text-red-500">
+            请先阅读并同意用户协议
           </text>
         </view>
       </view>
@@ -56,13 +77,24 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useAuthStore } from '../../stores/auth'
 import Taro from '@tarojs/taro'
 import LogoPng from './logo.png'
 
 const authStore = useAuthStore()
 const isLoading = ref(false)
+const isTermsAgreed = ref(false)
+
+// 计算是否可以登录
+const canLogin = computed(() => {
+  return isTermsAgreed.value && !isLoading.value
+})
+
+// 切换条款同意状态
+const toggleTermsAgreement = () => {
+  isTermsAgreed.value = !isTermsAgreed.value
+}
 
 const goToTermsOfService = () => {
   Taro.navigateTo({ url: '/pages/terms-of-service/index' })
@@ -71,6 +103,16 @@ const goToTermsOfService = () => {
 // 微信登录
 const handleWechatLogin = async () => {
   if (isLoading.value) return
+
+  // 检查是否同意条款
+  if (!isTermsAgreed.value) {
+    Taro.showToast({
+      title: '请先阅读并同意用户协议',
+      icon: 'none',
+      duration: 2000
+    })
+    return
+  }
 
   try {
     isLoading.value = true
