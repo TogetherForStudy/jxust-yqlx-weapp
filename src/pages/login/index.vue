@@ -16,8 +16,25 @@
         <text class="text-gray-600">学习生活信息共享交流平台</text>
       </view>
 
+      <!-- 登录按钮 -->
+      <view class="space-y-4">
+        <view
+          class="w-full py-4 px-6 rounded-xl font-bold shadow-lg transition-all duration-200 text-center"
+          :class="[
+            isLoading ? 'opacity-50' : '',
+            canLogin ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white active:scale-95' : 'bg-gray-300 text-gray-500'
+          ]"
+          @tap="handleWechatLogin"
+        >
+          <text v-if="!isLoading">
+            微信一键登录
+          </text>
+          <text v-else>登录中...</text>
+        </view>
+      </view>
+
       <!-- 条款同意 -->
-      <view class="bg-white rounded-xl p-4 mb-4 shadow-sm">
+      <view class="p-4 mb-4">
         <view class="flex items-center">
           <view
             class="flex-shrink-0 w-5 h-5 border-2 rounded flex items-center justify-center mr-3"
@@ -34,29 +51,6 @@
               《用户协议与法律协议》
             </text>
           </view>
-        </view>
-      </view>
-
-      <!-- 登录按钮 -->
-      <view class="space-y-4">
-        <view
-          class="w-full py-4 px-6 rounded-xl font-bold shadow-lg transition-all duration-200 text-center"
-          :class="[
-            isLoading ? 'opacity-50' : '',
-            canLogin ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white active:scale-95' : 'bg-gray-300 text-gray-500'
-          ]"
-          @tap="handleWechatLogin"
-        >
-          <text v-if="!isLoading">
-            微信一键登录
-          </text>
-          <text v-else>登录中...</text>
-        </view>
-
-        <view v-if="!isTermsAgreed" class="text-center">
-          <text class="text-xs text-red-500">
-            请先阅读并同意用户协议
-          </text>
         </view>
       </view>
     </view>
@@ -121,7 +115,7 @@ const handleWechatLogin = async () => {
 
     // 登录成功，返回上一页或跳转到首页
     setTimeout(() => {
-      Taro.switchTab({ url: '/pages/discover/index' })
+      Taro.switchTab({ url: '/pages/home/index' })
     }, 1000)
 
   } catch (error) {
@@ -135,7 +129,7 @@ const handleWechatLogin = async () => {
 Taro.useDidShow(() => {
   if (authStore.isLoggedIn) {
     // 已登录，跳转到首页
-    Taro.switchTab({ url: '/pages/discover/index' })
+    Taro.switchTab({ url: '/pages/home/index' })
   }
 })
 </script>
