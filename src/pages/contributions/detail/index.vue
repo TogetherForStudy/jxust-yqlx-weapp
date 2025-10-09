@@ -253,7 +253,7 @@ const fetchContributionDetail = async () => {
     console.error('获取投稿详情失败:', error)
     Taro.showToast({
       title: '加载失败',
-      icon: 'none'
+      icon: 'error'
     })
   } finally {
     isLoading.value = false
@@ -313,7 +313,7 @@ const deleteContribution = async () => {
       console.error('删除投稿失败:', error)
       Taro.showToast({
         title: '删除失败',
-        icon: 'none'
+        icon: 'error'
       })
     }
   }

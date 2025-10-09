@@ -37,7 +37,7 @@
     <view class="p-4 flex-1 h-[1px]">
       <scroll-view :scroll-y="true" class="h-full" @scrolltolower="loadMore" :lower-threshold="100">
         <!-- 加载状态 -->
-        <view v-if="notificationStore.isLoading && contributions.length === 0" class="mt-4">
+        <view v-if="notificationStore.isLoading && contributions.length === 0">
           <view class="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
             <view class="flex items-center justify-center">
               <text class="text-gray-500 text-sm">加载中...</text>
@@ -46,7 +46,7 @@
         </view>
 
         <!-- 空状态 -->
-        <view v-else-if="contributions.length === 0" class="mt-4">
+        <view v-else-if="contributions.length === 0">
           <view class="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
             <view class="flex flex-col items-center justify-center">
               <text class="i-lucide-file-text text-gray-300 text-4xl mb-2"></text>
@@ -66,7 +66,7 @@
               </text>
             </view>
 
-            <view class="grid grid-cols-4 gap-3">
+            <view class="grid grid-cols-5 gap-1">
               <view class="text-center">
                 <text class="text-lg font-bold text-gray-800 block">{{ stats.total }}</text>
                 <text class="text-xs text-gray-500">总数</text>
@@ -82,6 +82,10 @@
               <view class="text-center">
                 <text class="text-lg font-bold text-red-600 block">{{ stats.rejected }}</text>
                 <text class="text-xs text-gray-500">已拒绝</text>
+              </view>
+              <view class="text-center">
+                <text class="text-lg font-bold text-cyan-600 block">{{ stats.points }}</text>
+                <text class="text-xs text-gray-500">总积分</text>
               </view>
             </view>
           </view>
@@ -346,10 +350,11 @@ const isAdmin = computed(() => authStore.isAdmin)
 
 const stats = computed(() => {
   return {
-    total: notificationStore.contributionStats.total_count,
-    pending: notificationStore.contributionStats.pending_count,
-    approved: notificationStore.contributionStats.approved_count,
-    rejected: notificationStore.contributionStats.rejected_count
+    total: notificationStore.adminContributionStats.total_count,
+    pending: notificationStore.adminContributionStats.pending_count,
+    approved: notificationStore.adminContributionStats.approved_count,
+    rejected: notificationStore.adminContributionStats.rejected_count,
+    points: notificationStore.adminContributionStats.total_points
   }
 })
 
@@ -363,7 +368,7 @@ onMounted(async () => {
   if (!isAdmin.value) {
     Taro.showToast({
       title: '权限不足',
-      icon: 'none'
+      icon: 'error'
     })
     setTimeout(() => {
       Taro.navigateBack()
@@ -395,13 +400,13 @@ const initPage = async () => {
     await Promise.all([
       notificationStore.fetchCategories(),
       notificationStore.fetchContributions({ page: 1, status: 1 }),
-      notificationStore.fetchContributionStats()
+      notificationStore.fetchContributionStatsAdmin()
     ])
   } catch (error) {
     console.error('初始化页面失败:', error)
     Taro.showToast({
       title: '加载失败',
-      icon: 'none'
+      icon: 'error'
     })
   }
 }
@@ -431,7 +436,7 @@ const refreshData = async () => {
 
   await Promise.all([
     notificationStore.fetchContributions(params),
-    notificationStore.fetchContributionStats()
+    notificationStore.fetchContributionStatsAdmin()
   ])
   Taro.showToast({
     title: '刷新成功',
@@ -528,7 +533,7 @@ const submitReview = async () => {
   if (reviewForm.value.status === 3 && !reviewForm.value.reviewNote.trim()) {
     Taro.showToast({
       title: '请填写拒绝原因',
-      icon: 'none'
+      icon: 'error'
     })
     return
   }
@@ -537,7 +542,7 @@ const submitReview = async () => {
     if (!reviewForm.value.title.trim()) {
       Taro.showToast({
         title: '请填写信息标题',
-        icon: 'none'
+        icon: 'error'
       })
       return
     }
@@ -545,7 +550,7 @@ const submitReview = async () => {
     if (!reviewForm.value.content.trim()) {
       Taro.showToast({
         title: '请填写信息内容',
-        icon: 'none'
+        icon: 'error'
       })
       return
     }
@@ -553,7 +558,7 @@ const submitReview = async () => {
     if (reviewForm.value.categories.length === 0) {
       Taro.showToast({
         title: '请选择至少一个分类',
-        icon: 'none'
+        icon: 'error'
       })
       return
     }
@@ -583,7 +588,7 @@ const submitReview = async () => {
     console.error('审核投稿失败:', error)
     Taro.showToast({
       title: '操作失败',
-      icon: 'none'
+      icon: 'error'
     })
   }
 }

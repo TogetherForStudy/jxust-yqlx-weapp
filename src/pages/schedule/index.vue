@@ -350,7 +350,7 @@ const handleDeleteCourse = async (data) => {
     console.error('删除课程失败:', error)
     Taro.showToast({
       title: '删除失败',
-      icon: 'none'
+      icon: 'error'
     })
   }
 }
@@ -385,7 +385,7 @@ const handleSubmitCourse = async (submitData) => {
   } catch (error) {
     Taro.showToast({
       title: '保存失败',
-      icon: 'none'
+      icon: 'error'
     })
   }
 }
@@ -477,7 +477,7 @@ const loadCourseData = async () => {
 
       Taro.showToast({
         title: '获取课程表失败',
-        icon: 'none'
+        icon: 'error'
       })
     }
   }

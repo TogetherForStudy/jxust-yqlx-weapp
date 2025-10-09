@@ -93,7 +93,7 @@
     <!-- 通知列表 -->
     <view class="p-4 flex-1 h-[1px]">
       <!-- 加载状态 -->
-      <view v-if="notificationStore.isLoading && notifications.length === 0" class="mt-4">
+      <view v-if="notificationStore.isLoading && notifications.length === 0">
         <view class="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
           <view class="flex items-center justify-center">
             <text class="text-gray-500 text-sm">加载中...</text>
@@ -102,7 +102,7 @@
       </view>
 
       <!-- 空状态 -->
-      <view v-else-if="notifications.length === 0" class="mt-4">
+      <view v-else-if="notifications.length === 0">
         <view class="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
           <view class="flex flex-col items-center justify-center">
             <text class="i-lucide-bell-off text-gray-300 text-4xl mb-2"></text>
@@ -114,7 +114,7 @@
       <!-- 通知卡片列表 -->
       <scroll-view v-else :scroll-y="true" class="h-full" @scrolltolower="loadMore" :lower-threshold="100">
         <!-- 用户投稿区 -->
-        <view v-if="authStore.isLoggedIn" class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+        <view v-if="authStore.isLoggedIn && authStore.userInfo.role === 1" class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 mb-4">
           <view class="flex justify-between items-center mb-3">
             <text class="text-gray-800 font-medium">贡献信息差</text>
             <text class="text-blue-500 text-sm" @tap="goToMyContributions">
@@ -154,7 +154,7 @@
           </view>
         </view>
 
-        <view class="space-y-3 mt-4">
+        <view class="space-y-3">
           <view v-for="notification in notifications" :key="notification.id"
             class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 active:scale-98 transition-transform"
             @tap="goToNotificationDetail(notification)">
@@ -291,7 +291,7 @@ const initPage = async () => {
     console.error("初始化页面失败:", error);
     Taro.showToast({
       title: "加载失败",
-      icon: "none",
+      icon: "error",
     });
   }
 };

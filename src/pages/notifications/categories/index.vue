@@ -264,7 +264,7 @@ onMounted(async () => {
   if (!isAdmin.value) {
     Taro.showToast({
       title: '权限不足',
-      icon: 'none'
+      icon: 'error'
     })
     setTimeout(() => {
       Taro.navigateBack()
@@ -283,7 +283,7 @@ const initPage = async () => {
     console.error('初始化页面失败:', error)
     Taro.showToast({
       title: '加载失败',
-      icon: 'none'
+      icon: 'error'
     })
   }
 }
@@ -300,7 +300,7 @@ const refreshData = async () => {
     console.error('刷新数据失败:', error)
     Taro.showToast({
       title: '刷新失败',
-      icon: 'none'
+      icon: 'error'
     })
   }
 }
@@ -373,7 +373,7 @@ const submitCategory = async () => {
   if (!validateForm()) {
     Taro.showToast({
       title: '请检查表单信息',
-      icon: 'none'
+      icon: 'error'
     })
     return
   }
@@ -410,7 +410,7 @@ const submitCategory = async () => {
     console.error('提交分类失败:', error)
     Taro.showToast({
       title: error.message || '操作失败',
-      icon: 'none'
+      icon: 'error'
     })
   } finally {
     isSubmitting.value = false
@@ -438,7 +438,7 @@ const toggleCategoryStatus = async (category) => {
     console.error('切换状态失败:', error)
     Taro.showToast({
       title: '操作失败',
-      icon: 'none'
+      icon: 'error'
     })
   }
 }
@@ -457,7 +457,7 @@ const deleteCategory = async (id) => {
 
       Taro.showToast({
         title: '删除功能暂未开放',
-        icon: 'none'
+        icon: 'error'
       })
 
       // Taro.showToast({
@@ -470,7 +470,7 @@ const deleteCategory = async (id) => {
       console.error('删除分类失败:', error)
       Taro.showToast({
         title: '删除失败',
-        icon: 'none'
+        icon: 'error'
       })
     }
   }

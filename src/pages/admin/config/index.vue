@@ -446,7 +446,7 @@ const fetchAllConfigs = async (page = 1, keyword = '') => {
     console.error("获取配置失败:", error);
     Taro.showToast({
       title: error.message || "获取数据失败",
-      icon: "none",
+      icon: "error",
     });
   } finally {
     loading.value = false;
@@ -633,7 +633,7 @@ const confirmSave = async () => {
   } catch (error) {
     Taro.showToast({
       title: error.message || "保存失败",
-      icon: "none",
+      icon: "error",
     });
   } finally {
     saving.value = false;
@@ -688,7 +688,7 @@ const copyConfigValue = async (config) => {
   } catch (error) {
     Taro.showToast({
       title: "复制失败",
-      icon: "none",
+      icon: "error",
     });
   }
 };
@@ -723,7 +723,7 @@ const confirmDelete = async () => {
   } catch (error) {
     Taro.showToast({
       title: error.message || "删除失败",
-      icon: "none",
+      icon: "error",
     });
   } finally {
     deleting.value = false;
@@ -736,7 +736,7 @@ onMounted(async () => {
   if (!authStore.isAdmin) {
     Taro.showToast({
       title: "权限不足",
-      icon: "none",
+      icon: "error",
     });
     Taro.navigateBack();
     return;

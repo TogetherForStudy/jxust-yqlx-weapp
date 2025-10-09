@@ -407,7 +407,7 @@ const onSearchInput = (e) => {
       console.error("搜索失败:", error);
       Taro.showToast({
         title: "搜索失败",
-        icon: "none",
+        icon: "error",
       });
     }
   }, 300);
@@ -436,7 +436,7 @@ const selectStatusFilter = async (status) => {
     console.error("筛选失败:", error);
     Taro.showToast({
       title: "筛选失败",
-      icon: "none",
+      icon: "error",
     });
   }
 };
@@ -451,7 +451,7 @@ const refreshData = async () => {
   } catch (error) {
     Taro.showToast({
       title: "刷新失败",
-      icon: "none",
+      icon: "error",
     });
   }
 };
@@ -492,7 +492,7 @@ const loadMoreReviews = async () => {
     console.error("加载更多评价失败:", error);
     Taro.showToast({
       title: "加载失败",
-      icon: "none",
+      icon: "error",
     });
   }
 };
@@ -537,7 +537,7 @@ const confirmApprove = async () => {
   } catch (error) {
     Taro.showToast({
       title: error.message || "审核失败",
-      icon: "none",
+      icon: "error",
     });
   } finally {
     approving.value = false;
@@ -574,7 +574,7 @@ const confirmReject = async () => {
   } catch (error) {
     Taro.showToast({
       title: error.message || "操作失败",
-      icon: "none",
+      icon: "error",
     });
   } finally {
     rejecting.value = false;
@@ -608,7 +608,7 @@ const confirmDelete = async () => {
   } catch (error) {
     Taro.showToast({
       title: error.message || "删除失败",
-      icon: "none",
+      icon: "error",
     });
   } finally {
     deleting.value = false;
@@ -621,7 +621,7 @@ onMounted(async () => {
   if (!authStore.isAdmin) {
     Taro.showToast({
       title: "权限不足",
-      icon: "none",
+      icon: "error",
     });
     Taro.navigateBack();
     return;

@@ -25,6 +25,15 @@ export const useNotificationStore = defineStore('notifications', {
       total_points: 0
     },
 
+    // 管理员投稿统计数据
+    adminContributionStats: {
+      total_count: 0,
+      pending_count: 0,
+      approved_count: 0,
+      rejected_count: 0,
+      total_points: 0
+    },
+
     // 通知统计数据
     notificationStats: {
       total_count: 0,
@@ -378,6 +387,18 @@ export const useNotificationStore = defineStore('notifications', {
       }
     },
 
+    // 获取管理员投稿统计（管理员专用）
+    async fetchContributionStatsAdmin() {
+      try {
+        const result = await contributionAPI.getContributionStatsAdmin()
+        this.adminContributionStats = result.data || result
+        return result
+      } catch (error) {
+        console.error('获取管理员投稿统计失败:', error)
+        throw error
+      }
+    },
+
     // 获取通知统计（管理员专用）
     async fetchNotificationStats() {
       try {
@@ -475,6 +496,28 @@ export const useNotificationStore = defineStore('notifications', {
       this.adminNotificationDetail = null
       this.contributions = []
       this.contributionDetail = null
+
+      // 重置统计数据
+      this.contributionStats = {
+        total_count: 0,
+        pending_count: 0,
+        approved_count: 0,
+        rejected_count: 0,
+        total_points: 0
+      }
+      this.adminContributionStats = {
+        total_count: 0,
+        pending_count: 0,
+        approved_count: 0,
+        rejected_count: 0,
+        total_points: 0
+      }
+      this.notificationStats = {
+        total_count: 0,
+        draft_count: 0,
+        pending_count: 0,
+        published_count: 0
+      }
 
       // 重置通知分页状态
       this.notificationCurrentPage = 1

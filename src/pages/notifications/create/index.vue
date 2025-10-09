@@ -212,7 +212,7 @@ onMounted(async () => {
   if (!isAdmin.value && !isOperator.value) {
     Taro.showToast({
       title: '权限不足',
-      icon: 'none'
+      icon: 'error'
     })
     setTimeout(() => {
       Taro.navigateBack()
@@ -245,7 +245,7 @@ const initPage = async () => {
     console.error('初始化页面失败:', error)
     Taro.showToast({
       title: '加载失败',
-      icon: 'none'
+      icon: 'error'
     })
   }
 }
@@ -275,7 +275,7 @@ const loadNotificationForEdit = async () => {
     console.error('加载信息详情失败:', error)
     Taro.showToast({
       title: error.message || '加载失败',
-      icon: 'none'
+      icon: 'error'
     })
     setTimeout(() => {
       Taro.navigateBack()
@@ -329,7 +329,7 @@ const submitNotification = async () => {
   if (!validateForm()) {
     Taro.showToast({
       title: '请检查表单',
-      icon: 'none'
+      icon: 'error'
     })
     return
   }
@@ -369,7 +369,7 @@ const submitNotification = async () => {
     console.error(isEditing.value ? '更新信息失败:' : '提交通息失败:', error)
     Taro.showToast({
       title: error.message || (isEditing.value ? '更新失败' : '提交失败'),
-      icon: 'none'
+      icon: 'error'
     })
   } finally {
     isSubmitting.value = false
@@ -381,7 +381,7 @@ const previewNotification = () => {
   if (!form.value.title.trim() && !form.value.content.trim()) {
     Taro.showToast({
       title: '请填写信息内容',
-      icon: 'none'
+      icon: 'error'
     })
     return
   }

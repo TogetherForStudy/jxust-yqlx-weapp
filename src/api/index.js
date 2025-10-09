@@ -280,6 +280,11 @@ export const contributionAPI = {
   // 获取用户投稿统计（需认证）
   getContributionStats() {
     return get('/api/v0/contributions/stats')
+  },
+
+  // 获取管理员投稿统计（管理员专用）
+  getContributionStatsAdmin() {
+    return get('/api/v0/contributions/stats-admin')
   }
 }
 

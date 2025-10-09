@@ -735,7 +735,7 @@ const submitTask = async () => {
   } catch (error) {
     Taro.showToast({
       title: error.message || "添加失败",
-      icon: "none",
+      icon: "error",
     });
   } finally {
     submitting.value = false;
@@ -775,7 +775,7 @@ const updateTask = async () => {
   } catch (error) {
     Taro.showToast({
       title: error.message || "更新失败",
-      icon: "none",
+      icon: "error",
     });
   } finally {
     submitting.value = false;
@@ -806,7 +806,7 @@ const deleteTask = async () => {
     } catch (error) {
       Taro.showToast({
         title: error.message || "删除失败",
-        icon: "none",
+        icon: "error",
       });
     }
   }
@@ -840,7 +840,7 @@ const toggleTaskStatus = async (taskId) => {
   } catch (error) {
     Taro.showToast({
       title: error.message || "更新失败",
-      icon: "none",
+      icon: "error",
     });
   }
 };

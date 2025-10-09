@@ -466,7 +466,7 @@ const submitCountdown = async () => {
   } catch (error) {
     Taro.showToast({
       title: error.message || '添加失败',
-      icon: 'none'
+      icon: 'error'
     })
   } finally {
     submitting.value = false
@@ -490,7 +490,7 @@ const updateCountdown = async () => {
   } catch (error) {
     Taro.showToast({
       title: error.message || '更新失败',
-      icon: 'none'
+      icon: 'error'
     })
   } finally {
     submitting.value = false
@@ -521,7 +521,7 @@ const deleteCountdown = async () => {
     } catch (error) {
       Taro.showToast({
         title: error.message || '删除失败',
-        icon: 'none'
+        icon: 'error'
       })
     }
   }

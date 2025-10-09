@@ -155,7 +155,7 @@ const search = async () => {
   if (!searchKeyword.value.trim()) {
     Taro.showToast({
       title: '请输入班级名称',
-      icon: 'none'
+      icon: 'error'
     })
     return
   }
@@ -173,8 +173,8 @@ const search = async () => {
   } catch (error) {
     console.error('搜索班级失败:', error)
     Taro.showToast({
-      title: '搜索失败，请重试',
-      icon: 'none'
+      title: '搜索失败',
+      icon: 'error'
     })
   } finally {
     isLoading.value = false
@@ -210,7 +210,7 @@ const loadPage = async () => {
     console.error('加载页面失败:', error)
     Taro.showToast({
       title: '加载失败，请重试',
-      icon: 'none'
+      icon: 'error'
     })
   } finally {
     isLoading.value = false
@@ -252,7 +252,7 @@ const confirmBind = async () => {
     console.error('绑定班级失败:', error)
     Taro.showToast({
       title: '请联系客服',
-      icon: 'none'
+      icon: 'error'
     })
   } finally {
     isBinding.value = false

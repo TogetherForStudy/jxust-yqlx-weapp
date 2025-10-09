@@ -102,7 +102,7 @@ const handleWechatLogin = async () => {
   if (!isTermsAgreed.value) {
     Taro.showToast({
       title: '请先阅读并同意用户协议',
-      icon: 'none',
+      icon: 'error',
       duration: 2000
     })
     return
