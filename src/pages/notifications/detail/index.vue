@@ -653,6 +653,24 @@ const formatDateTime = (dateString) => {
 const goBack = () => {
   Taro.navigateBack()
 }
+
+Taro.useShareAppMessage((res) => {
+    if (res.from === 'button') {
+    }
+    return {
+      title: notification.value.title,
+      path: '/pages/notifications/detail/index?id='+notificationId.value,
+    }
+  })
+
+Taro.useShareTimeline((res) => {
+    if (res.from === 'button') {
+    }
+    return {
+      title: notification.value.title,
+      path: '/pages/notifications/detail/index?id='+notificationId.value,
+    }
+  })
 </script>
 
 <style>
