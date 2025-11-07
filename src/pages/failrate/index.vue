@@ -149,7 +149,7 @@ const loadRandomData = async () => {
     console.error("获取随机挂科率数据失败:", error);
     Taro.showToast({
       title: "加载失败",
-      icon: "none",
+      icon: "error",
     });
   } finally {
     loading.value = false;
@@ -185,7 +185,7 @@ const searchFailRate = async (keyword, page = 1) => {
     console.error("搜索挂科率数据失败:", error);
     Taro.showToast({
       title: "搜索失败",
-      icon: "none",
+      icon: "error",
     });
   } finally {
     loading.value = false;
@@ -226,4 +226,22 @@ const loadMore = () => {
 onMounted(() => {
   loadRandomData();
 });
+
+Taro.useShareAppMessage((res) => {
+    if (res.from === 'button') {
+    }
+    return {
+      title: '江理一起来学小程序',
+      path: '/pages/discover/index',
+    }
+  })
+
+Taro.useShareTimeline((res) => {
+    if (res.from === 'button') {
+    }
+    return {
+      title: '江理一起来学小程序',
+      path: '/pages/discover/index',
+    }
+  })
 </script>

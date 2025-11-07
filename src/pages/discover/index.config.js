@@ -1,3 +1,5 @@
 export default {
-  navigationBarTitleText: '发现'
+  navigationBarTitleText: '发现',
+  enableShareAppMessage: true,
+  enableShareTimeline: true
 }

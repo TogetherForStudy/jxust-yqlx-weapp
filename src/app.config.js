@@ -1,5 +1,6 @@
 export default {
   pages: [
+    'pages/home/index',
     'pages/schedule/index',
     'pages/schedule/schedule-bind/index',
     'pages/discover/index',
@@ -17,7 +18,18 @@ export default {
     'pages/hero/index',
     'pages/failrate/index',
     'pages/groupchat/index',
-    'pages/address/index'
+    'pages/address/index',
+    // 通知公告相关页面
+    'pages/notifications/index',
+    'pages/notifications/detail/index',
+    'pages/notifications/create/index',
+    'pages/notifications/manage/index',
+    'pages/notifications/categories/index',
+    // 用户投稿相关页面
+    'pages/contributions/create/index',
+    'pages/contributions/mine/index',
+    'pages/contributions/detail/index',
+    'pages/contributions/review/index',
   ],
   window: {
     backgroundTextStyle: 'light',
@@ -31,6 +43,12 @@ export default {
     backgroundColor: '#ffffff',
     borderStyle: 'black',
     list: [
+      {
+        pagePath: 'pages/home/index',
+        text: '首页',
+        iconPath: 'assets/icons/home.png',
+        selectedIconPath: 'assets/icons/home-active.png'
+      },
       {
         pagePath: 'pages/schedule/index',
         text: '课表',
