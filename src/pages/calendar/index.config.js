@@ -1,3 +1,5 @@
 export default {
-  navigationBarTitleText: '校历'
+  navigationBarTitleText: '校历',
+  enableShareAppMessage: true,
+  enableShareTimeline: true
 }

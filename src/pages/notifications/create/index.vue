@@ -396,7 +396,7 @@ const getSubmitButtonText = () => {
     return '保存修改'
   } else {
     // 创建新通知，所有用户都需要提交审核
-    return '提交审核'
+    return '发布信息'
   }
 }
 

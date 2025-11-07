@@ -363,6 +363,24 @@ const formatDate = (dateString) => {
   if (!dateString) return ''
   return formatDateTime(new Date(dateString), 'yyyy-MM-dd HH:mm')
 }
+
+Taro.useShareAppMessage((res) => {
+    if (res.from === 'button') {
+    }
+    return {
+      title: '江理一起来学信息投稿',
+      path: '/pages/contributions/mine/index',
+    }
+  })
+
+Taro.useShareTimeline((res) => {
+    if (res.from === 'button') {
+    }
+    return {
+      title: '江理一起来学信息投稿',
+      path: '/pages/contributions/mine/index',
+    }
+  })
 </script>
 
 <style>

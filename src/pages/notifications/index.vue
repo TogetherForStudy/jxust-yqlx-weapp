@@ -522,6 +522,24 @@ const hasScheduleData = (notification) => {
     notification.schedule.time_slots.length > 0
   );
 };
+
+Taro.useShareAppMessage((res) => {
+    if (res.from === 'button') {
+    }
+    return {
+      title: '江理一起来学信息海洋',
+      path: '/pages/notifications/index',
+    }
+  })
+
+Taro.useShareTimeline((res) => {
+    if (res.from === 'button') {
+    }
+    return {
+      title: '江理一起来学信息海洋',
+      path: '/pages/notifications/index',
+    }
+  })
 </script>
 
 <style>

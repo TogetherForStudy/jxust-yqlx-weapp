@@ -626,6 +626,23 @@ const goToNoticeToZLK = () => {
   });
 };
 
+Taro.useShareAppMessage((res) => {
+    if (res.from === 'button') {
+    }
+    return {
+      title: '江理一起来学发现功能',
+      path: '/pages/discover/index',
+    }
+  })
+
+Taro.useShareTimeline((res) => {
+    if (res.from === 'button') {
+    }
+    return {
+      title: '江理一起来学发现功能',
+      path: '/pages/discover/index',
+    }
+  })
 </script>
 
 <style scoped></style>

@@ -495,6 +495,24 @@ onMounted(async () => {
 Taro.useDidShow(async () => {
     await loadCourseData()
 })
+
+Taro.useShareAppMessage((res) => {
+    if (res.from === 'button') {
+    }
+    return {
+      title: '江理一起来学课程表',
+      path: '/pages/schedule/index',
+    }
+  })
+
+Taro.useShareTimeline((res) => {
+    if (res.from === 'button') {
+    }
+    return {
+      title: '江理一起来学课程表',
+      path: '/pages/schedule/index',
+    }
+  })
 </script>
 
 <style scoped>

@@ -228,6 +228,24 @@ const goToTermsOfService = () => {
 onMounted(() => {
   // 页面初始化时不需要自动打开编辑资料弹窗
 });
+
+Taro.useShareAppMessage((res) => {
+    if (res.from === 'button') {
+    }
+    return {
+      title: '江理一起来学小程序',
+      path: '/pages/home/index',
+    }
+  })
+
+Taro.useShareTimeline((res) => {
+    if (res.from === 'button') {
+    }
+    return {
+      title: '江理一起来学小程序',
+      path: '/pages/home/index',
+    }
+  })
 </script>
 
 <style scoped>
