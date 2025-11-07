@@ -14,6 +14,10 @@ export const useAuthStore = defineStore('auth', {
       return state.userInfo?.role === 2
     },
 
+    isOperator: (state) => {
+      return state.userInfo?.role === 3
+    },
+
     userId: (state) => {
       return state.userInfo?.id
     },
@@ -68,7 +72,7 @@ export const useAuthStore = defineStore('auth', {
 
         Taro.showToast({
           title: error.message || '登录失败',
-          icon: 'none'
+          icon: 'error'
         })
 
         throw error
@@ -118,7 +122,7 @@ export const useAuthStore = defineStore('auth', {
       Taro.removeStorageSync('userInfo')
       Taro.showToast({
         title: '请重新登录',
-        icon: 'none'
+        icon: 'error'
       })
       Taro.navigateTo({ url: '/pages/login/index' })
     },

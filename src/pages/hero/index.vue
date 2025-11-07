@@ -77,7 +77,7 @@ const fetchHeroes = async () => {
     console.error('获取英雄名单失败:', error)
     Taro.showToast({
       title: '获取英雄名单失败',
-      icon: 'none',
+      icon: 'error',
       duration: 2000
     })
     heroes.value = []
@@ -89,5 +89,23 @@ const fetchHeroes = async () => {
 onMounted(() => {
   fetchHeroes()
 })
+
+Taro.useShareAppMessage((res) => {
+    if (res.from === 'button') {
+    }
+    return {
+      title: '江理一起来学小程序',
+      path: '/pages/discover/index',
+    }
+  })
+
+Taro.useShareTimeline((res) => {
+    if (res.from === 'button') {
+    }
+    return {
+      title: '江理一起来学小程序',
+      path: '/pages/discover/index',
+    }
+  })
 </script>
 

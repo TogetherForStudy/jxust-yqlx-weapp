@@ -125,6 +125,24 @@ export const useScheduleStore = defineStore('schedule', {
       return false
     },
 
+    // 检查课程是否在今天周
+    isCourseInTodayWeek(weekStr) {
+      if (!weekStr) return false
+
+      const todayWeek = this.currentWeekNumber
+
+      // 解析周数字符串，例如 "1-4,6-17周", "10-17周", "1-4,6-17单周"
+      const weekRanges = weekStr.split(',')
+
+      for (const range of weekRanges) {
+        if (this.isWeekInRange(todayWeek, range.trim())) {
+          return true
+        }
+      }
+
+      return false
+    },
+
     // 检查周数是否在范围内
     isWeekInRange(week, rangeStr) {
       // 移除"周"字符

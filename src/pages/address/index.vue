@@ -98,10 +98,28 @@ const copyText = (text, type) => {
     fail: () => {
       Taro.showToast({
         title: "复制失败",
-        icon: "none",
+        icon: "error",
         duration: 2000
       });
     }
   });
 };
+
+Taro.useShareAppMessage((res) => {
+    if (res.from === 'button') {
+    }
+    return {
+      title: '江理一起来学小程序',
+      path: '/pages/discover/index',
+    }
+  })
+
+Taro.useShareTimeline((res) => {
+    if (res.from === 'button') {
+    }
+    return {
+      title: '江理一起来学小程序',
+      path: '/pages/discover/index',
+    }
+  })
 </script>

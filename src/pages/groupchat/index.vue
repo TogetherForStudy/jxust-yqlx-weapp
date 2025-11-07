@@ -93,7 +93,7 @@ const loadGroupChatConfig = async () => {
     groupChatList.value = [];
     Taro.showToast({
       title: "加载失败",
-      icon: "none",
+      icon: "error",
     });
   } finally {
     loading.value = false;
@@ -116,7 +116,7 @@ const copyGroupId = async (groupId, groupName) => {
     console.error("复制失败:", error);
     Taro.showToast({
       title: "复制失败",
-      icon: "none",
+      icon: "error",
     });
   }
 };
@@ -130,4 +130,22 @@ const applyToJoinGroup = async (groupName) => {
 onMounted(() => {
   loadGroupChatConfig();
 });
+
+Taro.useShareAppMessage((res) => {
+    if (res.from === 'button') {
+    }
+    return {
+      title: '江理一起来学小程序',
+      path: '/pages/discover/index',
+    }
+  })
+
+Taro.useShareTimeline((res) => {
+    if (res.from === 'button') {
+    }
+    return {
+      title: '江理一起来学小程序',
+      path: '/pages/discover/index',
+    }
+  })
 </script>

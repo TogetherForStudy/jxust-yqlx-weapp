@@ -1,4 +1,6 @@
 export default {
   navigationBarTitleText: '挂科率',
-  backgroundColor: '#f5f5f5'
+  backgroundColor: '#f5f5f5',
+  enableShareAppMessage: true,
+  enableShareTimeline: true
 }
