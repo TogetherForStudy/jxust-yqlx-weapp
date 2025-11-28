@@ -847,7 +847,12 @@ const toggleTaskStatus = async (taskId) => {
 
 // 加载数据
 const loadData = async (reset = true) => {
-  if (authStore.isLoggedIn && !isLoading.value) {
+  // 未登录时不发起请求
+  if (!authStore.isLoggedIn) {
+    return
+  }
+
+  if (!isLoading.value) {
     try {
       if (reset) {
         currentPage.value = 1;
