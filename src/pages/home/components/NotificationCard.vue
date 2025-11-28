@@ -80,13 +80,18 @@ const notifications = computed(() => {
 
 // 页面初始化
 onMounted(async () => {
-  if (notificationStore.notifications.length === 0) {
+  if (authStore.isLoggedIn && notificationStore.notifications.length === 0) {
     await loadNotifications()
   }
 })
 
 // 加载通知
 const loadNotifications = async () => {
+  // 未登录时不发起请求
+  if (!authStore.isLoggedIn) {
+    return
+  }
+
   try {
     await notificationStore.fetchNotifications({
       page: 1,

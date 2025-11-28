@@ -19,6 +19,8 @@ export default {
     'pages/failrate/index',
     'pages/groupchat/index',
     'pages/address/index',
+    'pages/final-review/index',
+    'pages/final-review/detail/index',
     // 通知公告相关页面
     'pages/notifications/index',
     'pages/notifications/detail/index',
@@ -30,6 +32,9 @@ export default {
     'pages/contributions/mine/index',
     'pages/contributions/detail/index',
     'pages/contributions/review/index',
+    // 资料库相关页面
+    'pages/materials/index',
+    'pages/materials/detail/index',
   ],
   window: {
     backgroundTextStyle: 'light',

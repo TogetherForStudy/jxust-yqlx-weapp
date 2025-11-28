@@ -38,7 +38,7 @@
         >
           <button class="flex items-center space-x-3 w-full h-full leading-normal text-base text-ms p-0 after:border-none bg-white hover:bg-gray-50" open-type="contact">
             <text class="i-lucide-phone"></text>
-            <text class="text-gray-800">联系客服</text>
+            <text class="text-gray-800">客服反馈</text>
           </button>
           <text class="i-lucide-chevron-right text-gray-400"></text>
         </view>
