@@ -61,7 +61,13 @@ export const reviewAPI = {
 
 // 课表相关API
 export const courseTableAPI = {
-  // 获取用户课程表
+  /**
+   * 获取用户课程表（支持版本检测）
+   * @param {object} params - 请求参数
+   * @param {string} params.semester - 学期标识（必填）
+   * @param {number} params.last_modified - 上次获取数据的时间戳（可选）
+   * @returns {Promise} 返回课表数据，包含 has_changes 标识
+   */
   getCourseTable(params) {
     return get('/api/v0/coursetable', params)
   },
@@ -164,6 +170,34 @@ export const ossAPI = {
       uri,
       expire_seconds: expireSeconds
     })
+  }
+}
+
+// 刷题相关API
+export const questionsAPI = {
+  // 获取项目列表
+  getProjects() {
+    return get('/api/v0/questions/projects')
+  },
+
+  // 获取题目ID列表
+  getQuestionIds(params) {
+    return get('/api/v0/questions/list', params)
+  },
+
+  // 获取题目详情
+  getQuestionDetail(id) {
+    return get(`/api/v0/questions/${id}`)
+  },
+
+  // 记录学习
+  recordStudy(data) {
+    return post('/api/v0/questions/study', data)
+  },
+
+  // 记录练习
+  recordPractice(data) {
+    return post('/api/v0/questions/practice', data)
   }
 }
 
@@ -285,6 +319,59 @@ export const contributionAPI = {
   // 获取管理员投稿统计（管理员专用）
   getContributionStatsAdmin() {
     return get('/api/v0/contributions/stats-admin')
+  }
+}
+
+// 资料库相关API
+export const materialAPI = {
+  // 获取资料列表
+  getMaterials(params) {
+    return get('/api/v0/materials', params)
+  },
+
+  // 获取热门资料
+  getTopMaterials(params) {
+    return get('/api/v0/materials/top', params)
+  },
+
+  // 获取搜索热词
+  getHotWords(params) {
+    return get('/api/v0/materials/hot-words', params)
+  },
+
+  // 搜索资料
+  searchMaterials(params) {
+    return get('/api/v0/materials/search', params)
+  },
+
+  // 获取资料详情
+  getMaterialDetail(md5) {
+    return get(`/api/v0/materials/${md5}`)
+  },
+
+  // 资料评分
+  rateMaterial(md5, data) {
+    return post(`/api/v0/materials/${md5}/rating`, data)
+  },
+
+  // 下载资料（记录下载行为）
+  downloadMaterial(md5) {
+    return post(`/api/v0/materials/${md5}/download`)
+  },
+
+  // 删除资料（管理员）
+  deleteMaterial(md5) {
+    return del(`/api/v0/admin/materials/${md5}`)
+  },
+
+  // 更新资料描述（管理员）
+  updateMaterialDesc(md5, data) {
+    return put(`/api/v0/admin/material-desc/${md5}`, data)
+  },
+
+  // 获取分类列表
+  getCategories(params) {
+    return get('/api/v0/material-categories', params)
   }
 }
 

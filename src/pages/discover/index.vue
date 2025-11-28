@@ -6,6 +6,19 @@
         <text class="text-gray-800 font-medium">学业</text>
       </view>
       <view class="grid grid-cols-4 gap-2">
+        <view
+          class="bg-white rounded-xl p-3 shadow-sm active:scale-95 transition-transform duration-200"
+          @tap="goToFinalReview"
+        >
+          <view class="flex flex-col items-center text-center">
+            <view
+              class="w-8 h-8 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center mb-2"
+            >
+              <text class="i-lucide-list-check text-white w-4 h-4"></text>
+            </view>
+            <text class="text-gray-800 font-medium text-sm">期末复习</text>
+          </view>
+        </view>
         <!-- 教师评价 -->
         <view
           class="bg-white rounded-xl p-3 shadow-sm active:scale-95 transition-transform duration-200"
@@ -554,6 +567,11 @@ const goToTeacherReviews = () => {
   Taro.navigateTo({ url: "/pages/teacher-reviews/index" });
 };
 
+const goToFinalReview = () => {
+  if (!authStore.requireAuth()) return;
+  Taro.navigateTo({ url: "/pages/final-review/index" });
+};
+
 const goToCoding = () => {
   Taro.showToast({
     title: "敬请期待",
@@ -569,8 +587,9 @@ const goToNotice = () => {
 };
 
 const goToDatabase = () => {
+  if (!authStore.requireAuth()) return;
   Taro.navigateTo({
-    url: "/pages/webview/index?url=https://mp.weixin.qq.com/s/iU1000Q7KQrfagS2Y-_7CQ",
+    url: "/pages/materials/index",
   });
 };
 
@@ -630,7 +649,7 @@ Taro.useShareAppMessage((res) => {
     if (res.from === 'button') {
     }
     return {
-      title: '江理一起来学发现功能',
+      title: '江理一起来学发现',
       path: '/pages/discover/index',
     }
   })
@@ -639,7 +658,7 @@ Taro.useShareTimeline((res) => {
     if (res.from === 'button') {
     }
     return {
-      title: '江理一起来学发现功能',
+      title: '江理一起来学发现',
       path: '/pages/discover/index',
     }
   })
