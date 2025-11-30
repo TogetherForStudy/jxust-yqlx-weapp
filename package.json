@@ -39,7 +39,7 @@
     "@tarojs/components": "4.1.6",
     "@tarojs/helper": "4.1.6",
     "@tarojs/plugin-framework-vue3": "4.1.6",
-    "@tarojs/plugin-platform-alipay": "4.1.6",
+    "@tarojs/plugin-platform-alipay": "4.1.9",
     "@tarojs/plugin-platform-h5": "4.1.6",
     "@tarojs/plugin-platform-jd": "4.1.6",
     "@tarojs/plugin-platform-qq": "4.1.6",
