@@ -37,7 +37,7 @@
           class="px-4 py-3 border-b border-gray-100 flex items-center justify-between"
         >
           <button class="flex items-center space-x-3 w-full h-full leading-normal text-base text-ms p-0 after:border-none bg-white hover:bg-gray-50" open-type="contact">
-            <text class="i-lucide-phone"></text>
+            <text class="i-lucide-user"></text>
             <text class="text-gray-800">客服反馈</text>
           </button>
           <text class="i-lucide-chevron-right text-gray-400"></text>

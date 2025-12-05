@@ -30,6 +30,12 @@
               <text class="text-base font-semibold text-gray-900">
                 {{ project.name || project.title }}
               </text>
+              <view
+                v-if="project.user_count != null && project.usage_count != null"
+                class="mt-1 text-xs text-gray-500"
+              >
+                {{ project.user_count }} 人已刷 {{ project.usage_count }} 题
+              </view>
             </view>
             <view class="text-right">
               <view class="text-xs text-gray-400">题量</view>

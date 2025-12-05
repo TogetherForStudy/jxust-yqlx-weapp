@@ -20,7 +20,35 @@
           <view class="flex items-center justify-between">
             <view>
               <view class="text-base font-medium text-gray-900">复习设置</view>
-              <view class="text-xs text-gray-400 mt-1">选择模式并决定题目顺序</view>
+              <view class="text-xs text-gray-400 mt-1">选择模式、题目来源和顺序</view>
+            </view>
+          </view>
+
+          <view class="flex items-center justify-between mt-3">
+            <view>
+              <view class="text-xs text-gray-500">题目来源</view>
+            </view>
+            <view class="flex gap-2">
+              <view
+                class="px-3 py-1 text-xs rounded-full border"
+                :class="!useWrongBook ? 'border-indigo-500 text-indigo-600 bg-indigo-50' : 'border-gray-200 text-gray-500'"
+                @tap="setSource(false)"
+              >
+                全部题
+              </view>
+              <view
+                class="px-3 py-1 text-xs rounded-full border"
+                :class="useWrongBook ? 'border-indigo-500 text-indigo-600 bg-indigo-50' : 'border-gray-200 text-gray-500'"
+                @tap="setSource(true)"
+              >
+                错题本
+              </view>
+            </view>
+          </view>
+
+          <view class="flex items-center justify-between mt-3">
+            <view>
+              <view class="text-xs text-gray-500">出题顺序</view>
             </view>
             <view class="flex gap-2">
               <view
@@ -88,11 +116,19 @@
           <text>题目进度</text>
           <text>{{ progressText }}</text>
         </view>
-        <view class="w-full bg-gray-100 rounded-full h-2 mt-3">
-          <view
-            class="h-2 rounded-full bg-indigo-500 transition-all duration-200"
-            :style="{ width: `${progressPercent}%` }"
-          ></view>
+        <view class="w-full mt-3">
+          <slider
+            class="m-0"
+            :min="1"
+            :max="questionIds.length || 1"
+            :value="(isSliding ? sliderIndex : currentIndex) + 1"
+            block-size="16"
+            track-size="8"
+            activeColor="#6366F1"
+            backgroundColor="#E5E7EB"
+            @changing="handleSliderChanging"
+            @change="handleSliderChange"
+          />
         </view>
       </view>
 
@@ -162,6 +198,19 @@
           </view>
 
           <view
+            v-if="mode"
+            class="flex justify-end pt-1"
+          >
+            <view
+              class="px-3 py-1 rounded-full border text-xs"
+              :class="inWrongBook ? 'border-green-200 text-green-700 bg-green-50' : 'border-red-200 text-red-500 bg-red-50'"
+              @tap="toggleWrongBook()"
+            >
+              {{ inWrongBook ? "移出错题本" : "加入错题本" }}
+            </view>
+          </view>
+
+          <view
             v-if="currentQuestion.sub_questions && currentQuestion.sub_questions.length"
             class="space-y-4"
           >
@@ -228,19 +277,41 @@
           <view class="pt-2">
             <view
               v-if="mode === 'practice'"
-              class="flex items-center justify-center w-full h-11 rounded-full text-sm font-medium"
-              :class="hasSubmitted ? 'bg-green-500 text-white' : canSubmit ? 'bg-indigo-500 text-white' : 'bg-gray-200 text-gray-400'"
-              :disabled="!canSubmit && !hasSubmitted"
-              @tap="hasSubmitted ? goNextQuestion() : handleSubmit()"
+              class="flex gap-3"
             >
-              {{ hasSubmitted ? "下一题" : "提交答案" }}
+              <view
+                class="flex-1 flex items-center justify-center h-11 rounded-full text-sm font-medium border"
+                :class="isFirstQuestion ? 'border-gray-100 text-gray-300 bg-gray-100' : 'border-gray-300 text-gray-700 bg-white'"
+                @tap="!isFirstQuestion && goPrevQuestion()"
+              >
+                上一题
+              </view>
+              <view
+                class="flex-1 flex items-center justify-center h-11 rounded-full text-sm font-medium"
+                :class="hasSubmitted ? 'bg-green-500 text-white' : canSubmit ? 'bg-indigo-500 text-white' : 'bg-gray-200 text-gray-400'"
+                :disabled="!canSubmit && !hasSubmitted"
+                @tap="hasSubmitted ? goNextQuestion() : handleSubmit()"
+              >
+                {{ hasSubmitted ? "下一题" : "提交答案" }}
+              </view>
             </view>
             <view
               v-else
-              class="flex items-center justify-center w-full h-11 rounded-full bg-green-500 text-white text-sm font-medium"
-              @tap="goNextQuestion"
+              class="flex gap-3"
             >
-              下一题
+              <view
+                class="flex-1 flex items-center justify-center h-11 rounded-full text-sm font-medium border"
+                :class="isFirstQuestion ? 'border-gray-100 text-gray-300 bg-gray-100' : 'border-gray-300 text-gray-700 bg-white'"
+                @tap="!isFirstQuestion && goPrevQuestion()"
+              >
+                上一题
+              </view>
+              <view
+                class="flex-1 flex items-center justify-center h-11 rounded-full bg-green-500 text-white text-sm font-medium"
+                @tap="goNextQuestion"
+              >
+                下一题
+              </view>
             </view>
           </view>
         </view>
@@ -261,7 +332,8 @@ defineOptions({
 const router = Taro.useRouter();
 const decodeParam = (value = "") => {
   try {
-    return decodeURIComponent(value);
+    // 先将 + 替换为空格，因为 decodeURIComponent 不会处理 +
+    return decodeURIComponent(value.replace(/\+/g, " "));
   } catch (error) {
     return value;
   }
@@ -269,6 +341,7 @@ const decodeParam = (value = "") => {
 
 const projectId = Number(router.params?.id || 0);
 const STORAGE_KEY = `finalReviewProgress:${projectId}`;
+const WRONG_BOOK_KEY = `finalReviewWrongBook:${projectId}`;
 const projectInfo = ref({
   id: projectId,
   name: decodeParam(router.params?.name) || "期末复习项目",
@@ -277,15 +350,19 @@ const projectInfo = ref({
 
 const mode = ref(null); // 'study' | 'practice'
 const randomOrder = ref(false);
+const useWrongBook = ref(false); // false: 全部题, true: 错题本
 const loadingList = ref(false);
 const loadingQuestion = ref(false);
 const questionIds = ref([]);
 const currentIndex = ref(-1);
+const sliderIndex = ref(0);
+const isSliding = ref(false);
 const currentQuestion = ref(null);
 const sessionFinished = ref(false);
 const hasSubmitted = ref(false);
 const resultStatus = ref(null); // 'correct' | 'incorrect' | 'partial' | 'text'
 const lastPracticePayload = ref(null);
+const wrongBookIds = ref([]);
 
 const answerState = reactive({
   optionKey: "",
@@ -298,8 +375,19 @@ const progressText = computed(() => {
   if (!questionIds.value.length) {
     return "0/0";
   }
-  return `${Math.min(currentIndex.value + 1, questionIds.value.length)}/${questionIds.value.length}`;
+  const baseIndex = isSliding.value
+    ? sliderIndex.value
+    : Math.max(currentIndex.value, 0);
+  const display = Math.min(baseIndex + 1, questionIds.value.length);
+  return `${display}/${questionIds.value.length}`;
 });
+
+const isFirstQuestion = computed(() => currentIndex.value <= 0);
+const inWrongBook = computed(
+  () =>
+    !!currentQuestion.value &&
+    wrongBookIds.value.includes(currentQuestion.value.id)
+);
 
 const progressPercent = computed(() => {
   if (!questionIds.value.length) return 0;
@@ -307,6 +395,14 @@ const progressPercent = computed(() => {
   const current = Math.max(currentIndex.value, 0);
   const completed = current + (currentQuestion.value ? 1 : 0);
   return Math.min(100, (completed / questionIds.value.length) * 100);
+});
+
+const displayQuestionIndex = computed(() => {
+  if (!questionIds.value.length) return 0;
+  if (isSliding.value) {
+    return sliderIndex.value + 1;
+  }
+  return currentIndex.value + 1;
 });
 
 const questionTypeText = computed(() => getQuestionTypeText(currentQuestion.value?.type));
@@ -334,9 +430,17 @@ const setRandom = (value) => {
   randomOrder.value = value;
 };
 
+const setSource = (value) => {
+  useWrongBook.value = value;
+};
+
 const startSession = async (selectedMode) => {
   if (!projectId) {
     Taro.showToast({ title: "缺少项目ID", icon: "error" });
+    return;
+  }
+  if (useWrongBook.value && !wrongBookIds.value.length) {
+    Taro.showToast({ title: "错题本为空，请先做题", icon: "none" });
     return;
   }
   if (loadingList.value) return;
@@ -348,6 +452,8 @@ const startSession = async (selectedMode) => {
 const resetSessionState = () => {
   questionIds.value = [];
   currentIndex.value = -1;
+  sliderIndex.value = 0;
+  isSliding.value = false;
   currentQuestion.value = null;
   hasSubmitted.value = false;
   resultStatus.value = null;
@@ -363,11 +469,25 @@ const loadQuestionIds = async () => {
   resetSessionState();
   loadingList.value = true;
   try {
-    const res = await questionsAPI.getQuestionIds({
-      project_id: projectId,
-      random: randomOrder.value,
-    });
-    const list = extractQuestionIds(res);
+    let list = [];
+
+    if (useWrongBook.value) {
+      list = [...wrongBookIds.value];
+      // 按需打乱顺序
+      if (randomOrder.value) {
+        list = list
+          .map((id) => ({ id, sort: Math.random() }))
+          .sort((a, b) => a.sort - b.sort)
+          .map((item) => item.id);
+      }
+    } else {
+      const res = await questionsAPI.getQuestionIds({
+        project_id: projectId,
+        random: randomOrder.value,
+      });
+      list = extractQuestionIds(res);
+    }
+
     questionIds.value = list;
     if (list.length) {
       await loadQuestionDetail(0);
@@ -409,6 +529,8 @@ const loadQuestionDetail = async (index) => {
     const questionId = questionIds.value[index];
     const res = await questionsAPI.getQuestionDetail(questionId);
     currentIndex.value = index;
+    sliderIndex.value = index;
+    isSliding.value = false;
     currentQuestion.value = normalizeQuestion(res);
     saveProgress();
   } catch (error) {
@@ -638,6 +760,15 @@ const handleSubmit = () => {
 
   lastPracticePayload.value = buildPracticePayload(question);
   hasSubmitted.value = true;
+
+  // 考试模式下客观题做错自动加入错题本
+  if (
+    mode.value === "practice" &&
+    question.type !== 2 &&
+    (resultStatus.value === "incorrect" || resultStatus.value === "partial")
+  ) {
+    addToWrongBook(question.id, false);
+  }
 };
 
 const onTextAnswerInput = (event) => {
@@ -700,6 +831,43 @@ const goNextQuestion = async () => {
   await loadQuestionDetail(nextIndex);
 };
 
+const goPrevQuestion = async () => {
+  if (!questionIds.value.length) return;
+  const prevIndex = currentIndex.value - 1;
+  if (prevIndex < 0) {
+    Taro.showToast({ title: "已经是第一题", icon: "none" });
+    return;
+  }
+  sessionFinished.value = false;
+  await loadQuestionDetail(prevIndex);
+};
+
+const handleSliderChanging = (event) => {
+  if (!questionIds.value.length) return;
+  const rawValue = Number(event.detail?.value || 1);
+  const target = Math.min(
+    Math.max(rawValue - 1, 0),
+    questionIds.value.length - 1
+  );
+  sliderIndex.value = target;
+  isSliding.value = true;
+};
+
+const handleSliderChange = async (event) => {
+  if (!questionIds.value.length) return;
+  const rawValue = Number(event.detail?.value || 1);
+  const target = Math.min(
+    Math.max(rawValue - 1, 0),
+    questionIds.value.length - 1
+  );
+  if (target === currentIndex.value) {
+    isSliding.value = false;
+    return;
+  }
+  sessionFinished.value = false;
+  await loadQuestionDetail(target);
+};
+
 const recordProgress = async () => {
   if (!currentQuestion.value) return;
   try {
@@ -748,36 +916,60 @@ const fetchProjectMeta = async () => {
 onMounted(fetchProjectMeta);
 onMounted(() => {
   restoreProgress();
+  loadWrongBook();
 });
 
-const checkSubQuestionCompletion = () => {
-  const question = currentQuestion.value;
-  if (!question?.sub_questions?.length) return;
-  const allJudged = question.sub_questions.every(
-    (sub) => subJudgeState[sub.id]?.submitted
-  );
-  if (!allJudged) {
-    hasSubmitted.value = false;
-    resultStatus.value = null;
-    lastPracticePayload.value = null;
+const loadWrongBook = () => {
+  try {
+    const saved = Taro.getStorageSync(WRONG_BOOK_KEY);
+    wrongBookIds.value = Array.isArray(saved) ? saved : [];
+  } catch (error) {
+    console.error("load wrong book failed", error);
+    wrongBookIds.value = [];
+  }
+};
+
+const saveWrongBook = () => {
+  try {
+    Taro.setStorageSync(WRONG_BOOK_KEY, wrongBookIds.value);
+  } catch (error) {
+    console.error("save wrong book failed", error);
+  }
+};
+
+const addToWrongBook = (questionId, showToast = true) => {
+  if (!questionId) return;
+  if (wrongBookIds.value.includes(questionId)) {
+    if (showToast) {
+      Taro.showToast({ title: "已在错题本中", icon: "none" });
+    }
     return;
   }
-
-  const total = question.sub_questions.length;
-  const correctCount = question.sub_questions.filter(
-    (sub) => subJudgeState[sub.id]?.result === "correct"
-  ).length;
-
-  if (correctCount === total) {
-    resultStatus.value = "correct";
-  } else if (correctCount === 0) {
-    resultStatus.value = "incorrect";
-  } else {
-    resultStatus.value = "partial";
+  wrongBookIds.value = [...wrongBookIds.value, questionId];
+  saveWrongBook();
+  if (showToast) {
+    Taro.showToast({ title: "已加入错题本", icon: "none" });
   }
+};
 
-  lastPracticePayload.value = buildPracticePayload(question);
-  hasSubmitted.value = true;
+const removeFromWrongBook = (questionId, showToast = true) => {
+  if (!questionId) return;
+  if (!wrongBookIds.value.includes(questionId)) return;
+  wrongBookIds.value = wrongBookIds.value.filter((id) => id !== questionId);
+  saveWrongBook();
+  if (showToast) {
+    Taro.showToast({ title: "已从错题本移出", icon: "none" });
+  }
+};
+
+const toggleWrongBook = () => {
+  if (!currentQuestion.value) return;
+  const id = currentQuestion.value.id;
+  if (wrongBookIds.value.includes(id)) {
+    removeFromWrongBook(id, true);
+  } else {
+    addToWrongBook(id, true);
+  }
 };
 
 const saveProgress = () => {
@@ -787,6 +979,7 @@ const saveProgress = () => {
       projectId,
       mode: mode.value,
       randomOrder: randomOrder.value,
+      useWrongBook: useWrongBook.value,
       questionIds: questionIds.value,
       currentIndex: currentIndex.value,
       timestamp: Date.now(),
@@ -811,6 +1004,7 @@ const restoreProgress = async () => {
     if (!saved.questionIds?.length || !saved.mode) return;
     mode.value = saved.mode;
     randomOrder.value = !!saved.randomOrder;
+    useWrongBook.value = !!saved.useWrongBook;
     questionIds.value = saved.questionIds;
     sessionFinished.value = false;
     const resumeIndex = Math.min(

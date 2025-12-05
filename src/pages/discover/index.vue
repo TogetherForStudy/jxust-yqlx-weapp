@@ -1,7 +1,55 @@
 <template>
   <view class="min-h-screen bg-gray-50">
     <!-- 功能卡片网格 -->
+     <!-- 来学 -->
     <view class="p-4">
+      <view class="flex justify-between items-center mb-2">
+        <text class="text-gray-800 font-medium">江理一起来学</text>
+      </view>
+      <view class="grid grid-cols-4 gap-2">
+        <view @tap="goToNotice" class="bg-white rounded-xl p-3 shadow-sm">
+          <view class="flex flex-col items-center text-center">
+            <view
+              class="w-8 h-8 bg-gradient-to-br from-indigo-300 to-indigo-500 rounded-full flex items-center justify-center mb-2"
+            >
+              <text class="i-lucide-bell text-white w-4 h-4"></text>
+            </view>
+            <text class="text-gray-800 font-medium text-sm">信息海洋</text>
+          </view>
+        </view>
+        <view @tap="goToDatabase" class="bg-white rounded-xl p-3 shadow-sm">
+          <view class="flex flex-col items-center text-center">
+            <view
+              class="w-8 h-8 bg-gradient-to-br from-green-300 to-green-500 rounded-full flex items-center justify-center mb-2"
+            >
+              <text class="i-lucide-folder-open text-white w-4 h-4"></text>
+            </view>
+            <text class="text-gray-800 font-medium text-sm">资料库</text>
+          </view>
+        </view>
+        <view @tap="goToHero" class="bg-white rounded-xl p-3 shadow-sm">
+          <view class="flex flex-col items-center text-center">
+            <view
+              class="w-8 h-8 bg-gradient-to-br from-yellow-300 to-yellow-500 rounded-full flex items-center justify-center mb-2"
+            >
+              <text class="i-lucide-trophy text-white w-4 h-4"></text>
+            </view>
+            <text class="text-gray-800 font-medium text-sm">英雄榜</text>
+          </view>
+        </view>
+        <view @tap="goToGroupChat" class="bg-white rounded-xl p-3 shadow-sm">
+          <view class="flex flex-col items-center text-center">
+            <view
+              class="w-8 h-8 bg-gradient-to-br from-blue-300 to-blue-500 rounded-full flex items-center justify-center mb-2"
+            >
+              <text class="i-lucide-message-circle text-white w-4 h-4"></text>
+            </view>
+            <text class="text-gray-800 font-medium text-sm">交流群</text>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class="p-4 pt-0">
       <view class="flex justify-between items-center mb-2">
         <text class="text-gray-800 font-medium">学业</text>
       </view>
@@ -57,55 +105,60 @@
           </view>
         </view>
 
-      </view>
-    </view>
-
-    <!-- 来学 -->
-    <view class="p-4 pt-0">
-      <view class="flex justify-between items-center mb-2">
-        <text class="text-gray-800 font-medium">江理一起来学</text>
-      </view>
-      <view class="grid grid-cols-4 gap-2">
-        <view @tap="goToNotice" class="bg-white rounded-xl p-3 shadow-sm">
-          <view class="flex flex-col items-center text-center">
-            <view
-              class="w-8 h-8 bg-gradient-to-br from-indigo-300 to-indigo-500 rounded-full flex items-center justify-center mb-2"
-            >
-              <text class="i-lucide-bell text-white w-4 h-4"></text>
-            </view>
-            <text class="text-gray-800 font-medium text-sm">信息海洋</text>
-          </view>
-        </view>
-        <view @tap="goToDatabase" class="bg-white rounded-xl p-3 shadow-sm">
-          <view class="flex flex-col items-center text-center">
-            <view
-              class="w-8 h-8 bg-gradient-to-br from-green-300 to-green-500 rounded-full flex items-center justify-center mb-2"
-            >
-              <text class="i-lucide-folder-open text-white w-4 h-4"></text>
-            </view>
-            <text class="text-gray-800 font-medium text-sm">资料库</text>
-          </view>
-        </view>
-        <view @tap="goToHero" class="bg-white rounded-xl p-3 shadow-sm">
-          <view class="flex flex-col items-center text-center">
-            <view
-              class="w-8 h-8 bg-gradient-to-br from-yellow-300 to-yellow-500 rounded-full flex items-center justify-center mb-2"
-            >
-              <text class="i-lucide-trophy text-white w-4 h-4"></text>
-            </view>
-            <text class="text-gray-800 font-medium text-sm">英雄榜</text>
-          </view>
-        </view>
-        <view @tap="goToGroupChat" class="bg-white rounded-xl p-3 shadow-sm">
+        <view
+          @tap="goToJw"
+          class="bg-white rounded-xl p-3 shadow-sm"
+        >
           <view class="flex flex-col items-center text-center">
             <view
               class="w-8 h-8 bg-gradient-to-br from-blue-300 to-blue-500 rounded-full flex items-center justify-center mb-2"
             >
-              <text class="i-lucide-message-circle text-white w-4 h-4"></text>
+              <text class="i-lucide-bar-chart-2 text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">交流群</text>
+            <text class="text-gray-800 font-medium text-sm">成绩查询</text>
           </view>
         </view>
+        <view
+          @tap="goToJw"
+          class="bg-white rounded-xl p-3 shadow-sm"
+        >
+          <view class="flex flex-col items-center text-center">
+            <view
+              class="w-8 h-8 bg-gradient-to-br from-purple-300 to-purple-500 rounded-full flex items-center justify-center mb-2"
+            >
+              <text class="i-lucide-calendar-days text-white w-4 h-4"></text>
+            </view>
+            <text class="text-gray-800 font-medium text-sm">考试安排</text>
+          </view>
+        </view>
+        <view
+          @tap="goToGpaCalculator"
+          class="bg-white rounded-xl p-3 shadow-sm"
+        >
+          <view class="flex flex-col items-center text-center">
+            <view
+              class="w-8 h-8 bg-gradient-to-br from-pink-300 to-pink-500 rounded-full flex items-center justify-center mb-2"
+            >
+              <text class="i-lucide-award text-white w-4 h-4"></text>
+            </view>
+            <text class="text-gray-800 font-medium text-sm">绩点计算</text>
+          </view>
+        </view>
+
+        <view
+          @tap="goToGraduation"
+          class="bg-white rounded-xl p-3 shadow-sm"
+        >
+          <view class="flex flex-col items-center text-center">
+            <view
+              class="w-8 h-8 bg-gradient-to-br from-yellow-300 to-yellow-500 rounded-full flex items-center justify-center mb-2"
+            >
+              <text class="i-lucide-check-circle text-white w-4 h-4"></text>
+            </view>
+            <text class="text-gray-800 font-medium text-sm">毕业条件</text>
+          </view>
+        </view>
+
       </view>
     </view>
     <!-- 校园 -->
@@ -197,68 +250,6 @@
       </view>
     </view>
     <!-- INSERT_YOUR_CODE -->
-
-    <!-- 学业 -->
-    <view class="p-4 pt-0">
-      <view class="flex justify-between items-center mb-2">
-        <text class="text-gray-800 font-medium">学业</text>
-      </view>
-      <view class="grid grid-cols-4 gap-2">
-        <view
-          @tap="goToCoding"
-          class="bg-white rounded-xl p-3 shadow-sm opacity-60"
-        >
-          <view class="flex flex-col items-center text-center">
-            <view
-              class="w-8 h-8 bg-gradient-to-br from-blue-300 to-blue-500 rounded-full flex items-center justify-center mb-2"
-            >
-              <text class="i-lucide-bar-chart-2 text-white w-4 h-4"></text>
-            </view>
-            <text class="text-gray-800 font-medium text-sm">成绩</text>
-          </view>
-        </view>
-        <view
-          @tap="goToCoding"
-          class="bg-white rounded-xl p-3 shadow-sm opacity-60"
-        >
-          <view class="flex flex-col items-center text-center">
-            <view
-              class="w-8 h-8 bg-gradient-to-br from-purple-300 to-purple-500 rounded-full flex items-center justify-center mb-2"
-            >
-              <text class="i-lucide-calendar-days text-white w-4 h-4"></text>
-            </view>
-            <text class="text-gray-800 font-medium text-sm">考试安排</text>
-          </view>
-        </view>
-        <view
-          @tap="goToCoding"
-          class="bg-white rounded-xl p-3 shadow-sm opacity-60"
-        >
-          <view class="flex flex-col items-center text-center">
-            <view
-              class="w-8 h-8 bg-gradient-to-br from-pink-300 to-pink-500 rounded-full flex items-center justify-center mb-2"
-            >
-              <text class="i-lucide-award text-white w-4 h-4"></text>
-            </view>
-            <text class="text-gray-800 font-medium text-sm">绩点排名</text>
-          </view>
-        </view>
-
-        <view
-          @tap="goToCoding"
-          class="bg-white rounded-xl p-3 shadow-sm opacity-60"
-        >
-          <view class="flex flex-col items-center text-center">
-            <view
-              class="w-8 h-8 bg-gradient-to-br from-yellow-300 to-yellow-500 rounded-full flex items-center justify-center mb-2"
-            >
-              <text class="i-lucide-check-circle text-white w-4 h-4"></text>
-            </view>
-            <text class="text-gray-800 font-medium text-sm">毕业条件</text>
-          </view>
-        </view>
-      </view>
-    </view>
 
     <!-- 发展 -->
     <view class="p-4 pt-0">
@@ -474,7 +465,7 @@
             >
               <text class="i-lucide-banknote text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">考公</text>
+            <text class="text-gray-800 font-medium text-sm">考公考编</text>
           </view>
         </view>
         <view
@@ -487,14 +478,14 @@
             >
               <text class="i-lucide-globe-2 text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">留学</text>
+            <text class="text-gray-800 font-medium text-sm">出国留学</text>
           </view>
         </view>
       </view>
     </view>
 
     <!-- 生活 -->
-    <view class="p-4 pt-0">
+    <!-- <view class="p-4 pt-0">
       <view class="flex justify-between items-center">
         <text class="text-gray-800 font-medium">生活</text>
       </view>
@@ -552,7 +543,7 @@
           </view>
         </view>
       </view>
-    </view>
+    </view> -->
   </view>
 </template>
 
@@ -643,6 +634,20 @@ const goToNoticeToZLK = () => {
     title: "请在资料库查找",
     icon: "success",
   });
+};
+
+const goToJw = () => {
+  if (!authStore.requireAuth()) return;
+  Taro.navigateTo({ url: "/pages/gotojw/index" });
+};
+
+const goToGpaCalculator = () => {
+  Taro.navigateTo({ url: "/pages/gpa-calculator/index" });
+};
+
+const goToGraduation = () => {
+  if (!authStore.requireAuth()) return;
+  Taro.navigateTo({ url: "/pages/graduation/index" });
 };
 
 Taro.useShareAppMessage((res) => {
