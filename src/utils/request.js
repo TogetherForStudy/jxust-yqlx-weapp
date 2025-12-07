@@ -1,8 +1,65 @@
 import Taro from '@tarojs/taro'
+import { v4 as uuidv4 } from 'uuid'
 import { useAuthStore } from '../stores/auth'
 
 // API基础配置
 const BASE_URL = 'https://wx.ntrun.com' // 请根据实际情况修改
+
+// 生成UUID
+const generateUUID = () => {
+  return uuidv4()
+}
+
+// 幂等性 Key 缓存：存储正在进行的请求的幂等性 Key
+// 格式：{ 'method:url:dataHash': { key: 'uuid', timestamp: number } }
+const idempotencyKeyCache = {}
+
+// 生成请求的唯一标识（用于缓存 Key）
+const generateRequestIdentifier = (method, url, data) => {
+  // 对于写操作，使用 method + url + data 的简单哈希作为标识
+  const dataStr = data ? JSON.stringify(data) : ''
+  return `${method}:${url}:${dataStr}`
+}
+
+// 获取或创建幂等性 Key
+const getOrCreateIdempotencyKey = (method, url, data) => {
+  const identifier = generateRequestIdentifier(method, url, data)
+  const now = Date.now()
+
+  // 检查缓存中是否有未过期的 Key（1分钟内）
+  if (idempotencyKeyCache[identifier]) {
+    const cached = idempotencyKeyCache[identifier]
+    // 如果 Key 在 1 分钟内，复用它
+    if (now - cached.timestamp < 1 * 60 * 1000) {
+      return cached.key
+    }
+  }
+
+  // 生成新的 Key 并缓存
+  const newKey = generateUUID()
+  idempotencyKeyCache[identifier] = {
+    key: newKey,
+    timestamp: now
+  }
+
+  return newKey
+}
+
+// 清除幂等性 Key（请求完成后调用）
+const clearIdempotencyKey = (method, url, data) => {
+  const identifier = generateRequestIdentifier(method, url, data)
+  delete idempotencyKeyCache[identifier]
+}
+
+// 定期清理过期的缓存（每2分钟）
+setInterval(() => {
+  const now = Date.now()
+  Object.keys(idempotencyKeyCache).forEach(key => {
+    if (now - idempotencyKeyCache[key].timestamp > 2 * 60 * 1000) {
+      delete idempotencyKeyCache[key]
+    }
+  })
+}, 2 * 60 * 1000)
 
 // 请求拦截器
 const interceptors = {
@@ -19,7 +76,20 @@ const interceptors = {
     // 添加通用头部
     config.header = {
       'Content-Type': 'application/json',
+      'X-Request-ID': generateUUID(),
       ...config.header
+    }
+
+    // 为写操作添加 X-Idempotency-Key
+    const method = config.method?.toUpperCase()
+    const writeMethod = ['POST', 'PUT', 'DELETE', 'PATCH'].includes(method)
+    if (writeMethod && !config.header['X-Idempotency-Key']) {
+      // 使用相同请求内容的缓存 Key，防止快速重复点击
+      config.header['X-Idempotency-Key'] = getOrCreateIdempotencyKey(
+        method,
+        config.url,
+        config.data
+      )
     }
 
     return config
@@ -53,6 +123,11 @@ export const request = (options) => {
     options.url = BASE_URL + options.url
   }
 
+  // 保存原始请求信息（用于清除幂等性 Key）
+  const originalMethod = options.method
+  const originalUrl = options.url
+  const originalData = options.data
+
   // 应用请求拦截器
   options = interceptors.request(options)
 
@@ -69,6 +144,11 @@ export const request = (options) => {
       })
 
       return Promise.reject(error)
+    }).finally(() => {
+      const method = originalMethod?.toUpperCase()
+      if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(method)) {
+        clearIdempotencyKey(method, originalUrl, originalData)
+      }
     })
 }
 
