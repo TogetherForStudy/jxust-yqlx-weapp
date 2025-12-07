@@ -17,8 +17,27 @@ const idempotencyKeyCache = {}
 // 生成请求的唯一标识（用于缓存 Key）
 const generateRequestIdentifier = (method, url, data) => {
   // 对于写操作，使用 method + url + data 的简单哈希作为标识
-  const dataStr = data ? JSON.stringify(data) : ''
+  // 对 data 进行排序以确保相同内容但键顺序不同的对象生成相同的标识
+  const dataStr = data ? JSON.stringify(sortObjectKeys(data)) : ''
   return `${method}:${url}:${dataStr}`
+}
+
+// 递归排序对象的键（用于生成一致的请求标识）
+const sortObjectKeys = (obj) => {
+  if (obj === null || typeof obj !== 'object') {
+    return obj
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map(item => sortObjectKeys(item))
+  }
+
+  return Object.keys(obj)
+    .sort()
+    .reduce((sorted, key) => {
+      sorted[key] = sortObjectKeys(obj[key])
+      return sorted
+    }, {})
 }
 
 // 获取或创建幂等性 Key
