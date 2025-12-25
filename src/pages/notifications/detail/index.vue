@@ -10,7 +10,7 @@
         <!-- 通知头部 -->
         <view class="mb-4">
           <!-- 标题 -->
-          <text class="font-bold text-base text-gray-800 leading-tight block mb-3">
+          <text class="font-bold text-base text-gray-800 leading-tight block mb-3" :selectable="true">
             {{ notification.title }}
           </text>
 
@@ -62,8 +62,8 @@
 
         <!-- 通知内容 -->
         <view class="mb-6">
-          <view class="text-gray-700 leading-relaxed">
-            <text class="whitespace-pre-wrap">{{ notification.content }}</text>
+          <view class="text-gray-700 leading-relaxed break-words">
+            <text class="whitespace-pre-wrap break-words" :selectable="true">{{ notification.content }}</text>
           </view>
         </view>
 
@@ -673,12 +673,3 @@ Taro.useShareTimeline((res) => {
   })
 </script>
 
-<style>
-.whitespace-pre-wrap {
-  white-space: pre-wrap;
-}
-
-.active\:scale-95:active {
-  transform: scale(0.95);
-}
-</style>

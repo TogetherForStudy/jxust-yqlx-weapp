@@ -10,8 +10,10 @@ import {
 
 export const useStudyTaskStore = defineStore('studyTask', {
   state: () => ({
-    // 学习任务列表
+    // 学习任务列表（主要是未完成的任务）
     studyTasks: [],
+    // 已完成任务列表
+    completedTasks: [],
     isFetchData: false,
     // 统计数据
     stats: {
@@ -42,10 +44,9 @@ export const useStudyTaskStore = defineStore('studyTask', {
         })
     },
 
-    // 已完成的任务
-    completedTasks: (state) => {
-      return state.studyTasks
-        .filter(task => task.status === 2) // 2=已完成
+    // 已完成的任务（从专门的completedTasks数组中获取）
+    completedTasksList: (state) => {
+      return state.completedTasks
         .sort((a, b) => {
           // 按完成时间倒序排序
           const dateA = new Date(a.completed_at || a.updated_at)
@@ -160,24 +161,54 @@ export const useStudyTaskStore = defineStore('studyTask', {
       try {
         const data = await apiUpdateStudyTask(id, taskData)
 
-        // 更新本地列表中的对应项
-        const index = this.studyTasks.findIndex(item => item.id === id)
-        if (index !== -1) {
-          const oldTask = this.studyTasks[index]
-          const newTask = data || { ...oldTask, ...taskData }
+        // 查找任务在未完成任务列表中的位置
+        const pendingIndex = this.studyTasks.findIndex(item => item.id === id)
+        // 查找任务在已完成任务列表中的位置
+        const completedIndex = this.completedTasks.findIndex(item => item.id === id)
 
-          // 如果状态发生变化，更新统计数据
-          if (oldTask.status !== newTask.status) {
-            if (oldTask.status === 1 && newTask.status === 2) {
-              this.stats.pending_count--
-              this.stats.completed_count++
-            } else if (oldTask.status === 2 && newTask.status === 1) {
-              this.stats.completed_count--
-              this.stats.pending_count++
+        const newTask = data || { ...(pendingIndex !== -1 ? this.studyTasks[pendingIndex] : completedIndex !== -1 ? this.completedTasks[completedIndex] : {}), ...taskData }
+        const oldTask = pendingIndex !== -1 ? this.studyTasks[pendingIndex] : completedIndex !== -1 ? this.completedTasks[completedIndex] : null
+
+        // 如果状态发生变化，更新统计数据并移动任务到正确的列表
+        if (oldTask && oldTask.status !== newTask.status) {
+          if (oldTask.status === 1 && newTask.status === 2) {
+            // 从未完成变为已完成
+            this.stats.pending_count--
+            this.stats.completed_count++
+            // 从未完成任务列表中移除
+            if (pendingIndex !== -1) {
+              this.studyTasks.splice(pendingIndex, 1)
+            }
+            // 添加到已完成任务列表（如果已完成任务列表已加载）
+            if (this.completedTasks.length > 0 || completedIndex !== -1) {
+              if (completedIndex === -1) {
+                this.completedTasks.unshift(newTask)
+              } else {
+                this.completedTasks[completedIndex] = newTask
+              }
+            }
+          } else if (oldTask.status === 2 && newTask.status === 1) {
+            // 从已完成变为待完成
+            this.stats.completed_count--
+            this.stats.pending_count++
+            // 从已完成任务列表中移除
+            if (completedIndex !== -1) {
+              this.completedTasks.splice(completedIndex, 1)
+            }
+            // 添加到未完成任务列表
+            if (pendingIndex === -1) {
+              this.studyTasks.push(newTask)
+            } else {
+              this.studyTasks[pendingIndex] = newTask
             }
           }
-
-          this.studyTasks[index] = newTask
+        } else {
+          // 状态没有变化，只更新任务数据
+          if (pendingIndex !== -1) {
+            this.studyTasks[pendingIndex] = newTask
+          } else if (completedIndex !== -1) {
+            this.completedTasks[completedIndex] = newTask
+          }
         }
 
         return data
@@ -192,11 +223,11 @@ export const useStudyTaskStore = defineStore('studyTask', {
       try {
         await apiDeleteStudyTask(id)
 
-        // 从本地列表中移除
-        const index = this.studyTasks.findIndex(item => item.id === id)
-        if (index !== -1) {
-          const task = this.studyTasks[index]
-          this.studyTasks.splice(index, 1)
+        // 从未完成任务列表中移除
+        const pendingIndex = this.studyTasks.findIndex(item => item.id === id)
+        if (pendingIndex !== -1) {
+          const task = this.studyTasks[pendingIndex]
+          this.studyTasks.splice(pendingIndex, 1)
 
           // 更新统计数据
           this.stats.total_count--
@@ -204,6 +235,21 @@ export const useStudyTaskStore = defineStore('studyTask', {
             this.stats.pending_count--
           } else if (task.status === 2) {
             this.stats.completed_count--
+          }
+        } else {
+          // 从已完成任务列表中移除
+          const completedIndex = this.completedTasks.findIndex(item => item.id === id)
+          if (completedIndex !== -1) {
+            const task = this.completedTasks[completedIndex]
+            this.completedTasks.splice(completedIndex, 1)
+
+            // 更新统计数据
+            this.stats.total_count--
+            if (task.status === 1) {
+              this.stats.pending_count--
+            } else if (task.status === 2) {
+              this.stats.completed_count--
+            }
           }
         }
 
@@ -230,10 +276,28 @@ export const useStudyTaskStore = defineStore('studyTask', {
       }
     },
 
+    // 获取已完成任务列表
+    async fetchCompletedStudyTasks(params = {}) {
+      try {
+        const data = await getStudyTasks(params)
+        // 如果是追加模式，将新数据添加到现有数据后面
+        if (params.append && data?.data) {
+          this.completedTasks = [...this.completedTasks, ...data.data]
+        } else {
+          this.completedTasks = data?.data || []
+        }
+        return data
+      } catch (error) {
+        console.error('获取已完成任务列表失败:', error)
+        throw error
+      }
+    },
+
 
     // 清空学习任务列表
     clearStudyTasks() {
       this.studyTasks = []
+      this.completedTasks = []
       this.stats = {
         total_count: 0,
         pending_count: 0,

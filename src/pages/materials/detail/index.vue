@@ -14,7 +14,7 @@
             <text class="i-lucide-file-text text-white w-6 h-6"></text>
           </view>
           <view class="flex-1 min-w-0">
-            <text class="text-gray-800 font-bold text-base break-all">
+            <text class="text-gray-800 font-bold text-base break-all" :selectable="true">
               {{ material.file_name }}
             </text>
             <view class="flex items-center space-x-3 mt-2 text-xs text-gray-400">
@@ -25,7 +25,7 @@
 
         <!-- 分类路径 -->
         <view v-if="material.category_path" class="pt-3">
-          <text class="text-xs text-gray-500">分类：{{ material.category_path }}</text>
+          <text class="text-xs text-gray-500" :selectable="true">分类：{{ material.category_path }}</text>
         </view>
 
         <!-- 标签 -->
@@ -51,7 +51,7 @@
       <!-- 描述信息 -->
       <view v-if="material.description" class="bg-white p-4 mb-2">
         <text class="text-gray-800 font-medium text-sm mb-2 block">资料描述</text>
-        <text class="text-gray-600 text-sm leading-relaxed">{{ material.description }}</text>
+        <text class="text-gray-600 text-sm leading-relaxed" :selectable="true">{{ material.description }}</text>
       </view>
 
       <!-- 外部链接 -->
