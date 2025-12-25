@@ -19,11 +19,11 @@
         <view class="space-y-3">
           <view class="flex justify-between items-center">
             <text class="text-gray-600">账号</text>
-            <text class="text-gray-800">{{ userInfo?.id || "无" }}</text>
+            <text class="text-gray-800" :selectable="true">{{ userInfo?.id || "无" }}</text>
           </view>
           <view class="flex justify-between items-center">
             <text class="text-gray-600">班级</text>
-            <text class="text-gray-800">{{ userInfo?.class_id || "无" }}</text>
+            <text class="text-gray-800" :selectable="true">{{ userInfo?.class_id || "无" }}</text>
           </view>
         </view>
       </view>

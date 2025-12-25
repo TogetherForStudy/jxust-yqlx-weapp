@@ -1,83 +1,85 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
-  <view class="min-h-screen bg-gray-50 px-4 pt-4">
-    <!-- 绩点结果显示区域 -->
-    <view class="bg-white rounded-xl shadow-sm p-6 mb-4">
-      <view class="text-center">
-        <view class="grid grid-cols-3 gap-4">
-          <!-- 五分制 -->
-          <view class="flex flex-col items-center">
-            <text class="text-gray-400 text-xs mb-1">五分制</text>
-            <text class="text-2xl font-bold text-green-600">
-              {{ gpaResults.fivePoint.toFixed(2) }}
-            </text>
-          </view>
-          <!-- 百分制 -->
-          <view class="flex flex-col items-center">
-            <text class="text-gray-400 text-xs mb-1">百分制</text>
-            <text class="text-2xl font-bold text-blue-600">
-              {{ gpaResults.percentage.toFixed(2) }}
-            </text>
-          </view>
-          <!-- 四分制 -->
-          <view class="flex flex-col items-center">
-            <text class="text-gray-400 text-xs mb-1">四分制</text>
-            <text class="text-2xl font-bold text-purple-600">
-              {{ gpaResults.fourPoint.toFixed(2) }}
-            </text>
+  <view class="h-screen bg-gray-50 flex flex-col">
+    <view class="px-4 pt-4 flex-shrink-0">
+      <!-- 绩点结果显示区域 -->
+      <view class="bg-white rounded-xl shadow-sm p-6 mb-4">
+        <view class="text-center">
+          <view class="grid grid-cols-3 gap-4">
+            <!-- 五分制 -->
+            <view class="flex flex-col items-center">
+              <text class="text-gray-400 text-xs mb-1">五分制</text>
+              <text class="text-2xl font-bold text-green-600" :selectable="true">
+                {{ gpaResults.fivePoint.toFixed(2) }}
+              </text>
+            </view>
+            <!-- 百分制 -->
+            <view class="flex flex-col items-center">
+              <text class="text-gray-400 text-xs mb-1">百分制</text>
+              <text class="text-2xl font-bold text-blue-600" :selectable="true">
+                {{ gpaResults.percentage.toFixed(2) }}
+              </text>
+            </view>
+            <!-- 四分制 -->
+            <view class="flex flex-col items-center">
+              <text class="text-gray-400 text-xs mb-1">四分制</text>
+              <text class="text-2xl font-bold text-purple-600" :selectable="true">
+                {{ gpaResults.fourPoint.toFixed(2) }}
+              </text>
+            </view>
           </view>
         </view>
       </view>
-    </view>
 
-    <!-- 输入区域 -->
-    <view class="bg-white rounded-xl shadow-sm p-4 mb-4">
-      <view>
-        <!-- 课程名称和添加按钮 -->
-        <view class="mb-3">
-          <text class="text-gray-700 text-sm mb-2 block">课程名称</text>
-          <view class="flex items-center gap-2">
-            <view class="flex-1 flex items-center bg-gray-100 rounded-lg px-3 py-2 h-10">
-              <input
-                v-model="currentCourse.courseName"
-                placeholder="请输入课程名称"
-                class="flex-1 bg-transparent text-sm outline-none h-full"
-              />
-            </view>
-            <view
-              @tap="addCourse"
-              :class="[
-                'px-4 py-2 rounded-lg text-white font-medium text-sm h-10 flex items-center justify-center',
-                canAdd ? 'bg-blue-500 active:bg-blue-600' : 'bg-gray-300'
-              ]"
-            >
-              添加
+      <!-- 输入区域 -->
+      <view class="bg-white rounded-xl shadow-sm p-4 mb-4">
+        <view>
+          <!-- 课程名称和添加按钮 -->
+          <view class="mb-3">
+            <text class="text-gray-700 text-sm mb-2 block">课程名称</text>
+            <view class="flex items-center gap-2">
+              <view class="flex-1 flex items-center bg-gray-100 rounded-lg px-3 py-2 h-10">
+                <input
+                  v-model="currentCourse.courseName"
+                  placeholder="请输入课程名称"
+                  class="flex-1 bg-transparent text-sm outline-none h-full"
+                />
+              </view>
+              <view
+                @tap="addCourse"
+                :class="[
+                  'px-4 py-2 rounded-lg text-white font-medium text-sm h-10 flex items-center justify-center',
+                  canAdd ? 'bg-blue-500 active:bg-blue-600' : 'bg-gray-300'
+                ]"
+              >
+                添加
+              </view>
             </view>
           </view>
-        </view>
 
-        <!-- 学分和成绩 -->
-        <view class="grid grid-cols-2 gap-3">
-          <view>
-            <text class="text-gray-700 text-sm mb-2 block">学分</text>
-            <view class="flex items-center bg-gray-100 rounded-lg px-3 py-2 h-10">
-              <input
-                v-model.number="currentCourse.credits"
-                type="digit"
-                placeholder="请输入学分"
-                class="flex-1 bg-transparent text-sm outline-none h-full"
-              />
+          <!-- 学分和成绩 -->
+          <view class="grid grid-cols-2 gap-3">
+            <view>
+              <text class="text-gray-700 text-sm mb-2 block">学分</text>
+              <view class="flex items-center bg-gray-100 rounded-lg px-3 py-2 h-10">
+                <input
+                  v-model.number="currentCourse.credits"
+                  type="digit"
+                  placeholder="请输入学分"
+                  class="flex-1 bg-transparent text-sm outline-none h-full"
+                />
+              </view>
             </view>
-          </view>
-          <view>
-            <text class="text-gray-700 text-sm mb-2 block">成绩</text>
-            <view class="flex items-center bg-gray-100 rounded-lg px-3 py-2 h-10">
-              <input
-                v-model.number="currentCourse.score"
-                type="digit"
-                placeholder="请输入成绩"
-                class="flex-1 bg-transparent text-sm outline-none h-full"
-              />
+            <view>
+              <text class="text-gray-700 text-sm mb-2 block">成绩</text>
+              <view class="flex items-center bg-gray-100 rounded-lg px-3 py-2 h-10">
+                <input
+                  v-model.number="currentCourse.score"
+                  type="digit"
+                  placeholder="请输入成绩"
+                  class="flex-1 bg-transparent text-sm outline-none h-full"
+                />
+              </view>
             </view>
           </view>
         </view>
@@ -85,42 +87,76 @@
     </view>
 
     <!-- 历史数据列表 -->
-    <view class="mb-4">
-      <view v-if="courses.length > 0" class="bg-white rounded-xl shadow-sm overflow-hidden">
-        <view class="px-4 py-3 border-b border-gray-100">
+    <view class="px-4 flex-1 h-[1px] flex flex-col">
+      <view v-if="courses.length > 0" class="bg-white rounded-xl shadow-sm overflow-hidden flex-1 flex flex-col h-full">
+        <view class="px-4 py-3 border-b border-gray-100 flex-shrink-0 flex items-center justify-between">
           <text class="text-gray-700 font-medium text-sm">已添加课程</text>
-        </view>
-        <view class="divide-y divide-gray-100">
-          <view
-            v-for="(course, index) in courses"
-            :key="index"
-            class="px-4 py-3 flex items-center justify-between"
-          >
-            <view class="flex-1" @tap="editCourse(index)">
-              <text class="text-gray-800 font-medium text-sm block mb-1">
-                {{ course.courseName }}
-              </text>
-              <view class="flex items-center space-x-4 text-xs text-gray-500">
-                <text>学分: {{ course.credits }}</text>
-                <text>成绩: {{ course.score }}</text>
-              </view>
+          <view class="flex items-center flex-shrink-0">
+            <view
+              @tap="selectAll"
+              class="mx-2 active:bg-gray-100 rounded"
+            >
+              <text class="text-blue-500 text-xs">全选</text>
             </view>
-            <view class="flex items-center">
-              <view
-                @tap="editCourse(index)"
-                class="ml-3 p-2 active:bg-gray-100 rounded"
-              >
-                <text class="i-lucide-edit text-blue-500 w-5 h-5"></text>
-              </view>
-              <view
-                @tap="removeCourse(index)"
-                class="ml-2 p-2 active:bg-gray-100 rounded"
-              >
-                <text class="i-lucide-trash-2 text-red-500 w-5 h-5"></text>
-              </view>
+            <view
+              @tap="toggleAll"
+              class="mx-2 active:bg-gray-100 rounded"
+            >
+              <text class="text-blue-500 text-xs">不选</text>
             </view>
           </view>
         </view>
+        <scroll-view :scroll-y="true" class="flex-1 h-[0px]">
+          <view class="divide-y divide-gray-100">
+            <view
+              v-for="(course, index) in courses"
+              :key="index"
+              class="px-4 py-3 flex items-center"
+            >
+              <!-- 左侧勾选框 -->
+              <view class="mr-3 flex-shrink-0" @tap.stop="toggleCourseSelection(index)">
+                <view
+                  class="w-5 h-5 rounded border-2 flex items-center justify-center transition-colors"
+                  :class="course.selected
+                    ? 'bg-blue-500 border-blue-500'
+                    : 'bg-white border-gray-300'"
+                >
+                  <text
+                    v-if="course.selected"
+                    class="i-lucide-check text-white text-xs"
+                  ></text>
+                </view>
+              </view>
+
+              <!-- 课程信息 -->
+              <view class="flex-1" @tap="toggleCourseSelection(index)">
+                <text class="text-gray-800 font-medium text-sm block mb-1">
+                  {{ course.courseName }}
+                </text>
+                <view class="flex items-center space-x-4 text-xs text-gray-500">
+                  <text>学分: {{ course.credits }}</text>
+                  <text>成绩: {{ course.score }}</text>
+                </view>
+              </view>
+
+              <!-- 右侧操作按钮 -->
+              <view class="flex items-center flex-shrink-0">
+                <view
+                  @tap.stop="editCourse(index)"
+                  class="ml-3 p-2 active:bg-gray-100 rounded"
+                >
+                  <text class="i-lucide-edit text-blue-500 w-5 h-5"></text>
+                </view>
+                <view
+                  @tap.stop="removeCourse(index)"
+                  class="ml-2 p-2 active:bg-gray-100 rounded"
+                >
+                  <text class="i-lucide-trash-2 text-red-500 w-5 h-5"></text>
+                </view>
+              </view>
+            </view>
+          </view>
+        </scroll-view>
       </view>
 
       <!-- 空状态 -->
@@ -134,7 +170,7 @@
     </view>
 
     <!-- 底部提示 -->
-    <view class="pb-4">
+    <view class="p-4 flex-shrink-0">
       <text class="text-gray-400 text-xs text-center block">
         您的数据不会被上传
       </text>
@@ -253,9 +289,11 @@ const canSaveEdit = computed(() => {
   )
 })
 
-// 绩点计算结果
+// 绩点计算结果（只计算选中的课程）
 const gpaResults = computed(() => {
-  if (courses.value.length === 0) {
+  const selectedCourses = courses.value.filter(course => course.selected !== false)
+
+  if (selectedCourses.length === 0) {
     return {
       percentage: 0,
       fivePoint: 0,
@@ -268,7 +306,7 @@ const gpaResults = computed(() => {
   let totalFivePointWeighted = 0
   let totalFourPointWeighted = 0
 
-  courses.value.forEach(course => {
+  selectedCourses.forEach(course => {
     const credits = parseFloat(course.credits) || 0
     const score = parseFloat(course.score) || 0
 
@@ -324,6 +362,30 @@ const convertToFourPoint = (score) => {
   return 0
 }
 
+// 切换课程选中状态
+const toggleCourseSelection = (index) => {
+  if (courses.value[index]) {
+    courses.value[index].selected = !courses.value[index].selected
+    saveToLocalStorage()
+  }
+}
+
+// 全选
+const selectAll = () => {
+  courses.value.forEach(course => {
+    course.selected = true
+  })
+  saveToLocalStorage()
+}
+
+// 反选
+const toggleAll = () => {
+  courses.value.forEach(course => {
+    course.selected = !course.selected
+  })
+  saveToLocalStorage()
+}
+
 // 添加课程
 const addCourse = () => {
   if (!canAdd.value) {
@@ -337,7 +399,8 @@ const addCourse = () => {
   const newCourse = {
     courseName: currentCourse.value.courseName.trim(),
     credits: parseFloat(currentCourse.value.credits),
-    score: parseFloat(currentCourse.value.score)
+    score: parseFloat(currentCourse.value.score),
+    selected: true // 默认选中
   }
 
   // 使用unshift确保新课程添加到数组开头（显示在顶部）
@@ -375,10 +438,16 @@ const saveEditCourse = () => {
     return
   }
 
+  // 保留原有的 selected 状态
+  const originalSelected = courses.value[editCourseIndex.value]?.selected !== undefined
+    ? courses.value[editCourseIndex.value].selected
+    : true
+
   courses.value[editCourseIndex.value] = {
     courseName: editCourseData.value.courseName.trim(),
     credits: parseFloat(editCourseData.value.credits),
-    score: parseFloat(editCourseData.value.score)
+    score: parseFloat(editCourseData.value.score),
+    selected: originalSelected // 保留原有的选中状态
   }
 
   saveToLocalStorage()
@@ -424,7 +493,11 @@ const loadFromLocalStorage = () => {
   try {
     const saved = Taro.getStorageSync('gpa_calculator_courses')
     if (saved && Array.isArray(saved)) {
-      courses.value = saved
+      // 确保每个课程都有selected属性，默认为true
+      courses.value = saved.map(course => ({
+        ...course,
+        selected: course.selected !== undefined ? course.selected : true
+      }))
     }
   } catch (error) {
     console.error('加载数据失败:', error)
