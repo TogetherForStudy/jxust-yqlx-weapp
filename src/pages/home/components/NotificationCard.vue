@@ -53,7 +53,7 @@
                 <text v-if="hasScheduleData(notification)" class="i-lucide-calendar text-blue-500 mx-2 shrink-0 text-sm"></text>
               </view>
                 <!-- 发布时间 -->
-                <text class="text-gray-400 text-xs shrink-0">
+                <text v-if="!notification.is_pinned" class="text-gray-400 text-xs shrink-0">
                   {{ formatDate(notification.published_at || notification.created_at) }}
                 </text>
           </view>
@@ -138,6 +138,12 @@ const formatDate = (dateString) => {
     return '昨天'
   } else if (days < 7) {
     return `${days}天前`
+  } else if (days < 30) {
+    const weeks = Math.floor(days / 7)
+    return weeks === 1 ? '1周前' : `${weeks}周前`
+  } else if (days < 365) {
+    const months = Math.floor(days / 30)
+    return months === 1 ? '1月前' : `${months}月前`
   } else {
     return formatDateTime(date, 'yyyy-MM-dd HH:mm')
   }

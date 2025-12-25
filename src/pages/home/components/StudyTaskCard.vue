@@ -39,7 +39,7 @@
             待完成 {{ stats.pending_count }} · 已完成
             {{ stats.completed_count }}
           </text>
-          <view @tap="showCompleted = !showCompleted" class="flex items-center text-xs text-gray-500">
+          <view @tap="toggleCompletedTasks" class="flex items-center text-xs text-gray-500">
             <text class="mr-1">{{
               showCompleted ? "隐藏已完成" : "显示已完成"
               }}</text>
@@ -414,7 +414,7 @@ const priorityOptions = [
 // 计算属性
 const isLoading = computed(() => studyTaskStore.isLoading);
 const pendingTasks = computed(() => studyTaskStore.pendingTasks);
-const completedTasks = computed(() => studyTaskStore.completedTasks);
+const completedTasks = computed(() => studyTaskStore.completedTasksList);
 const stats = computed(() => studyTaskStore.stats);
 
 const canSubmit = computed(() => {
@@ -859,16 +859,24 @@ const loadData = async (reset = true) => {
         hasMoreData.value = true;
       }
 
+      // 只请求未完成的任务（status=1）
       const response = await studyTaskStore.fetchStudyTasks({
         page: currentPage.value,
         size: pageSize.value,
+        status: 1, // 只获取待完成的任务
       });
 
       await studyTaskStore.fetchStudyTaskStats();
 
       // 判断是否还有更多数据
+      // 基于未完成任务的数量来判断
       if (response && response.data) {
-        hasMoreData.value = response.data.length === pageSize.value;
+        const returnedCount = response.data.length;
+        // 如果返回的数据少于pageSize，说明没有更多数据了
+        // 或者如果当前已加载的未完成任务数量已经达到或超过pending_count，也没有更多数据了
+        const currentPendingCount = pendingTasks.value.length;
+        hasMoreData.value = returnedCount === pageSize.value &&
+                           currentPendingCount < stats.value.pending_count;
       } else {
         hasMoreData.value = false;
       }
@@ -888,15 +896,23 @@ const loadMoreTasks = async () => {
   isLoadingMore.value = true;
   try {
     currentPage.value++;
+    // 只请求未完成的任务（status=1）
     const response = await studyTaskStore.fetchStudyTasks({
       page: currentPage.value,
       size: pageSize.value,
+      status: 1, // 只获取待完成的任务
       append: true, // 标记为追加数据，不替换现有数据
     });
 
     // 判断是否还有更多数据
+    // 基于未完成任务的数量来判断
     if (response && response.data) {
-      hasMoreData.value = response.data.length === pageSize.value;
+      const returnedCount = response.data.length;
+      const currentPendingCount = pendingTasks.value.length;
+      // 如果返回的数据少于pageSize，说明没有更多数据了
+      // 或者如果当前已加载的未完成任务数量已经达到或超过pending_count，也没有更多数据了
+      hasMoreData.value = returnedCount === pageSize.value &&
+                         currentPendingCount < stats.value.pending_count;
     } else {
       hasMoreData.value = false;
     }
@@ -906,6 +922,24 @@ const loadMoreTasks = async () => {
     hasMoreData.value = false;
   } finally {
     isLoadingMore.value = false;
+  }
+};
+
+// 切换显示已完成任务
+const toggleCompletedTasks = async () => {
+  showCompleted.value = !showCompleted.value;
+
+  // 如果显示已完成任务，且还没有加载过，则加载已完成任务
+  if (showCompleted.value && completedTasks.value.length === 0 && stats.value.completed_count > 0) {
+    try {
+      await studyTaskStore.fetchCompletedStudyTasks({
+        status: 2,
+        page: 1,
+        size: 20, // 先加载前20条已完成任务
+      });
+    } catch (error) {
+      console.error("加载已完成任务失败:", error);
+    }
   }
 };
 
