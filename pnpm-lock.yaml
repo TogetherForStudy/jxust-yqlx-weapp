@@ -19,28 +19,28 @@ importers:
         version: 4.1.6
       '@tarojs/plugin-framework-vue3':
         specifier: 4.1.6
-        version: 4.1.6(@tarojs/helper@4.1.6)(@tarojs/runner-utils@4.1.9)(@tarojs/runtime@4.1.6)(@tarojs/shared@4.1.6)(@vitejs/plugin-vue-jsx@3.1.0(vite@4.5.14(@types/node@24.10.1)(sass@1.91.0)(terser@5.43.1))(vue@3.5.21(typescript@5.9.2)))(@vitejs/plugin-vue@4.6.2(vite@4.5.14(@types/node@24.10.1)(sass@1.91.0)(terser@5.43.1))(vue@3.5.21(typescript@5.9.2)))(vite@4.5.14(@types/node@24.10.1)(sass@1.91.0)(terser@5.43.1))(vue-loader@17.4.2(vue@3.5.21(typescript@5.9.2))(webpack@5.101.3(@swc/core@1.3.96)))(vue@3.5.21(typescript@5.9.2))(webpack@5.101.3(@swc/core@1.3.96))
+        version: 4.1.6(@tarojs/helper@4.1.6)(@tarojs/runner-utils@4.1.9)(@tarojs/runtime@4.1.6)(@tarojs/shared@4.1.6)(@vitejs/plugin-vue-jsx@3.1.0(vite@4.5.14(@types/node@25.0.3)(sass@1.91.0)(terser@5.43.1))(vue@3.5.21(typescript@5.9.2)))(@vitejs/plugin-vue@4.6.2(vite@4.5.14(@types/node@25.0.3)(sass@1.91.0)(terser@5.43.1))(vue@3.5.21(typescript@5.9.2)))(vite@4.5.14(@types/node@25.0.3)(sass@1.91.0)(terser@5.43.1))(vue-loader@17.4.2(vue@3.5.21(typescript@5.9.2))(webpack@5.101.3(@swc/core@1.3.96)))(vue@3.5.21(typescript@5.9.2))(webpack@5.101.3(@swc/core@1.3.96))
       '@tarojs/plugin-platform-alipay':
         specifier: 4.1.6
-        version: 4.1.6(@tarojs/service@4.1.9)(@tarojs/shared@4.1.6)
+        version: 4.1.6(@tarojs/shared@4.1.6)
       '@tarojs/plugin-platform-h5':
         specifier: 4.1.6
         version: 4.1.6(@tarojs/taro@4.1.6(@tarojs/components@4.1.6(@tarojs/helper@4.1.6)(postcss@8.5.6)(rollup@3.29.5)(vue@3.5.21(typescript@5.9.2))(webpack@5.101.3(@swc/core@1.3.96)))(@tarojs/helper@4.1.6)(@tarojs/shared@4.1.6)(postcss@8.5.6)(rollup@3.29.5)(vue@3.5.21(typescript@5.9.2))(webpack@5.101.3(@swc/core@1.3.96)))(postcss@8.5.6)(react@19.1.1)(rollup@3.29.5)(solid-js@1.9.9)(vue@3.5.21(typescript@5.9.2))(webpack@5.101.3(@swc/core@1.3.96))
       '@tarojs/plugin-platform-jd':
         specifier: 4.1.6
-        version: 4.1.6(@tarojs/service@4.1.9)(@tarojs/shared@4.1.6)
+        version: 4.1.6(@tarojs/shared@4.1.6)
       '@tarojs/plugin-platform-qq':
         specifier: 4.1.6
-        version: 4.1.6(@tarojs/plugin-platform-weapp@4.1.6(@tarojs/service@4.1.9)(@tarojs/shared@4.1.6))(@tarojs/shared@4.1.6)
+        version: 4.1.6(@tarojs/plugin-platform-weapp@4.1.6(@tarojs/shared@4.1.6))(@tarojs/shared@4.1.6)
       '@tarojs/plugin-platform-swan':
-        specifier: 4.1.6
-        version: 4.1.6(@tarojs/service@4.1.9)(@tarojs/shared@4.1.6)
+        specifier: 4.1.9
+        version: 4.1.9(@tarojs/shared@4.1.6)
       '@tarojs/plugin-platform-tt':
         specifier: 4.1.6
-        version: 4.1.6(@tarojs/service@4.1.9)(@tarojs/shared@4.1.6)
+        version: 4.1.6(@tarojs/shared@4.1.6)
       '@tarojs/plugin-platform-weapp':
         specifier: 4.1.6
-        version: 4.1.6(@tarojs/service@4.1.9)(@tarojs/shared@4.1.6)
+        version: 4.1.6(@tarojs/shared@4.1.6)
       '@tarojs/runtime':
         specifier: 4.1.6
         version: 4.1.6
@@ -74,16 +74,16 @@ importers:
         version: 1.2.66
       '@tarojs/cli':
         specifier: 4.1.9
-        version: 4.1.9(@types/node@24.10.1)
+        version: 4.1.9(@types/node@25.0.3)
       '@tarojs/vite-runner':
         specifier: 4.1.6
-        version: 4.1.6(@tarojs/runtime@4.1.6)(jiti@2.5.1)(postcss@8.5.6)(rollup@3.29.5)(terser@5.43.1)(typescript@5.9.2)(vite@4.5.14(@types/node@24.10.1)(sass@1.91.0)(terser@5.43.1))
+        version: 4.1.6(@tarojs/runtime@4.1.6)(jiti@2.5.1)(postcss@8.5.6)(rollup@3.29.5)(terser@5.43.1)(typescript@5.9.2)(vite@4.5.14(@types/node@25.0.3)(sass@1.91.0)(terser@5.43.1))
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.6.2(vite@4.5.14(@types/node@24.10.1)(sass@1.91.0)(terser@5.43.1))(vue@3.5.21(typescript@5.9.2))
+        version: 4.6.2(vite@4.5.14(@types/node@25.0.3)(sass@1.91.0)(terser@5.43.1))(vue@3.5.21(typescript@5.9.2))
       '@vitejs/plugin-vue-jsx':
         specifier: ^3.0.0
-        version: 3.1.0(vite@4.5.14(@types/node@24.10.1)(sass@1.91.0)(terser@5.43.1))(vue@3.5.21(typescript@5.9.2))
+        version: 3.1.0(vite@4.5.14(@types/node@25.0.3)(sass@1.91.0)(terser@5.43.1))(vue@3.5.21(typescript@5.9.2))
       babel-preset-taro:
         specifier: 4.1.6
         version: 4.1.6(@babel/core@7.28.4)(@babel/plugin-transform-typescript@7.28.0(@babel/core@7.28.4))(@vue/babel-plugin-jsx@1.5.0(@babel/core@7.28.4))
@@ -116,7 +116,7 @@ importers:
         version: 5.43.1
       vite:
         specifier: ^4.2.0
-        version: 4.5.14(@types/node@24.10.1)(sass@1.91.0)(terser@5.43.1)
+        version: 4.5.14(@types/node@25.0.3)(sass@1.91.0)(terser@5.43.1)
       weapp-tailwindcss:
         specifier: ^4.2.6
         version: 4.2.6(tailwindcss@3.4.17)(typescript@5.9.2)
@@ -1941,12 +1941,12 @@ packages:
       '@tarojs/plugin-platform-weapp': 4.1.6
       '@tarojs/shared': 4.1.6
 
-  '@tarojs/plugin-platform-swan@4.1.6':
-    resolution: {integrity: sha512-5Fjta6EOoWuOnSjGzexUoCoMJzUIumMYd5FNt67PeDjflGnE9A9PSo5T39+KkGW7TaeTrTpmICQe7AXJlKbRTQ==}
+  '@tarojs/plugin-platform-swan@4.1.9':
+    resolution: {integrity: sha512-2jueywyY2oRs5eJPoXL00qont0AdBw4vLNBs6AEbVl+8LsTpqqC///QKPouXH+Sllg4BxU/4vhT+eZpIPC1V/w==}
     engines: {node: '>= 18'}
     peerDependencies:
-      '@tarojs/service': 4.1.6
-      '@tarojs/shared': 4.1.6
+      '@tarojs/service': 4.1.9
+      '@tarojs/shared': 4.1.9
 
   '@tarojs/plugin-platform-tt@4.1.6':
     resolution: {integrity: sha512-1Y/2OBt73nD0sLbKTAtYpTsOQm/DFj8xyFGiTQ5Ro2v8/xHuULmdRWhYOurh+Fb9f6sqxnYqe3c60iz+kzR3NQ==}
@@ -2092,6 +2092,9 @@ packages:
 
   '@types/node@24.3.0':
     resolution: {integrity: sha512-aPTXCrfwnDLj4VvXrm+UUCQjNEvJgNA8s5F1cvwQU+3KNltTOkBm1j30uNLyqqPNe7gE3KFzImYoZEfLhp4Yow==}
+
+  '@types/node@25.0.3':
+    resolution: {integrity: sha512-W609buLVRVmeW693xKfzHeIV6nJGGz98uCPfeXI1ELMLXVeKYZ9m15fAMSaUPBHYLGFsVRcMmSCksQOrZV9BYA==}
 
   '@types/normalize-package-data@2.4.4':
     resolution: {integrity: sha512-37i+OaWTh9qeK4LSHPsyRC7NahnGotNuZvjLSgcPzblpHB3rrCJxAOgI5gCdKm7coonsaX1Of0ILiTcnZjbfxA==}
@@ -3057,8 +3060,8 @@ packages:
   end-of-stream@1.4.5:
     resolution: {integrity: sha512-ooEGc6HP26xXq/N+GCGOT0JKCLDGrq2bQUZrQ7gyrJiZANJ/8YDTxTpQBXGMn+WbIQXNVpyWymm7KYVICQnyOg==}
 
-  enhanced-resolve@5.18.3:
-    resolution: {integrity: sha512-d4lC8xfavMeBjzGr2vECC3fsGXziXZQyJxD868h2M/mBI3PwAuODxAkLkq5HYuvrPYcUtiLzsTo8U3PgX3Ocww==}
+  enhanced-resolve@5.18.4:
+    resolution: {integrity: sha512-LgQMM4WXU3QI+SYgEc2liRgznaD5ojbmY3sb8LxyguVkIg5FxdpTkvk72te2R38/TGKxH634oLxXRGY6d7AP+Q==}
     engines: {node: '>=10.13.0'}
 
   entities@4.5.0:
@@ -5462,8 +5465,8 @@ packages:
     resolution: {integrity: sha512-5S7Va8hKfV7W5U6g3aYxXmlPoZVAwUMy9AOKyF2fVuZa2UD3qZjg578OrLRt8PcNN1PleVaL/5/yYATNL0ICUw==}
     engines: {node: '>=18'}
 
-  terser-webpack-plugin@5.3.14:
-    resolution: {integrity: sha512-vkZjpUjb6OMS7dhV+tILUW6BhpDR7P2L/aQSAv+Uwk+m8KATX9EccViHTJR2qDtACKPIYndLGCyl3FMo+r2LMw==}
+  terser-webpack-plugin@5.3.16:
+    resolution: {integrity: sha512-h9oBFCWrq78NyWWVcSwZarJkZ01c2AyGrzs1crmHZO3QUg9D61Wu4NPjBy69n7JqylFF5y+CsUZYmYEIZ3mR+Q==}
     engines: {node: '>= 10.13.0'}
     peerDependencies:
       '@swc/core': '*'
@@ -5787,8 +5790,8 @@ packages:
       typescript:
         optional: true
 
-  watchpack@2.4.4:
-    resolution: {integrity: sha512-c5EGNOiyxxV5qmTtAB7rbiXxi1ooX1pQKMLX/MIabJjRA0SJBQOjKF+KSVfHkr9U1cADPon0mRiVe/riyaiDUA==}
+  watchpack@2.5.0:
+    resolution: {integrity: sha512-e6vZvY6xboSwLz2GD36c16+O/2Z6fKvIf4pOXptw2rY9MVwE/TXc6RGqxD3I3x0a28lwBY7DE+76uTPSsBrrCA==}
     engines: {node: '>=10.13.0'}
 
   wcwidth@1.0.1:
@@ -7237,12 +7240,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@inquirer/external-editor@1.0.3(@types/node@24.10.1)':
+  '@inquirer/external-editor@1.0.3(@types/node@25.0.3)':
     dependencies:
       chardet: 2.1.1
       iconv-lite: 0.7.0
     optionalDependencies:
-      '@types/node': 24.10.1
+      '@types/node': 25.0.3
 
   '@isaacs/balanced-match@4.0.1': {}
 
@@ -7556,7 +7559,7 @@ snapshots:
       '@tarojs/binding-linux-x64-gnu': 4.1.9
       '@tarojs/binding-win32-x64-msvc': 4.1.9
 
-  '@tarojs/cli@4.1.9(@types/node@24.10.1)':
+  '@tarojs/cli@4.1.9(@types/node@25.0.3)':
     dependencies:
       '@tarojs/binding': 4.1.9
       '@tarojs/helper': 4.1.9
@@ -7568,7 +7571,7 @@ snapshots:
       cli-highlight: 2.1.11
       download-git-repo: 3.0.2
       envinfo: 7.21.0
-      inquirer: 8.2.7(@types/node@24.10.1)
+      inquirer: 8.2.7(@types/node@25.0.3)
       latest-version: 5.1.0
       minimist: 1.2.8
       ora: 5.4.1
@@ -7775,7 +7778,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@tarojs/plugin-framework-vue3@4.1.6(@tarojs/helper@4.1.6)(@tarojs/runner-utils@4.1.9)(@tarojs/runtime@4.1.6)(@tarojs/shared@4.1.6)(@vitejs/plugin-vue-jsx@3.1.0(vite@4.5.14(@types/node@24.10.1)(sass@1.91.0)(terser@5.43.1))(vue@3.5.21(typescript@5.9.2)))(@vitejs/plugin-vue@4.6.2(vite@4.5.14(@types/node@24.10.1)(sass@1.91.0)(terser@5.43.1))(vue@3.5.21(typescript@5.9.2)))(vite@4.5.14(@types/node@24.10.1)(sass@1.91.0)(terser@5.43.1))(vue-loader@17.4.2(vue@3.5.21(typescript@5.9.2))(webpack@5.101.3(@swc/core@1.3.96)))(vue@3.5.21(typescript@5.9.2))(webpack@5.101.3(@swc/core@1.3.96))':
+  '@tarojs/plugin-framework-vue3@4.1.6(@tarojs/helper@4.1.6)(@tarojs/runner-utils@4.1.9)(@tarojs/runtime@4.1.6)(@tarojs/shared@4.1.6)(@vitejs/plugin-vue-jsx@3.1.0(vite@4.5.14(@types/node@25.0.3)(sass@1.91.0)(terser@5.43.1))(vue@3.5.21(typescript@5.9.2)))(@vitejs/plugin-vue@4.6.2(vite@4.5.14(@types/node@25.0.3)(sass@1.91.0)(terser@5.43.1))(vue@3.5.21(typescript@5.9.2)))(vite@4.5.14(@types/node@25.0.3)(sass@1.91.0)(terser@5.43.1))(vue-loader@17.4.2(vue@3.5.21(typescript@5.9.2))(webpack@5.101.3(@swc/core@1.3.96)))(vue@3.5.21(typescript@5.9.2))(webpack@5.101.3(@swc/core@1.3.96))':
     dependencies:
       '@tarojs/helper': 4.1.6
       '@tarojs/runner-utils': 4.1.9
@@ -7787,13 +7790,12 @@ snapshots:
       vue-loader: 17.4.2(vue@3.5.21(typescript@5.9.2))(webpack@5.101.3(@swc/core@1.3.96))
       webpack: 5.101.3(@swc/core@1.3.96)
     optionalDependencies:
-      '@vitejs/plugin-vue': 4.6.2(vite@4.5.14(@types/node@24.10.1)(sass@1.91.0)(terser@5.43.1))(vue@3.5.21(typescript@5.9.2))
-      '@vitejs/plugin-vue-jsx': 3.1.0(vite@4.5.14(@types/node@24.10.1)(sass@1.91.0)(terser@5.43.1))(vue@3.5.21(typescript@5.9.2))
-      vite: 4.5.14(@types/node@24.10.1)(sass@1.91.0)(terser@5.43.1)
+      '@vitejs/plugin-vue': 4.6.2(vite@4.5.14(@types/node@25.0.3)(sass@1.91.0)(terser@5.43.1))(vue@3.5.21(typescript@5.9.2))
+      '@vitejs/plugin-vue-jsx': 3.1.0(vite@4.5.14(@types/node@25.0.3)(sass@1.91.0)(terser@5.43.1))(vue@3.5.21(typescript@5.9.2))
+      vite: 4.5.14(@types/node@25.0.3)(sass@1.91.0)(terser@5.43.1)
 
-  '@tarojs/plugin-platform-alipay@4.1.6(@tarojs/service@4.1.9)(@tarojs/shared@4.1.6)':
+  '@tarojs/plugin-platform-alipay@4.1.6(@tarojs/shared@4.1.6)':
     dependencies:
-      '@tarojs/service': 4.1.9
       '@tarojs/shared': 4.1.6
 
   '@tarojs/plugin-platform-h5@4.1.6(@tarojs/taro@4.1.6(@tarojs/components@4.1.6(@tarojs/helper@4.1.6)(postcss@8.5.6)(rollup@3.29.5)(vue@3.5.21(typescript@5.9.2))(webpack@5.101.3(@swc/core@1.3.96)))(@tarojs/helper@4.1.6)(@tarojs/shared@4.1.6)(postcss@8.5.6)(rollup@3.29.5)(vue@3.5.21(typescript@5.9.2))(webpack@5.101.3(@swc/core@1.3.96)))(postcss@8.5.6)(react@19.1.1)(rollup@3.29.5)(solid-js@1.9.9)(vue@3.5.21(typescript@5.9.2))(webpack@5.101.3(@swc/core@1.3.96))':
@@ -7825,30 +7827,26 @@ snapshots:
       - webpack-chain
       - webpack-dev-server
 
-  '@tarojs/plugin-platform-jd@4.1.6(@tarojs/service@4.1.9)(@tarojs/shared@4.1.6)':
+  '@tarojs/plugin-platform-jd@4.1.6(@tarojs/shared@4.1.6)':
     dependencies:
-      '@tarojs/service': 4.1.9
       '@tarojs/shared': 4.1.6
 
-  '@tarojs/plugin-platform-qq@4.1.6(@tarojs/plugin-platform-weapp@4.1.6(@tarojs/service@4.1.9)(@tarojs/shared@4.1.6))(@tarojs/shared@4.1.6)':
+  '@tarojs/plugin-platform-qq@4.1.6(@tarojs/plugin-platform-weapp@4.1.6(@tarojs/shared@4.1.6))(@tarojs/shared@4.1.6)':
     dependencies:
-      '@tarojs/plugin-platform-weapp': 4.1.6(@tarojs/service@4.1.9)(@tarojs/shared@4.1.6)
+      '@tarojs/plugin-platform-weapp': 4.1.6(@tarojs/shared@4.1.6)
       '@tarojs/shared': 4.1.6
 
-  '@tarojs/plugin-platform-swan@4.1.6(@tarojs/service@4.1.9)(@tarojs/shared@4.1.6)':
+  '@tarojs/plugin-platform-swan@4.1.9(@tarojs/shared@4.1.6)':
     dependencies:
-      '@tarojs/service': 4.1.9
       '@tarojs/shared': 4.1.6
 
-  '@tarojs/plugin-platform-tt@4.1.6(@tarojs/service@4.1.9)(@tarojs/shared@4.1.6)':
+  '@tarojs/plugin-platform-tt@4.1.6(@tarojs/shared@4.1.6)':
     dependencies:
-      '@tarojs/service': 4.1.9
       '@tarojs/shared': 4.1.6
       webpack-sources: 3.3.3
 
-  '@tarojs/plugin-platform-weapp@4.1.6(@tarojs/service@4.1.9)(@tarojs/shared@4.1.6)':
+  '@tarojs/plugin-platform-weapp@4.1.6(@tarojs/shared@4.1.6)':
     dependencies:
-      '@tarojs/service': 4.1.9
       '@tarojs/shared': 4.1.6
 
   '@tarojs/router@4.1.6(@tarojs/runtime@4.1.6)(@tarojs/shared@4.1.6)(@tarojs/taro@4.1.6(@tarojs/components@4.1.6(@tarojs/helper@4.1.6)(postcss@8.5.6)(rollup@3.29.5)(vue@3.5.21(typescript@5.9.2))(webpack@5.101.3(@swc/core@1.3.96)))(@tarojs/helper@4.1.6)(@tarojs/shared@4.1.6)(postcss@8.5.6)(rollup@3.29.5)(vue@3.5.21(typescript@5.9.2))(webpack@5.101.3(@swc/core@1.3.96)))':
@@ -7954,7 +7952,7 @@ snapshots:
       vue: 3.5.21(typescript@5.9.2)
       webpack: 5.101.3(@swc/core@1.3.96)
 
-  '@tarojs/vite-runner@4.1.6(@tarojs/runtime@4.1.6)(jiti@2.5.1)(postcss@8.5.6)(rollup@3.29.5)(terser@5.43.1)(typescript@5.9.2)(vite@4.5.14(@types/node@24.10.1)(sass@1.91.0)(terser@5.43.1))':
+  '@tarojs/vite-runner@4.1.6(@tarojs/runtime@4.1.6)(jiti@2.5.1)(postcss@8.5.6)(rollup@3.29.5)(terser@5.43.1)(typescript@5.9.2)(vite@4.5.14(@types/node@25.0.3)(sass@1.91.0)(terser@5.43.1))':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@babel/core': 7.28.4
@@ -7967,7 +7965,7 @@ snapshots:
       '@tarojs/runner-utils': 4.1.6
       '@tarojs/runtime': 4.1.6
       '@tarojs/shared': 4.1.6
-      '@vitejs/plugin-legacy': 4.1.1(terser@5.43.1)(vite@4.5.14(@types/node@24.10.1)(sass@1.91.0)(terser@5.43.1))
+      '@vitejs/plugin-legacy': 4.1.1(terser@5.43.1)(vite@4.5.14(@types/node@25.0.3)(sass@1.91.0)(terser@5.43.1))
       acorn-walk: 8.3.4
       autoprefixer: 10.4.21(postcss@8.5.6)
       babel-plugin-transform-taroapi: 4.1.6(@babel/core@7.28.4)
@@ -7990,8 +7988,8 @@ snapshots:
       regenerator-runtime: 0.11.1
       sax: 1.2.4
       stylelint: 16.23.1(typescript@5.9.2)
-      vite: 4.5.14(@types/node@24.10.1)(sass@1.91.0)(terser@5.43.1)
-      vite-plugin-static-copy: 0.17.1(vite@4.5.14(@types/node@24.10.1)(sass@1.91.0)(terser@5.43.1))
+      vite: 4.5.14(@types/node@25.0.3)(sass@1.91.0)(terser@5.43.1)
+      vite-plugin-static-copy: 0.17.1(vite@4.5.14(@types/node@25.0.3)(sass@1.91.0)(terser@5.43.1))
     transitivePeerDependencies:
       - '@swc/helpers'
       - '@types/babel__core'
@@ -8058,6 +8056,10 @@ snapshots:
   '@types/node@24.3.0':
     dependencies:
       undici-types: 7.10.0
+
+  '@types/node@25.0.3':
+    dependencies:
+      undici-types: 7.16.0
 
   '@types/normalize-package-data@2.4.4': {}
 
@@ -8166,7 +8168,7 @@ snapshots:
 
   '@ungap/structured-clone@1.3.0': {}
 
-  '@vitejs/plugin-legacy@4.1.1(terser@5.43.1)(vite@4.5.14(@types/node@24.10.1)(sass@1.91.0)(terser@5.43.1))':
+  '@vitejs/plugin-legacy@4.1.1(terser@5.43.1)(vite@4.5.14(@types/node@25.0.3)(sass@1.91.0)(terser@5.43.1))':
     dependencies:
       '@babel/core': 7.28.4
       '@babel/preset-env': 7.28.3(@babel/core@7.28.4)
@@ -8176,23 +8178,23 @@ snapshots:
       regenerator-runtime: 0.13.11
       systemjs: 6.15.1
       terser: 5.43.1
-      vite: 4.5.14(@types/node@24.10.1)(sass@1.91.0)(terser@5.43.1)
+      vite: 4.5.14(@types/node@25.0.3)(sass@1.91.0)(terser@5.43.1)
     transitivePeerDependencies:
       - supports-color
 
-  '@vitejs/plugin-vue-jsx@3.1.0(vite@4.5.14(@types/node@24.10.1)(sass@1.91.0)(terser@5.43.1))(vue@3.5.21(typescript@5.9.2))':
+  '@vitejs/plugin-vue-jsx@3.1.0(vite@4.5.14(@types/node@25.0.3)(sass@1.91.0)(terser@5.43.1))(vue@3.5.21(typescript@5.9.2))':
     dependencies:
       '@babel/core': 7.28.4
       '@babel/plugin-transform-typescript': 7.28.0(@babel/core@7.28.4)
       '@vue/babel-plugin-jsx': 1.5.0(@babel/core@7.28.4)
-      vite: 4.5.14(@types/node@24.10.1)(sass@1.91.0)(terser@5.43.1)
+      vite: 4.5.14(@types/node@25.0.3)(sass@1.91.0)(terser@5.43.1)
       vue: 3.5.21(typescript@5.9.2)
     transitivePeerDependencies:
       - supports-color
 
-  '@vitejs/plugin-vue@4.6.2(vite@4.5.14(@types/node@24.10.1)(sass@1.91.0)(terser@5.43.1))(vue@3.5.21(typescript@5.9.2))':
+  '@vitejs/plugin-vue@4.6.2(vite@4.5.14(@types/node@25.0.3)(sass@1.91.0)(terser@5.43.1))(vue@3.5.21(typescript@5.9.2))':
     dependencies:
-      vite: 4.5.14(@types/node@24.10.1)(sass@1.91.0)(terser@5.43.1)
+      vite: 4.5.14(@types/node@25.0.3)(sass@1.91.0)(terser@5.43.1)
       vue: 3.5.21(typescript@5.9.2)
 
   '@vue/babel-helper-vue-transform-on@1.5.0': {}
@@ -9239,7 +9241,7 @@ snapshots:
     dependencies:
       once: 1.4.0
 
-  enhanced-resolve@5.18.3:
+  enhanced-resolve@5.18.4:
     dependencies:
       graceful-fs: 4.2.11
       tapable: 2.3.0
@@ -10124,9 +10126,9 @@ snapshots:
 
   ini@1.3.8: {}
 
-  inquirer@8.2.7(@types/node@24.10.1):
+  inquirer@8.2.7(@types/node@25.0.3):
     dependencies:
-      '@inquirer/external-editor': 1.0.3(@types/node@24.10.1)
+      '@inquirer/external-editor': 1.0.3(@types/node@25.0.3)
       ansi-escapes: 4.3.2
       chalk: 4.1.2
       cli-cursor: 3.1.0
@@ -10328,7 +10330,7 @@ snapshots:
 
   jest-worker@27.5.1:
     dependencies:
-      '@types/node': 24.10.1
+      '@types/node': 25.0.3
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
@@ -12064,7 +12066,7 @@ snapshots:
       mkdirp: 3.0.1
       yallist: 5.0.0
 
-  terser-webpack-plugin@5.3.14(@swc/core@1.3.96)(webpack@5.101.3(@swc/core@1.3.96)):
+  terser-webpack-plugin@5.3.16(@swc/core@1.3.96)(webpack@5.101.3(@swc/core@1.3.96)):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
       jest-worker: 27.5.1
@@ -12293,21 +12295,21 @@ snapshots:
 
   validate-npm-package-name@6.0.2: {}
 
-  vite-plugin-static-copy@0.17.1(vite@4.5.14(@types/node@24.10.1)(sass@1.91.0)(terser@5.43.1)):
+  vite-plugin-static-copy@0.17.1(vite@4.5.14(@types/node@25.0.3)(sass@1.91.0)(terser@5.43.1)):
     dependencies:
       chokidar: 3.6.0
       fast-glob: 3.3.3
       fs-extra: 11.3.1
       picocolors: 1.1.1
-      vite: 4.5.14(@types/node@24.10.1)(sass@1.91.0)(terser@5.43.1)
+      vite: 4.5.14(@types/node@25.0.3)(sass@1.91.0)(terser@5.43.1)
 
-  vite@4.5.14(@types/node@24.10.1)(sass@1.91.0)(terser@5.43.1):
+  vite@4.5.14(@types/node@25.0.3)(sass@1.91.0)(terser@5.43.1):
     dependencies:
       esbuild: 0.18.20
       postcss: 8.5.6
       rollup: 3.29.5
     optionalDependencies:
-      '@types/node': 24.10.1
+      '@types/node': 25.0.3
       fsevents: 2.3.3
       sass: 1.91.0
       terser: 5.43.1
@@ -12333,7 +12335,7 @@ snapshots:
     dependencies:
       chalk: 4.1.2
       hash-sum: 2.0.0
-      watchpack: 2.4.4
+      watchpack: 2.5.0
       webpack: 5.101.3(@swc/core@1.3.96)
     optionalDependencies:
       vue: 3.5.21(typescript@5.9.2)
@@ -12348,7 +12350,7 @@ snapshots:
     optionalDependencies:
       typescript: 5.9.2
 
-  watchpack@2.4.4:
+  watchpack@2.5.0:
     dependencies:
       glob-to-regexp: 0.4.1
       graceful-fs: 4.2.11
@@ -12407,7 +12409,7 @@ snapshots:
       acorn-import-phases: 1.0.4(acorn@8.15.0)
       browserslist: 4.25.4
       chrome-trace-event: 1.0.4
-      enhanced-resolve: 5.18.3
+      enhanced-resolve: 5.18.4
       es-module-lexer: 1.7.0
       eslint-scope: 5.1.1
       events: 3.3.0
@@ -12419,8 +12421,8 @@ snapshots:
       neo-async: 2.6.2
       schema-utils: 4.3.3
       tapable: 2.3.0
-      terser-webpack-plugin: 5.3.14(@swc/core@1.3.96)(webpack@5.101.3(@swc/core@1.3.96))
-      watchpack: 2.4.4
+      terser-webpack-plugin: 5.3.16(@swc/core@1.3.96)(webpack@5.101.3(@swc/core@1.3.96))
+      watchpack: 2.5.0
       webpack-sources: 3.3.3
     transitivePeerDependencies:
       - '@swc/core'
