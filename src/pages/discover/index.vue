@@ -5,6 +5,12 @@
     <view class="p-4">
       <view class="flex justify-between items-center mb-2">
         <text class="text-gray-800 font-medium">江理一起来学</text>
+        <text
+          v-if="systemOnlineCount !== null"
+          class="text-xs text-gray-500"
+        >
+          {{ systemOnlineCount }} 人与你一起来学
+        </text>
       </view>
       <view class="grid grid-cols-4 gap-2">
         <view @tap="goToNotice" class="bg-white rounded-xl p-3 shadow-sm">
@@ -548,10 +554,49 @@
 </template>
 
 <script setup>
+import { ref, onMounted, onBeforeUnmount } from "vue";
 import { useAuthStore } from "../../stores/auth";
 import Taro from "@tarojs/taro";
+import { statAPI } from "../../api";
 
 const authStore = useAuthStore();
+
+const systemOnlineCount = ref(null);
+const systemOnlineCountTimer = ref(null);
+
+const fetchSystemOnline = async () => {
+  // 未登录时不请求
+  if (!authStore.isLoggedIn) {
+    return;
+  }
+  try {
+    const res = await statAPI.getSystemOnline();
+    if (typeof res === "object" && res !== null) {
+      systemOnlineCount.value = res.online_count ?? res.onlineCount ?? null;
+    } else if (typeof res === "number") {
+      systemOnlineCount.value = res;
+    }
+  } catch (error) {
+    console.error("fetchSystemOnline error", error);
+  }
+};
+
+onMounted(() => {
+  fetchSystemOnline();
+  // 每 60 秒轮询一次在线人数
+  if (!systemOnlineCountTimer.value) {
+    systemOnlineCountTimer.value = setInterval(() => {
+      fetchSystemOnline();
+    }, 60000);
+  }
+});
+
+onBeforeUnmount(() => {
+  if (systemOnlineCountTimer.value) {
+    clearInterval(systemOnlineCountTimer.value);
+    systemOnlineCountTimer.value = null;
+  }
+});
 
 // 导航方法
 const goToTeacherReviews = () => {

@@ -382,3 +382,62 @@ export const systemAPI = {
     return get('/health')
   }
 }
+
+// 统计相关API
+export const statAPI = {
+  // 获取系统在线人数
+  getSystemOnline() {
+    return get('/api/v0/stat/system/online')
+  },
+
+  // 获取某项目在线人数
+  getProjectOnline(projectId) {
+    return get(`/api/v0/stat/project/${projectId}/online`)
+  }
+}
+
+// 积分相关API
+export const pointsAPI = {
+  // 获取当前用户积分信息
+  getPoints() {
+    return get('/api/v0/points')
+  },
+
+  // 获取积分交易记录（分页）
+  getTransactions(params) {
+    return get('/api/v0/points/transactions', params)
+  },
+
+  // 获取积分统计信息（支持user_id参数，管理员可查看其他用户）
+  getStats(params) {
+    return get('/api/v0/points/stats', params)
+  },
+
+  // 管理员手动赋予积分
+  grantPoints(data) {
+    return post('/api/v0/points/grant', data)
+  }
+}
+
+// RBAC权限管理相关API
+export const rbacAPI = {
+  // 获取角色列表（管理员）
+  getRoles() {
+    return get('/api/v0/admin/rbac/roles')
+  },
+
+  // 获取权限列表（管理员）
+  getPermissions() {
+    return get('/api/v0/admin/rbac/permissions')
+  },
+
+  // 获取角色权限关联列表（管理员）
+  getRolesPermissions() {
+    return get('/api/v0/admin/rbac/roles/permissions')
+  },
+
+  // 更新用户角色（管理员）
+  updateUserRoles(userId, data) {
+    return post(`/api/v0/admin/rbac/users/${userId}/roles`, data)
+  }
+}

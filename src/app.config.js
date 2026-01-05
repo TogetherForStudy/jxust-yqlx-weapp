@@ -15,6 +15,8 @@ export default {
     'pages/admin/teacher-reviews/index',
     'pages/admin/heroes/index',
     'pages/admin/config/index',
+    'pages/admin/rbac/index',
+    'pages/admin/points/index',
     'pages/terms-of-service/index',
     'pages/webview/index',
     'pages/hero/index',
@@ -38,6 +40,8 @@ export default {
     // 资料库相关页面
     'pages/materials/index',
     'pages/materials/detail/index',
+    // 积分页面
+    'pages/points/index',
   ],
   window: {
     backgroundTextStyle: 'light',

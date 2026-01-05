@@ -9,6 +9,9 @@
               {{ projectInfo.name }}
             </view>
           </view>
+          <view v-if="onlineCount !== null" class="flex items-center gap-1 text-xs text-gray-500">
+            <text>{{ onlineCount }} 人一起在学</text>
+          </view>
         </view>
         <view class="mt-3 text-sm text-gray-600 leading-relaxed whitespace-pre-line">
           {{ projectInfo.description || "暂无项目简介" }}
@@ -89,6 +92,43 @@
               </view>
             </view>
           </view>
+
+          <!-- 接续进度 -->
+          <view v-if="savedProgressList.length > 0" class="mt-3 space-y-2">
+            <view class="text-xs text-gray-500 mb-2">暂存记录</view>
+            <view
+              v-for="(progress, index) in savedProgressList"
+              :key="index"
+              class="rounded-2xl border px-4 py-3 active:scale-[0.98] transition-all duration-150"
+              :class="getProgressCardClass(progress.type)"
+            >
+              <view class="flex items-center justify-between">
+                <view class="flex-1" @tap="resumeProgress(progress)">
+                  <view class="text-sm font-semibold" :class="getProgressTitleClass(progress.type)">
+                    {{ getProgressTypeLabel(progress.type) }}
+                  </view>
+                  <view class="text-xs mt-1" :class="getProgressInfoClass(progress.type)">
+                    {{ getProgressInfo(progress) }}
+                  </view>
+                </view>
+                <view class="flex items-center gap-2">
+                  <view
+                    class="text-xs px-2 py-1 rounded"
+                    :class="getProgressButtonClass(progress.type)"
+                    @tap.stop="resumeProgress(progress)"
+                  >
+                    继续
+                  </view>
+                  <view
+                    class="text-xs px-2 py-1 rounded border border-gray-300 text-gray-600"
+                    @tap.stop="deleteProgress(progress.type, progress.isOldVersion)"
+                  >
+                    删除
+                  </view>
+                </view>
+              </view>
+            </view>
+          </view>
         </template>
         <template v-else>
           <view class="flex items-center justify-between">
@@ -100,10 +140,10 @@
             </view>
             <view
               class="px-3 py-2 text-xs rounded-full border border-gray-200 text-gray-600"
-              @tap="handleRestart"
+              @tap="handleBackToSelection"
             >
-              重开
-          </view>
+              返回
+            </view>
           </view>
         </template>
       </view>
@@ -192,15 +232,25 @@
               第 {{ currentIndex + 1 }} / {{ questionIds.length }} 题
             </view>
           </view>
-
-          <view class="text-base text-gray-900">
+          <view>
+            <text class="text-gray-900 text-base" :selectable="true">
             {{ currentQuestion.title }}
+          </text>
           </view>
+
 
           <view
             v-if="mode"
-            class="flex justify-end pt-1"
+            class="flex justify-end items-center gap-2 pt-1"
           >
+            <view
+              v-if="mode === 'study'"
+              class="px-3 py-1 rounded-full border text-xs"
+              :class="showAnswer ? 'border-blue-200 text-blue-700 bg-blue-50' : 'border-gray-200 text-gray-600 bg-gray-50'"
+              @tap="showAnswer = !showAnswer"
+            >
+              {{ showAnswer ? "隐藏答案" : "显示答案" }}
+            </view>
             <view
               class="px-3 py-1 rounded-full border text-xs"
               :class="inWrongBook ? 'border-green-200 text-green-700 bg-green-50' : 'border-red-200 text-red-500 bg-red-50'"
@@ -214,26 +264,32 @@
             v-if="currentQuestion.sub_questions && currentQuestion.sub_questions.length"
             class="space-y-4"
           >
+          <!-- 父子题（多题展示） -->
             <view
-              v-for="sub in currentQuestion.sub_questions"
+              v-for="(sub, index) in currentQuestion.sub_questions"
               :key="sub.id"
             >
-              <view class="text-sm font-medium text-gray-900">
+              <text class="text-gray-900 text-base" :selectable="true">
                 {{ sub.title }}
-              </view>
+              </text>
               <view class="mt-3 space-y-2">
                 <view
                   v-for="option in getOptions(sub)"
                   :key="option.key"
-                  class="p-3 rounded-xl border text-sm flex items-center justify-between"
+                  class="p-3 rounded-xl border flex items-center justify-between"
                   :class="getOptionClass(sub, option.key, sub.id)"
                   @tap="handleOptionTap(option.key, sub, sub.id)"
                 >
                   <view class="flex items-center gap-2">
-                    <text>{{ option.label }}</text>
+                    <text class="text-[30rpx]">{{ option.label }}</text>
                   </view>
                 </view>
               </view>
+              <!-- 分割线：在非最后一个子题后显示 -->
+              <view
+                v-if="index < currentQuestion.sub_questions.length - 1"
+                class="mt-4 h-[1px] bg-gray-200"
+              ></view>
             </view>
           </view>
 
@@ -254,24 +310,25 @@
             v-else
             class="space-y-2"
           >
+          <!-- 普通选择 -->
             <view
               v-for="option in getOptions(currentQuestion)"
               :key="option.key"
-              class="p-3 rounded-2xl border text-sm flex items-center justify-between"
+              class="p-3 rounded-2xl border flex items-center justify-between"
               :class="getOptionClass(currentQuestion, option.key)"
               @tap="handleOptionTap(option.key, currentQuestion)"
             >
               <view class="flex items-center gap-2">
-                <text>{{ option.label }}</text>
+                <text class="text-[30rpx]">{{ option.label }}</text>
               </view>
             </view>
           </view>
 
           <view
-            v-if="currentQuestion.type === 2 && (mode === 'study' || (mode === 'practice' && hasSubmitted))"
-            class="rounded-2xl bg-indigo-50 px-4 py-3 text-sm text-indigo-700"
+            v-if="currentQuestion.type === 2 && ((mode === 'study' && showAnswer) || (mode === 'practice' && hasSubmitted))"
           >
-            答案：{{ getCorrectText(currentQuestion) }}
+          <view class="text-indigo-600 mb-2 text-[30rpx]">参考答案</view>
+          <text class="text-gray-900 whitespace-pre-wrap leading-relaxed text-[30rpx]" :selectable="true">{{ getCorrectText(currentQuestion) }}</text>
           </view>
 
           <view class="pt-2">
@@ -321,9 +378,9 @@
 </template>
 
 <script setup>
-import { reactive, ref, computed, onMounted } from "vue";
+import { reactive, ref, computed, onMounted, onBeforeUnmount, nextTick } from "vue";
 import Taro from "@tarojs/taro";
-import { questionsAPI } from "../../../api";
+import { questionsAPI, statAPI } from "../../../api";
 
 defineOptions({
   name: "FinalReviewDetail",
@@ -340,8 +397,12 @@ const decodeParam = (value = "") => {
 };
 
 const projectId = Number(router.params?.id || 0);
-const STORAGE_KEY = `finalReviewProgress:${projectId}`;
+const STORAGE_KEY_OLD = `finalReviewProgress:${projectId}`; // 旧版存储键（向前兼容）
+const STORAGE_KEY_STUDY = `finalReviewProgress:${projectId}:study`;
+const STORAGE_KEY_PRACTICE = `finalReviewProgress:${projectId}:practice`;
+const STORAGE_KEY_WRONGBOOK = `finalReviewProgress:${projectId}:wrongbook`;
 const WRONG_BOOK_KEY = `finalReviewWrongBook:${projectId}`;
+const progressUpdateTrigger = ref(0); // 用于触发 computed 更新
 const projectInfo = ref({
   id: projectId,
   name: decodeParam(router.params?.name) || "期末复习项目",
@@ -361,8 +422,10 @@ const currentQuestion = ref(null);
 const sessionFinished = ref(false);
 const hasSubmitted = ref(false);
 const resultStatus = ref(null); // 'correct' | 'incorrect' | 'partial' | 'text'
-const lastPracticePayload = ref(null);
 const wrongBookIds = ref([]);
+const showAnswer = ref(true); // 学习模式下控制答案显示/隐藏
+const onlineCount = ref(null); // 在线人数
+const onlineCountTimer = ref(null); // 在线人数轮询定时器ID
 
 const answerState = reactive({
   optionKey: "",
@@ -413,6 +476,143 @@ const modeLabel = computed(() => {
 });
 const orderLabel = computed(() => (randomOrder.value ? "乱序答题" : "顺序答题"));
 
+const savedProgressList = computed(() => {
+  // 触发更新
+  progressUpdateTrigger.value;
+
+  const list = [];
+  try {
+    // 学习模式进度
+    const studyProgress = Taro.getStorageSync(STORAGE_KEY_STUDY);
+    if (studyProgress && Number(studyProgress.projectId) === projectId && studyProgress.questionIds?.length) {
+      list.push({ ...studyProgress, type: 'study' });
+    }
+
+    // 考试模式进度
+    const practiceProgress = Taro.getStorageSync(STORAGE_KEY_PRACTICE);
+    if (practiceProgress && Number(practiceProgress.projectId) === projectId && practiceProgress.questionIds?.length) {
+      list.push({ ...practiceProgress, type: 'practice' });
+    }
+
+    // 错题本进度
+    const wrongbookProgress = Taro.getStorageSync(STORAGE_KEY_WRONGBOOK);
+    if (wrongbookProgress && Number(wrongbookProgress.projectId) === projectId && wrongbookProgress.questionIds?.length) {
+      list.push({ ...wrongbookProgress, type: 'wrongbook' });
+    }
+
+    // 向前兼容：检查旧版存储
+    const oldProgress = Taro.getStorageSync(STORAGE_KEY_OLD);
+    if (oldProgress && Number(oldProgress.projectId) === projectId && oldProgress.questionIds?.length && oldProgress.mode) {
+      // 根据旧版存储的内容判断类型
+      let oldType = 'practice'; // 默认为考试模式
+      if (oldProgress.useWrongBook) {
+        oldType = 'wrongbook';
+      } else if (oldProgress.mode === 'study') {
+        oldType = 'study';
+      } else if (oldProgress.mode === 'practice') {
+        oldType = 'practice';
+      }
+
+      // 添加到列表，标记为旧版记录
+      list.push({
+        ...oldProgress,
+        type: oldType,
+        isOldVersion: true // 标记为旧版记录
+      });
+    }
+  } catch (error) {
+    console.error("load saved progress list failed", error);
+  }
+
+  // 按时间戳倒序排列
+  return list.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+});
+
+const getProgressTypeLabel = (type) => {
+  switch (type) {
+    case 'study':
+      return '学习模式';
+    case 'practice':
+      return '考试模式';
+    case 'wrongbook':
+      return '错题本';
+    default:
+      return '未知';
+  }
+};
+
+const getProgressInfo = (progress) => {
+  const orderText = progress.randomOrder ? "乱序" : "顺序";
+  const current = Math.min((progress.currentIndex ?? 0) + 1, progress.questionIds?.length || 0);
+  const total = progress.questionIds?.length || 0;
+
+  // 根据类型显示不同的信息
+  if (progress.type === 'wrongbook') {
+    // 错题本类型：显示模式信息（如果有）
+    const modeText = progress.mode === 'study' ? '学习模式' : progress.mode === 'practice' ? '考试模式' : '';
+    if (modeText) {
+      return `${orderText} · ${modeText} · 进度 ${current}/${total}`;
+    }
+    return `${orderText} · 进度 ${current}/${total}`;
+  } else {
+    // 学习模式和考试模式：显示题目来源
+    const sourceText = progress.useWrongBook ? "错题本" : "全部题";
+    return `${orderText} · ${sourceText} · 进度 ${current}/${total}`;
+  }
+};
+
+const getProgressCardClass = (type) => {
+  switch (type) {
+    case 'study':
+      return 'border-green-200 bg-green-50';
+    case 'practice':
+      return 'border-indigo-200 bg-indigo-50';
+    case 'wrongbook':
+      return 'border-orange-200 bg-orange-50';
+    default:
+      return 'border-gray-200 bg-gray-50';
+  }
+};
+
+const getProgressTitleClass = (type) => {
+  switch (type) {
+    case 'study':
+      return 'text-green-900';
+    case 'practice':
+      return 'text-indigo-900';
+    case 'wrongbook':
+      return 'text-orange-900';
+    default:
+      return 'text-gray-900';
+  }
+};
+
+const getProgressInfoClass = (type) => {
+  switch (type) {
+    case 'study':
+      return 'text-green-600';
+    case 'practice':
+      return 'text-indigo-600';
+    case 'wrongbook':
+      return 'text-orange-600';
+    default:
+      return 'text-gray-600';
+  }
+};
+
+const getProgressButtonClass = (type) => {
+  switch (type) {
+    case 'study':
+      return 'bg-green-500 text-white';
+    case 'practice':
+      return 'bg-indigo-500 text-white';
+    case 'wrongbook':
+      return 'bg-orange-500 text-white';
+    default:
+      return 'bg-gray-500 text-white';
+  }
+};
+
 const canSubmit = computed(() => {
   if (mode.value !== "practice" || !currentQuestion.value || hasSubmitted.value) return false;
   if (currentQuestion.value.sub_questions?.length) {
@@ -430,6 +630,40 @@ const setRandom = (value) => {
   randomOrder.value = value;
 };
 
+// 检查错题本数据是否有更新
+const checkWrongBookUpdate = () => {
+  try {
+    const savedProgress = Taro.getStorageSync(STORAGE_KEY_WRONGBOOK);
+    if (!savedProgress || Number(savedProgress.projectId) !== projectId) {
+      return false; // 没有保存的进度，不算更新
+    }
+
+    // 比较当前错题本ID列表和保存的进度中的错题本ID列表
+    const savedQuestionIds = savedProgress.questionIds || [];
+    const currentWrongBookIds = wrongBookIds.value || [];
+
+    // 排序后比较，避免顺序不同导致的误判
+    const savedSorted = [...savedQuestionIds].sort((a, b) => a - b);
+    const currentSorted = [...currentWrongBookIds].sort((a, b) => a - b);
+
+    // 如果长度不同或内容不同，说明有更新
+    if (savedSorted.length !== currentSorted.length) {
+      return true;
+    }
+
+    for (let i = 0; i < savedSorted.length; i++) {
+      if (savedSorted[i] !== currentSorted[i]) {
+        return true;
+      }
+    }
+
+    return false;
+  } catch (error) {
+    console.error("check wrong book update failed", error);
+    return false;
+  }
+};
+
 const setSource = (value) => {
   useWrongBook.value = value;
 };
@@ -444,7 +678,75 @@ const startSession = async (selectedMode) => {
     return;
   }
   if (loadingList.value) return;
-  clearProgress();
+
+  // 检查是否有已存在的对应记录
+  let storageKey;
+  if (useWrongBook.value) {
+    storageKey = STORAGE_KEY_WRONGBOOK;
+  } else if (selectedMode === 'study') {
+    storageKey = STORAGE_KEY_STUDY;
+  } else {
+    storageKey = STORAGE_KEY_PRACTICE;
+  }
+
+  try {
+    const existingProgress = Taro.getStorageSync(storageKey);
+    if (existingProgress && Number(existingProgress.projectId) === projectId && existingProgress.questionIds?.length) {
+      // 如果是错题本，先提示是否覆盖
+      if (useWrongBook.value) {
+        const res = await Taro.showModal({
+          title: "覆盖已存在的记录",
+          content: "检测到已存在的错题本记录，是否覆盖并重新开始？",
+          confirmText: "覆盖",
+          cancelText: "取消",
+          confirmColor: "#ef4444",
+        });
+
+        if (!res.confirm) {
+          // 用户选择不覆盖，检测是否有变化
+          const hasUpdate = checkWrongBookUpdate();
+          if (hasUpdate) {
+            // 有变化，提示用户
+            await Taro.showModal({
+              title: "错题本数据已更新",
+              content: "错题本内容有变化，建议重新开始",
+              confirmText: "知道了",
+              showCancel: false,
+              confirmColor: "#6366F1",
+            });
+          }
+          // 用户取消，不开始
+          return;
+        }
+
+        // 用户确认覆盖，清除记录
+        clearProgress('wrongbook');
+      } else {
+        // 非错题本，提示是否覆盖
+        const progressType = selectedMode === 'study' ? '学习模式' : '考试模式';
+        const res = await Taro.showModal({
+          title: "覆盖已存在的记录",
+          content: `检测到已存在的${progressType}记录，是否覆盖并重新开始？`,
+          confirmText: "覆盖",
+          cancelText: "取消",
+          confirmColor: "#ef4444",
+        });
+
+        if (!res.confirm) {
+          // 用户取消，不开始
+          return;
+        }
+
+        // 用户确认覆盖，清除对应记录
+        clearProgress(selectedMode === 'study' ? 'study' : 'practice');
+      }
+    }
+  } catch (error) {
+    console.error("check existing progress failed", error);
+  }
+
+  // 不清除进度，保留所有类型的暂存记录
+  // 用户可以通过返回选择界面来暂存当前进度
   mode.value = selectedMode;
   await loadQuestionIds();
 };
@@ -457,7 +759,6 @@ const resetSessionState = () => {
   currentQuestion.value = null;
   hasSubmitted.value = false;
   resultStatus.value = null;
-  lastPracticePayload.value = null;
   answerState.optionKey = "";
   answerState.textAnswer = "";
   answerState.subAnswers = {};
@@ -520,11 +821,14 @@ const loadQuestionDetail = async (index) => {
   loadingQuestion.value = true;
   hasSubmitted.value = false;
   resultStatus.value = null;
-  lastPracticePayload.value = null;
   answerState.optionKey = "";
   answerState.textAnswer = "";
   answerState.subAnswers = {};
   Object.keys(subJudgeState).forEach((key) => delete subJudgeState[key]);
+  // 学习模式下切换题目时重置答案显示状态为显示
+  if (mode.value === "study") {
+    showAnswer.value = true;
+  }
   try {
     const questionId = questionIds.value[index];
     const res = await questionsAPI.getQuestionDetail(questionId);
@@ -712,6 +1016,9 @@ const getOptionStatus = (question, optionKey, subId = null) => {
   }
 
   if (mode.value === "study") {
+    if (!showAnswer.value) {
+      return optionKey === selectedKey ? "selected" : "base";
+    }
     return optionKey === correctKey ? "correct" : "base";
   }
 
@@ -758,7 +1065,6 @@ const handleSubmit = () => {
       answerState.optionKey === correctKey ? "correct" : "incorrect";
   }
 
-  lastPracticePayload.value = buildPracticePayload(question);
   hasSubmitted.value = true;
 
   // 考试模式下客观题做错自动加入错题本
@@ -775,43 +1081,6 @@ const onTextAnswerInput = (event) => {
   answerState.textAnswer = event.detail?.value || "";
 };
 
-const buildPracticePayload = (question) => {
-  if (!question) return null;
-  const base = {
-    project_id: projectId,
-    question_id: question.id,
-    mode: "practice",
-  };
-  if (question.sub_questions?.length) {
-    return {
-      ...base,
-      sub_answers: question.sub_questions.map((sub) => ({
-        id: sub.id,
-        answer: answerState.subAnswers[sub.id] || "",
-        answer_label: findOptionLabel(sub, answerState.subAnswers[sub.id]),
-      })),
-    };
-  }
-  if (question.type === 2) {
-    return {
-      ...base,
-      answer_text: answerState.textAnswer.trim(),
-    };
-  }
-  const answerKey = answerState.optionKey;
-  return {
-    ...base,
-    answer: answerKey,
-    answer_label: findOptionLabel(question, answerKey),
-  };
-};
-
-const findOptionLabel = (question, key) => {
-  if (!question || !key) return "";
-  const option = getOptions(question).find((item) => item.key === key);
-  return option?.label || "";
-};
-
 const goNextQuestion = async () => {
   if (!currentQuestion.value || !questionIds.value.length) return;
   if (mode.value === "practice" && !hasSubmitted.value) {
@@ -825,7 +1094,9 @@ const goNextQuestion = async () => {
   if (nextIndex >= questionIds.value.length) {
     sessionFinished.value = true;
     currentQuestion.value = null;
-    clearProgress();
+    // 完成时清除当前类型的进度，保留其他类型的暂存记录
+    const currentType = useWrongBook.value ? 'wrongbook' : (mode.value === 'study' ? 'study' : 'practice');
+    clearProgress(currentType);
     return;
   }
   await loadQuestionDetail(nextIndex);
@@ -871,14 +1142,14 @@ const handleSliderChange = async (event) => {
 const recordProgress = async () => {
   if (!currentQuestion.value) return;
   try {
+    const payload = {
+      project_id: projectId,
+      question_id: currentQuestion.value.id,
+    };
     if (mode.value === "study") {
-      await questionsAPI.recordStudy({
-        project_id: projectId,
-        question_id: currentQuestion.value.id,
-        mode: "study",
-      });
-    } else if (mode.value === "practice" && lastPracticePayload.value) {
-      await questionsAPI.recordPractice(lastPracticePayload.value);
+      await questionsAPI.recordStudy(payload);
+    } else if (mode.value === "practice") {
+      await questionsAPI.recordPractice(payload);
     }
   } catch (error) {
     console.error("record progress failed", error);
@@ -913,10 +1184,41 @@ const fetchProjectMeta = async () => {
   }
 };
 
+const fetchOnlineCount = async () => {
+  if (!projectId) return;
+  try {
+    const res = await statAPI.getProjectOnline(projectId);
+    // 处理不同的响应格式
+    if (typeof res === 'object' && res !== null) {
+      onlineCount.value = res.online_count ?? res.onlineCount ?? null;
+    } else if (typeof res === 'number') {
+      onlineCount.value = res;
+    }
+  } catch (error) {
+    console.error("fetchOnlineCount error", error);
+    // 失败时不显示在线人数，不设置 onlineCount
+  }
+};
+
 onMounted(fetchProjectMeta);
 onMounted(() => {
-  restoreProgress();
+  // 不再自动恢复进度，让用户主动选择接续进度
   loadWrongBook();
+  // 立即获取一次在线人数
+  fetchOnlineCount();
+  // 每 60 秒轮询一次在线人数
+  if (!onlineCountTimer.value) {
+    onlineCountTimer.value = setInterval(() => {
+      fetchOnlineCount();
+    }, 60000);
+  }
+});
+
+onBeforeUnmount(() => {
+  if (onlineCountTimer.value) {
+    clearInterval(onlineCountTimer.value);
+    onlineCountTimer.value = null;
+  }
 });
 
 const loadWrongBook = () => {
@@ -975,7 +1277,7 @@ const toggleWrongBook = () => {
 const saveProgress = () => {
   if (!mode.value || !questionIds.value.length || currentIndex.value < 0) return;
   try {
-    Taro.setStorageSync(STORAGE_KEY, {
+    const progressData = {
       projectId,
       mode: mode.value,
       randomOrder: randomOrder.value,
@@ -983,15 +1285,46 @@ const saveProgress = () => {
       questionIds: questionIds.value,
       currentIndex: currentIndex.value,
       timestamp: Date.now(),
-    });
+    };
+
+    // 根据类型和来源选择存储键
+    let storageKey;
+    if (useWrongBook.value) {
+      // 错题本
+      storageKey = STORAGE_KEY_WRONGBOOK;
+    } else if (mode.value === 'study') {
+      // 学习模式
+      storageKey = STORAGE_KEY_STUDY;
+    } else {
+      // 考试模式
+      storageKey = STORAGE_KEY_PRACTICE;
+    }
+
+    Taro.setStorageSync(storageKey, progressData);
+    // 触发 computed 更新
+    progressUpdateTrigger.value++;
   } catch (error) {
     console.error("save progress failed", error);
   }
 };
 
-const clearProgress = () => {
+const clearProgress = (type = null) => {
   try {
-    Taro.removeStorageSync(STORAGE_KEY);
+    if (type === 'study') {
+      Taro.removeStorageSync(STORAGE_KEY_STUDY);
+    } else if (type === 'practice') {
+      Taro.removeStorageSync(STORAGE_KEY_PRACTICE);
+    } else if (type === 'wrongbook') {
+      Taro.removeStorageSync(STORAGE_KEY_WRONGBOOK);
+    } else {
+      // 清除所有（包括旧版）
+      Taro.removeStorageSync(STORAGE_KEY_STUDY);
+      Taro.removeStorageSync(STORAGE_KEY_PRACTICE);
+      Taro.removeStorageSync(STORAGE_KEY_WRONGBOOK);
+      Taro.removeStorageSync(STORAGE_KEY_OLD);
+    }
+    // 触发 computed 更新
+    progressUpdateTrigger.value++;
   } catch (error) {
     console.error("clear progress failed", error);
   }
@@ -999,7 +1332,8 @@ const clearProgress = () => {
 
 const restoreProgress = async () => {
   try {
-    const saved = Taro.getStorageSync(STORAGE_KEY);
+    // 兼容旧版存储
+    const saved = Taro.getStorageSync(STORAGE_KEY_OLD);
     if (!saved || Number(saved.projectId) !== projectId) return;
     if (!saved.questionIds?.length || !saved.mode) return;
     mode.value = saved.mode;
@@ -1018,19 +1352,157 @@ const restoreProgress = async () => {
   }
 };
 
-const handleRestart = () => {
+const handleBackToSelection = async () => {
+  // 暂存当前进度
+  if (mode.value && questionIds.value.length && currentIndex.value >= 0) {
+    saveProgress();
+    // 返回选择界面
+    resetSession();
+    // 等待 DOM 更新后触发 computed 更新
+    await nextTick();
+    progressUpdateTrigger.value++;
+    Taro.showToast({ title: "进度已暂存", icon: "success", duration: 1500 });
+  } else {
+    // 返回选择界面
+    resetSession();
+  }
+};
+
+const resumeProgress = async (progress) => {
+  if (!progress) {
+    Taro.showToast({ title: "未找到保存的进度", icon: "none" });
+    return;
+  }
+
+  try {
+    if (!progress.questionIds?.length) {
+      Taro.showToast({ title: "进度数据无效", icon: "none" });
+      return;
+    }
+
+    // 如果是错题本类型，检测是否有变化
+    if (progress.type === 'wrongbook' || progress.useWrongBook) {
+      const hasUpdate = checkWrongBookUpdate();
+      if (hasUpdate) {
+        const res = await Taro.showModal({
+          title: "错题本数据已更新",
+          content: "错题本内容有变化，是否仍要恢复之前的进度？",
+          confirmText: "恢复进度",
+          cancelText: "取消",
+          confirmColor: "#6366F1",
+        });
+
+        if (!res.confirm) {
+          // 用户取消，不恢复
+          return;
+        }
+      }
+    }
+
+    // 如果是旧版记录，迁移到新格式
+    if (progress.isOldVersion) {
+      migrateOldProgress(progress);
+    }
+
+    // 恢复模式，如果缺失则根据类型推断
+    if (!progress.mode) {
+      // 根据类型推断模式
+      if (progress.type === 'study') {
+        mode.value = 'study';
+      } else if (progress.type === 'practice') {
+        mode.value = 'practice';
+      } else if (progress.type === 'wrongbook') {
+        // 错题本默认为考试模式
+        mode.value = 'practice';
+      } else {
+        mode.value = 'practice'; // 默认考试模式
+      }
+    } else {
+      mode.value = progress.mode;
+    }
+
+    randomOrder.value = !!progress.randomOrder;
+    useWrongBook.value = !!progress.useWrongBook;
+    questionIds.value = progress.questionIds;
+    sessionFinished.value = false;
+    const resumeIndex = Math.min(
+      progress.currentIndex ?? 0,
+      progress.questionIds.length - 1
+    );
+    if (resumeIndex < 0) {
+      Taro.showToast({ title: "进度数据无效", icon: "none" });
+      return;
+    }
+    await loadQuestionDetail(resumeIndex);
+    Taro.showToast({ title: "已恢复进度", icon: "success", duration: 1500 });
+  } catch (error) {
+    console.error("resume progress failed", error);
+    Taro.showToast({ title: "恢复进度失败", icon: "none" });
+  }
+};
+
+// 迁移旧版进度到新格式
+const migrateOldProgress = (oldProgress) => {
+  try {
+    const progressData = {
+      projectId: oldProgress.projectId,
+      mode: oldProgress.mode,
+      randomOrder: oldProgress.randomOrder,
+      useWrongBook: oldProgress.useWrongBook,
+      questionIds: oldProgress.questionIds,
+      currentIndex: oldProgress.currentIndex,
+      timestamp: oldProgress.timestamp || Date.now(),
+    };
+
+    // 根据类型和来源选择存储键
+    let storageKey;
+    if (oldProgress.useWrongBook) {
+      storageKey = STORAGE_KEY_WRONGBOOK;
+    } else if (oldProgress.mode === 'study') {
+      storageKey = STORAGE_KEY_STUDY;
+    } else {
+      storageKey = STORAGE_KEY_PRACTICE;
+    }
+
+    // 保存到新格式
+    Taro.setStorageSync(storageKey, progressData);
+    // 删除旧版存储
+    Taro.removeStorageSync(STORAGE_KEY_OLD);
+    // 触发更新
+    progressUpdateTrigger.value++;
+  } catch (error) {
+    console.error("migrate old progress failed", error);
+  }
+};
+
+const deleteProgress = (type, isOldVersion = false) => {
+  if (!type && !isOldVersion) return;
+
   Taro.showModal({
-    title: "重新开始",
-    content: "将清除当前练习进度，需要重新选择模式与顺序。",
-    confirmColor: "#6366f1",
+    title: "删除暂存记录",
+    content: "确定要删除这条暂存记录吗？",
+    confirmColor: "#ef4444",
     success(res) {
       if (res.confirm) {
-        clearProgress();
-        resetSession();
+        if (isOldVersion) {
+          // 删除旧版存储
+          try {
+            Taro.removeStorageSync(STORAGE_KEY_OLD);
+            progressUpdateTrigger.value++;
+            Taro.showToast({ title: "已删除", icon: "success", duration: 1500 });
+          } catch (error) {
+            console.error("delete old progress failed", error);
+            Taro.showToast({ title: "删除失败", icon: "none" });
+          }
+        } else {
+          clearProgress(type);
+          Taro.showToast({ title: "已删除", icon: "success", duration: 1500 });
+        }
       }
     },
   });
 };
+
 
 Taro.useShareAppMessage((res) => {
     if (res.from === 'button') {

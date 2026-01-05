@@ -58,73 +58,65 @@
         :lower-threshold="100"
         @scrolltolower="onScrollToLower"
       >
-        <view class="p-4 space-y-4">
+        <view class="p-2 flex flex-wrap" style="gap: 8px;">
           <view
             v-for="hero in filteredHeroes"
             :key="hero.id"
             class="bg-white rounded-lg shadow-sm"
+            style="width: calc(50% - 4px);"
           >
-            <!-- 英雄信息头部 -->
-            <view class="px-4 pt-4 pb-3 border-b border-gray-100">
-              <view class="flex justify-between items-start">
-                <view class="flex-1">
-                  <view class="flex items-center mb-2">
-                    <text class="text-lg font-medium text-gray-800 mr-2">{{
-                      hero.name
-                    }}</text>
-                    <view
-                      :class="[
-                        'px-2 py-0.5 rounded text-xs',
-                        hero.is_show
-                          ? 'bg-green-100 text-green-600'
-                          : 'bg-gray-100 text-gray-600',
-                      ]"
-                    >
-                      {{ hero.is_show ? "显示中" : "已隐藏" }}
-                    </view>
-                  </view>
-                  <view class="flex items-center text-sm text-gray-600">
-                    <text class="mr-4">排序: {{ hero.sort }}</text>
-                    <text v-if="hero.created_at" class="text-xs text-gray-400">{{
-                      formatDate(hero.created_at)
-                    }}</text>
-                  </view>
+            <!-- 英雄信息 -->
+            <view class="px-3 pt-3 pb-2">
+              <view class="flex items-center justify-between mb-1">
+                <text class="text-sm font-medium text-gray-800 flex-1 truncate">{{
+                  hero.name
+                }}</text>
+                <view
+                  :class="[
+                    'px-1.5 py-0.5 rounded text-xs ml-1 shrink-0',
+                    hero.is_show
+                      ? 'bg-green-100 text-green-600'
+                      : 'bg-gray-100 text-gray-600',
+                  ]"
+                >
+                  {{ hero.is_show ? "显示" : "隐藏" }}
                 </view>
+              </view>
+              <view class="text-xs text-gray-500 mb-2">
+                排序: {{ hero.sort }}
               </view>
             </view>
 
-            <!-- 操作按钮 -->
-            <view class="px-4 py-3">
-              <view class="flex space-x-3">
-                <view
-                  @tap="showEditModal(hero)"
-                  class="flex-1 py-2 px-4 bg-blue-50 text-blue-600 rounded-lg text-center text-sm"
-                >
-                  编辑
-                </view>
-                <view
-                  @tap="toggleHeroStatus(hero)"
+            <!-- 操作按钮图标 -->
+            <view class="px-3 flex items-center justify-around border-t border-gray-100">
+              <view
+                @tap="showEditModal(hero)"
+                class="p-1.5 rounded active:bg-blue-50"
+              >
+                <text class="i-lucide-edit w-4 h-4 text-blue-600"></text>
+              </view>
+              <view
+                @tap="toggleHeroStatus(hero)"
+                class="p-1.5 rounded active:bg-gray-50"
+              >
+                <text
                   :class="[
-                    'flex-1 py-2 px-4 rounded-lg text-center text-sm',
-                    hero.is_show
-                      ? 'bg-yellow-50 text-yellow-600'
-                      : 'bg-green-50 text-green-600',
+                    'w-4 h-4',
+                    hero.is_show ? 'i-lucide-eye-off text-yellow-600' : 'i-lucide-eye text-green-600',
                   ]"
-                >
-                  {{ hero.is_show ? "隐藏" : "显示" }}
-                </view>
-                <view
-                  @tap="showDeleteConfirm(hero)"
-                  class="py-2 px-4 bg-red-50 text-red-600 rounded-lg text-center text-sm"
-                >
-                  删除
-                </view>
+                ></text>
+              </view>
+              <view
+                @tap="showDeleteConfirm(hero)"
+                class="p-1.5 rounded active:bg-red-50"
+              >
+                <text class="i-lucide-trash-2 w-4 h-4 text-red-600"></text>
               </view>
             </view>
           </view>
 
           <!-- 首次加载状态 -->
-          <view v-if="loading && currentPage === 1" class="text-center py-8">
+          <view v-if="loading && currentPage === 1" class="w-full text-center py-8">
             <view class="inline-flex items-center space-x-2">
               <view class="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></view>
               <text class="text-gray-500 text-sm">加载中...</text>
@@ -132,7 +124,7 @@
           </view>
 
           <!-- 加载更多状态 -->
-          <view v-if="isLoadingMore" class="text-center py-4">
+          <view v-if="isLoadingMore" class="w-full text-center py-4">
             <view class="inline-flex items-center space-x-2">
               <view class="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></view>
               <text class="text-gray-400 text-sm">加载更多中...</text>
@@ -140,12 +132,12 @@
           </view>
 
           <!-- 底部加载提示 -->
-          <view v-if="hasMore && !loading && !isLoadingMore && filteredHeroes.length > 0" class="text-center py-4">
+          <view v-if="hasMore && !loading && !isLoadingMore && filteredHeroes.length > 0" class="w-full text-center py-4">
             <text class="text-gray-400 text-sm">滚动加载更多</text>
           </view>
 
           <!-- 没有更多数据提示 -->
-          <view v-if="!hasMore && !loading && !isLoadingMore && filteredHeroes.length > 0" class="text-center py-4">
+          <view v-if="!hasMore && !loading && !isLoadingMore && filteredHeroes.length > 0" class="w-full text-center py-4">
             <text class="text-gray-400 text-sm">—— 没有更多数据了 ——</text>
           </view>
 
@@ -187,7 +179,7 @@
               <input
                 v-model="heroForm.name"
                 placeholder="请输入英雄姓名"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                class="border-solid border-[1px] border-gray-300 rounded-lg p-2"
                 maxlength="20"
               />
             </view>
@@ -201,7 +193,7 @@
                 v-model="heroForm.sort"
                 type="number"
                 placeholder="请输入排序值"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                class="border-solid border-[1px] border-gray-300 rounded-lg p-2"
               />
               <text class="text-xs text-gray-400 mt-1">数值越小排序越靠前</text>
             </view>

@@ -57,7 +57,7 @@
           <!-- 待完成任务 -->
           <view class="space-y-2">
             <view v-for="task in pendingTasks" :key="`pending-${task.id}`"
-              class="relative p-3 border rounded-lg bg-gray-50" :class="getTaskBorderClass(task)"
+              class="relative p-3 border rounded-lg" :class="getTaskBorderClass(task)"
               @tap="showEditTaskModal(task)">
               <!-- 任务内容 -->
               <view class="flex items-start gap-3">

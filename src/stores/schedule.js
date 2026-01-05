@@ -24,7 +24,14 @@ export const useScheduleStore = defineStore('schedule', {
     // 获取今天是第几周
     currentWeekNumber: (state) => {
       const now = new Date()
-      const diffTime = now.getTime() - state.semesterStartDate.getTime()
+      // 标准化到当天的 00:00:00，消除时分秒和时区影响
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+      const startDate = new Date(
+        state.semesterStartDate.getFullYear(),
+        state.semesterStartDate.getMonth(),
+        state.semesterStartDate.getDate()
+      )
+      const diffTime = today.getTime() - startDate.getTime()
       const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
       const weekNumber = Math.floor(diffDays / 7) + 1
       return Math.max(1, weekNumber)
