@@ -79,10 +79,11 @@ import LogoPng from './logo.png'
 const authStore = useAuthStore()
 const isLoading = ref(false)
 const isTermsAgreed = ref(false)
+const loginButtonDisabled = ref(false) // 额外的按钮禁用状态
 
 // 计算是否可以登录
 const canLogin = computed(() => {
-  return isTermsAgreed.value && !isLoading.value
+  return isTermsAgreed.value && !isLoading.value && !loginButtonDisabled.value
 })
 
 // 切换条款同意状态
@@ -96,30 +97,37 @@ const goToTermsOfService = () => {
 
 // 微信登录
 const handleWechatLogin = async () => {
-  if (isLoading.value) return
+  if (isLoading.value || loginButtonDisabled.value) return
 
   // 检查是否同意条款
   if (!isTermsAgreed.value) {
     Taro.showToast({
       title: '请先阅读并同意用户协议',
       icon: 'error',
-      duration: 2000
+      duration: 1500
     })
     return
   }
 
   try {
     isLoading.value = true
+    loginButtonDisabled.value = true
 
     await authStore.wechatLogin()
 
-    // 登录成功，返回上一页或跳转到首页
+    // 登录成功，保持按钮禁用状态，跳转到首页
     setTimeout(() => {
       Taro.switchTab({ url: '/pages/home/index' })
     }, 1000)
+    // 注意：登录成功后不重新启用按钮
 
   } catch (error) {
     console.error('登录失败:', error)
+    
+    // 登录失败，等待2秒（错误提示消失）后再启用按钮
+    setTimeout(() => {
+      loginButtonDisabled.value = false
+    }, 2000)
   } finally {
     isLoading.value = false
   }

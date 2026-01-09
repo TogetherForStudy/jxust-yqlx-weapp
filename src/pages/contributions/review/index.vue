@@ -440,7 +440,8 @@ const refreshData = async () => {
   ])
   Taro.showToast({
     title: '刷新成功',
-    icon: 'success'
+    icon: 'success',
+    duration: 1500
   })
 }
 
@@ -568,8 +569,8 @@ const submitReview = async () => {
     const data = {
       status: reviewForm.value.status,
       review_note: reviewForm.value.reviewNote.trim() ||
-        (reviewForm.value.status === 2 ? '内容质量很好，采纳发布' : '内容不符合要求'),
-      points: reviewForm.value.status === 2 ? reviewForm.value.points : 0,
+        (reviewForm.value.status === 2 ? '内容质量很好,采纳发布' : '内容不符合要求'),
+      ...(reviewForm.value.status === 2 && { points: reviewForm.value.points }),
       title: reviewForm.value.title.trim(),
       content: reviewForm.value.content.trim(),
       categories: reviewForm.value.categories
@@ -579,7 +580,8 @@ const submitReview = async () => {
 
     Taro.showToast({
       title: reviewForm.value.status === 2 ? '采纳成功' : '拒绝成功',
-      icon: 'success'
+      icon: 'success',
+      duration: 1500
     })
 
     showReview.value = false
