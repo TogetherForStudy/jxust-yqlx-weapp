@@ -62,20 +62,29 @@
               <view
                 v-for="role in roles"
                 :key="role.id"
-                class="px-4 py-3"
+                class="px-4 py-3 active:bg-gray-50"
+                @tap="showUserIdsModal(role)"
               >
                 <view class="flex justify-between items-start">
-                  <view class="flex-1">
+                  <view class="flex-1 mr-3">
                     <view class="flex items-center mb-1">
                       <text class="text-base font-medium text-gray-800 mr-2">{{ role.name }}</text>
                       <view class="px-2 py-0.5 bg-blue-100 text-blue-600 rounded text-xs">
                         {{ role.role_tag }}
                       </view>
                     </view>
-                    <text v-if="role.description" class="text-sm text-gray-600">
+                    <text v-if="role.description" class="text-sm text-gray-600 block">
                       {{ role.description }}
                     </text>
-                    <text v-else class="text-sm text-gray-400">暂无描述</text>
+                    <text v-else class="text-sm text-gray-400 block">暂无描述</text>
+                  </view>
+                  <view class="flex flex-col items-end justify-center shrink-0">
+                    <view class="flex items-center px-3 py-1.5 bg-blue-50 rounded-lg">
+                      <text class="i-lucide-users w-4 h-4 text-blue-600 mr-1"></text>
+                      <text class="text-sm font-semibold text-blue-600">
+                        {{ role.user_count }}
+                      </text>
+                    </view>
                   </view>
                 </view>
               </view>
@@ -280,6 +289,58 @@
         </view>
       </view>
     </view>
+
+    <!-- 用户ID列表弹窗 -->
+    <view
+      v-if="showUserIdsPopup"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      @tap="hideUserIdsModal"
+    >
+      <view @tap.stop="" class="bg-white rounded-2xl mx-4 w-full max-w-md">
+        <view class="p-6">
+          <view class="mb-4">
+            <text class="text-lg font-semibold text-gray-800 block mb-1">
+              {{ currentRole?.name }}
+            </text>
+            <view class="flex items-center">
+              <view class="px-2 py-0.5 bg-blue-100 text-blue-600 rounded text-xs mr-2">
+                {{ currentRole?.role_tag }}
+              </view>
+              <text class="text-sm text-gray-500">
+                共 {{ currentRole?.user_count }} 个用户
+              </text>
+            </view>
+          </view>
+
+          <view v-if="currentRole?.user_ids && currentRole.user_ids.length > 0">
+            <text class="block text-sm font-medium text-gray-700 mb-3">
+              用户ID列表
+            </text>
+            <view class="flex flex-wrap gap-2 max-h-64 overflow-y-auto">
+              <view
+                v-for="userId in currentRole.user_ids"
+                :key="userId"
+                class="px-3 py-1.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg text-sm font-medium shadow-sm"
+              >
+                {{ userId }}
+              </view>
+            </view>
+          </view>
+          <view v-else class="py-8 text-center">
+            <text class="text-gray-400 text-sm">该角色暂无用户</text>
+          </view>
+
+          <view class="mt-6">
+            <view
+              @tap="hideUserIdsModal"
+              class="w-full py-2 px-4 bg-gray-100 text-gray-600 rounded-lg text-center"
+            >
+              关闭
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
   </view>
 </template>
 
@@ -314,11 +375,15 @@ const userRolesForm = ref({
 });
 const selectedRoleIds = ref([]);
 
+// 用户ID列表弹窗状态
+const showUserIdsPopup = ref(false);
+const currentRole = ref(null);
+
 // 计算属性
 const canUpdateUserRoles = computed(() => {
+  const userId = String(userRolesForm.value.userId || "").trim();
   return (
-    userRolesForm.value.userId &&
-    userRolesForm.value.userId.trim() !== "" &&
+    userId !== "" &&
     selectedRoleIds.value.length > 0 &&
     !updating.value
   );
@@ -328,7 +393,13 @@ const canUpdateUserRoles = computed(() => {
 const fetchRoles = async () => {
   try {
     const response = await rbacAPI.getRoles();
-    roles.value = response || [];
+    // 处理新的响应格式：每个项包含 role 对象、user_count 和 user_ids
+    // 将数据扁平化，同时保留 user_count 和 user_ids 信息
+    roles.value = (response || []).map(item => ({
+      ...item.role,
+      user_count: item.user_count || 0,
+      user_ids: item.user_ids || []
+    }));
   } catch (error) {
     console.error("获取角色列表失败:", error);
     Taro.showToast({
@@ -416,12 +487,22 @@ const confirmUpdateUserRoles = async () => {
 
   updating.value = true;
   try {
-    const userId = parseInt(userRolesForm.value.userId.trim());
+    const userIdStr = String(userRolesForm.value.userId || "").trim();
+    if (userIdStr === "") {
+      Taro.showToast({
+        title: "请输入用户ID",
+        icon: "none",
+      });
+      updating.value = false;
+      return;
+    }
+    const userId = parseInt(userIdStr);
     if (isNaN(userId)) {
       Taro.showToast({
         title: "请输入有效的用户ID",
         icon: "none",
       });
+      updating.value = false;
       return;
     }
 
@@ -443,6 +524,17 @@ const confirmUpdateUserRoles = async () => {
   } finally {
     updating.value = false;
   }
+};
+
+// 用户ID列表弹窗相关方法
+const showUserIdsModal = (role) => {
+  currentRole.value = role;
+  showUserIdsPopup.value = true;
+};
+
+const hideUserIdsModal = () => {
+  showUserIdsPopup.value = false;
+  currentRole.value = null;
 };
 
 // 生命周期
