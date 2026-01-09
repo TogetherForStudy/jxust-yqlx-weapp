@@ -1,13 +1,56 @@
 import Taro from '@tarojs/taro'
-import { v4 as uuidv4 } from 'uuid'
 import { useAuthStore } from '../stores/auth'
 
 // API基础配置
 const BASE_URL = 'https://wx.ntrun.com' // 请根据实际情况修改
 
-// 生成UUID
+// 生成UUID v4（使用微信小程序加密随机数生成器）
 const generateUUID = () => {
-  return uuidv4()
+  return new Promise((resolve) => {
+    try {
+      // 使用微信小程序的加密级随机数生成器
+      const cryptoManager = Taro.getUserCryptoManager()
+
+      // 生成16个随机字节（128位）
+      cryptoManager.getRandomValues({
+        length: 16,
+        success: (res) => {
+          // Convert ArrayBuffer to Uint8Array
+          const buffer = new Uint8Array(res.randomValues)
+
+          // 设置版本号（第7字节的高4位为0100，表示版本4）
+          buffer[6] = (buffer[6] & 0x0f) | 0x40
+          // 设置变体位（第9字节的高2位为10）
+          buffer[8] = (buffer[8] & 0x3f) | 0x80
+
+          // 将字节数组转换为 UUID 字符串格式
+          const hex = Array.from(buffer).map(b => b.toString(16).padStart(2, '0')).join('')
+          const uuid = `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20, 32)}`
+
+          resolve(uuid)
+        },
+        fail: (err) => {
+          console.error('Failed to generate random values:', err)
+          // Fallback: 使用 Math.random() + 时间戳
+          resolve(generateFallbackUUID())
+        }
+      })
+    } catch (error) {
+      console.error('getUserCryptoManager failed, falling back to Math.random:', error)
+      // Fallback: 使用 Math.random() + 时间戳
+      resolve(generateFallbackUUID())
+    }
+  })
+}
+
+// 降级方案：使用 Math.random() 生成 UUID
+const generateFallbackUUID = () => {
+  const timestamp = Date.now().toString(16)
+  const random1 = Math.random().toString(16).substring(2, 10)
+  const random2 = Math.random().toString(16).substring(2, 14)
+  const random3 = Math.random().toString(16).substring(2, 10)
+
+  return `${random1}-${timestamp.substring(0, 4)}-4${random2.substring(0, 3)}-${(8 + Math.floor(Math.random() * 4)).toString(16)}${random3.substring(0, 3)}-${random2.substring(3)}${random3.substring(3)}`
 }
 
 // 幂等性 Key 缓存：存储正在进行的请求的幂等性 Key
@@ -41,7 +84,7 @@ const sortObjectKeys = (obj) => {
 }
 
 // 获取或创建幂等性 Key
-const getOrCreateIdempotencyKey = (method, url, data) => {
+const getOrCreateIdempotencyKey = async (method, url, data) => {
   const identifier = generateRequestIdentifier(method, url, data)
   const now = Date.now()
 
@@ -55,7 +98,7 @@ const getOrCreateIdempotencyKey = (method, url, data) => {
   }
 
   // 生成新的 Key 并缓存
-  const newKey = generateUUID()
+  const newKey = await generateUUID()
   idempotencyKeyCache[identifier] = {
     key: newKey,
     timestamp: now
@@ -82,7 +125,7 @@ setInterval(() => {
 
 // 请求拦截器
 const interceptors = {
-  request(config) {
+  async request(config) {
     // 添加认证token
     const token = Taro.getStorageSync('token')
     if (token) {
@@ -95,7 +138,7 @@ const interceptors = {
     // 添加通用头部
     config.header = {
       'Content-Type': 'application/json',
-      'X-Request-ID': generateUUID(),
+      'X-Request-ID': await generateUUID(),
       ...config.header
     }
 
@@ -104,7 +147,7 @@ const interceptors = {
     const writeMethod = ['POST', 'PUT', 'DELETE', 'PATCH'].includes(method)
     if (writeMethod && !config.header['X-Idempotency-Key']) {
       // 使用相同请求内容的缓存 Key，防止快速重复点击
-      config.header['X-Idempotency-Key'] = getOrCreateIdempotencyKey(
+      config.header['X-Idempotency-Key'] = await getOrCreateIdempotencyKey(
         method,
         config.url,
         config.data
@@ -136,7 +179,7 @@ const interceptors = {
 }
 
 // 通用请求方法
-export const request = (options) => {
+export const request = async (options) => {
   // 添加基础URL
   if (!options.url.startsWith('http')) {
     options.url = BASE_URL + options.url
@@ -148,7 +191,7 @@ export const request = (options) => {
   const originalData = options.data
 
   // 应用请求拦截器
-  options = interceptors.request(options)
+  options = await interceptors.request(options)
 
   return Taro.request(options)
     .then(interceptors.response)

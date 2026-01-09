@@ -64,7 +64,7 @@
         </view>
 
         <!-- 审核投稿 -->
-        <view v-if="isAdmin"
+        <view v-if="isAdmin || isOperator"
           class="relative bg-gradient-to-br from-green-300 to-green-400 rounded-lg p-1 active:scale-95 transition-transform"
           @tap="goToReviewContributions">
           <view class="flex items-center justify-center">

@@ -282,6 +282,11 @@ const getCourseStatusClass = (timeStatus, minutesToStart = 0) => {
 
 // 加载数据
 const loadData = async () => {
+  // 未登录时不发起请求
+  if (!authStore.isLoggedIn) {
+    return
+  }
+
   if (authStore.userClass && !scheduleStore.isLoading) {
     try {
       await scheduleStore.fetchCourseTable()
@@ -295,7 +300,7 @@ const loadData = async () => {
 let statusUpdateInterval = null
 
 onMounted(() => {
-  if (authStore.userClass && Object.keys(scheduleStore.courseData).length === 0) {
+  if (authStore.isLoggedIn && authStore.userClass && Object.keys(scheduleStore.courseData).length === 0) {
     loadData()
     scheduleStore.setCurrentWeek(scheduleStore.currentWeekNumber)
   }

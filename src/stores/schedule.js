@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { courseTableAPI } from '../api'
 import { COURSE_COLORS, SEMESTER_CONFIG } from '../utils/constants'
+import { courseTableCache } from '../utils/courseTableCache'
 
 export const useScheduleStore = defineStore('schedule', {
   state: () => ({
@@ -23,7 +24,14 @@ export const useScheduleStore = defineStore('schedule', {
     // 获取今天是第几周
     currentWeekNumber: (state) => {
       const now = new Date()
-      const diffTime = now.getTime() - state.semesterStartDate.getTime()
+      // 标准化到当天的 00:00:00，消除时分秒和时区影响
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+      const startDate = new Date(
+        state.semesterStartDate.getFullYear(),
+        state.semesterStartDate.getMonth(),
+        state.semesterStartDate.getDate()
+      )
+      const diffTime = today.getTime() - startDate.getTime()
       const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
       const weekNumber = Math.floor(diffDays / 7) + 1
       return Math.max(1, weekNumber)
@@ -165,17 +173,83 @@ export const useScheduleStore = defineStore('schedule', {
       }
     },
 
-    // 获取课程表
-    async fetchCourseTable(semester = this.semester) {
+    /**
+     * 获取课程表（支持版本检测和缓存）
+     * @param {string} semester - 学期标识
+     * @param {boolean} forceRefresh - 是否强制刷新，忽略缓存
+     * @returns {Promise} 返回课表数据
+     */
+    async fetchCourseTable(semester = this.semester, forceRefresh = false) {
       try {
         this.isLoading = true
-        const result = await courseTableAPI.getCourseTable({ semester })
 
-        this.courseData = result.course_data || {}
-        this.semester = result.semester || semester || SEMESTER_CONFIG.CURRENT
+        // 获取当前用户的班级ID（用于验证缓存有效性）
+        const authStore = await import('./auth').then(m => m.useAuthStore())
+        const currentClassId = authStore.userClass
+
+        let lastModified = null
+
+        // 非强制刷新时，尝试使用缓存的时间戳
+        if (!forceRefresh && currentClassId) {
+          // 检查缓存是否有效（班级ID是否匹配）
+          if (courseTableCache.isCacheValid(semester, currentClassId)) {
+            lastModified = courseTableCache.getCachedTimestamp(semester)
+          } else {
+            // 缓存无效（可能是切换了班级），清除旧缓存
+            courseTableCache.clearCache(semester)
+          }
+        } else if (forceRefresh) {
+          courseTableCache.clearCache(semester)
+        }
+
+        // 请求服务器
+        const result = await courseTableAPI.getCourseTable({
+          semester,
+          last_modified: lastModified
+        })
+
+        if (result.has_changes) {
+          // 服务器返回了新数据
+          this.courseData = result.course_data || {}
+          this.semester = result.semester || semester || SEMESTER_CONFIG.CURRENT
+
+          // 保存到缓存
+          courseTableCache.saveCourseTable(
+            result.semester || semester,
+            result.course_data,
+            result.last_modified,
+            result.class_id
+          )
+        } else {
+          // 数据无变化，使用本地缓存
+          const cachedData = courseTableCache.getCachedData(semester)
+
+          if (cachedData) {
+            this.courseData = cachedData
+            this.semester = result.semester || semester || SEMESTER_CONFIG.CURRENT
+          } else {
+            // 缓存丢失，强制重新获取
+            return this.fetchCourseTable(semester, true)
+          }
+        }
 
         return result
       } catch (error) {
+        console.error('获取课程表失败:', error)
+
+        // 网络错误时，尝试使用缓存数据
+        const cachedData = courseTableCache.getCachedData(semester)
+        if (cachedData) {
+          this.courseData = cachedData
+          this.semester = semester || SEMESTER_CONFIG.CURRENT
+          // 不抛出错误，使用缓存数据
+          return {
+            course_data: cachedData,
+            semester: semester,
+            from_cache: true
+          }
+        }
+
         throw error
       } finally {
         this.isLoading = false
@@ -198,12 +272,19 @@ export const useScheduleStore = defineStore('schedule', {
       }
     },
 
-    // 更新班级
+    /**
+     * 更新班级
+     * @param {string} classId - 班级ID
+     */
     async updateClass(classId) {
       try {
         await courseTableAPI.updateClass({ class_id: classId })
-        // 重新获取课程表
-        await this.fetchCourseTable()
+
+        // 切换班级后，清除所有缓存（因为班级变了）
+        courseTableCache.clearAllCache()
+
+        // 强制重新获取课程表
+        await this.fetchCourseTable(this.semester, true)
       } catch (error) {
         console.error('更新班级失败:', error)
         throw error
@@ -221,7 +302,14 @@ export const useScheduleStore = defineStore('schedule', {
       return this.courseData[courseIndex.toString()] || null
     },
 
-    // 编辑课程格子（添加、编辑、删除）
+    /**
+     * 编辑课程格子（添加、编辑、删除）
+     * @param {string} semester - 学期标识
+     * @param {number} index - 课程格子索引
+     * @param {object} courseData - 课程数据
+     * @param {string} operationType - 操作类型：add/edit/delete
+     * @param {object} originalCourse - 原始课程数据（编辑和删除时需要）
+     */
     async editCourseCell(semester, index, courseData, operationType = 'add', originalCourse = null) {
       try {
         // 获取当前格子的所有课程数据
@@ -254,8 +342,11 @@ export const useScheduleStore = defineStore('schedule', {
           value: updatedCourses
         })
 
-        // 刷新课程表数据
-        await this.fetchCourseTable(semester)
+        // 编辑后清除缓存，确保下次获取最新数据
+        courseTableCache.clearCache(semester || this.semester)
+
+        // 强制刷新课程表数据
+        await this.fetchCourseTable(semester, true)
       } catch (error) {
         console.error('编辑课程格子失败:', error)
         throw error

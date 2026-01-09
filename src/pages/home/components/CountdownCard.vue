@@ -529,7 +529,12 @@ const deleteCountdown = async () => {
 
 // 加载数据
 const loadData = async () => {
-  if (authStore.isLoggedIn && !isLoading.value) {
+  // 未登录时不发起请求
+  if (!authStore.isLoggedIn) {
+    return
+  }
+
+  if (!isLoading.value) {
     try {
       await countdownStore.fetchCountdowns()
     } catch (error) {
