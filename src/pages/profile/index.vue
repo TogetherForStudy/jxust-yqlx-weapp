@@ -21,12 +21,12 @@
               <text class="text-gray-600">账号</text>
             <view class="flex items-center">
               <text class="px-2 py-0.5 rounded-full text-xs" :class="roleTagClass">{{ roleTagText }}</text>
-              <text class="pl-2 text-gray-800" :selectable="true">{{ userInfo?.id || "无" }}</text>
+              <text class="pl-2 text-gray-800" :user-select="true">{{ userInfo?.id || "无" }}</text>
             </view>
           </view>
           <view class="flex justify-between items-center">
             <text class="text-gray-600">班级</text>
-            <text class="text-gray-800" :selectable="true">{{ userInfo?.class_id || "无" }}</text>
+            <text class="text-gray-800" :user-select="true">{{ userInfo?.class_id || "无" }}</text>
           </view>
         </view>
       </view>

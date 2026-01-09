@@ -112,18 +112,12 @@
                   </view>
                 </view>
                 <view class="flex items-center gap-2">
+
                   <view
-                    class="text-xs px-2 py-1 rounded"
-                    :class="getProgressButtonClass(progress.type)"
-                    @tap.stop="resumeProgress(progress)"
-                  >
-                    继续
-                  </view>
-                  <view
-                    class="text-xs px-2 py-1 rounded border border-gray-300 text-gray-600"
+                    class="w-6 h-6 flex items-center justify-center rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
                     @tap.stop="deleteProgress(progress.type, progress.isOldVersion)"
                   >
-                    删除
+                    <text class="i-lucide-trash-2 w-4 h-4"></text>
                   </view>
                 </view>
               </view>
@@ -233,7 +227,7 @@
             </view>
           </view>
           <view>
-            <text class="text-gray-900 text-base" :selectable="true">
+            <text class="text-gray-900 text-base" :user-select="true">
             {{ currentQuestion.title }}
           </text>
           </view>
@@ -269,7 +263,7 @@
               v-for="(sub, index) in currentQuestion.sub_questions"
               :key="sub.id"
             >
-              <text class="text-gray-900 text-base" :selectable="true">
+              <text class="text-gray-900 text-base" :user-select="true">
                 {{ sub.title }}
               </text>
               <view class="mt-3 space-y-2">
@@ -328,7 +322,7 @@
             v-if="currentQuestion.type === 2 && ((mode === 'study' && showAnswer) || (mode === 'practice' && hasSubmitted))"
           >
           <view class="text-indigo-600 mb-2 text-[30rpx]">参考答案</view>
-          <text class="text-gray-900 whitespace-pre-wrap leading-relaxed text-[30rpx]" :selectable="true">{{ getCorrectText(currentQuestion) }}</text>
+          <text class="text-gray-900 whitespace-pre-wrap leading-relaxed text-[30rpx]" :user-select="true">{{ getCorrectText(currentQuestion) }}</text>
           </view>
 
           <view class="pt-2">
@@ -1361,7 +1355,7 @@ const handleBackToSelection = async () => {
     // 等待 DOM 更新后触发 computed 更新
     await nextTick();
     progressUpdateTrigger.value++;
-    Taro.showToast({ title: "进度已暂存", icon: "success", duration: 1500 });
+    Taro.showToast({ title: "进度已暂存", icon: "success", duration: 1000 });
   } else {
     // 返回选择界面
     resetSession();
@@ -1434,7 +1428,7 @@ const resumeProgress = async (progress) => {
       return;
     }
     await loadQuestionDetail(resumeIndex);
-    Taro.showToast({ title: "已恢复进度", icon: "success", duration: 1500 });
+    Taro.showToast({ title: "已恢复进度", icon: "success", duration: 1000 });
   } catch (error) {
     console.error("resume progress failed", error);
     Taro.showToast({ title: "恢复进度失败", icon: "none" });
@@ -1489,14 +1483,14 @@ const deleteProgress = (type, isOldVersion = false) => {
           try {
             Taro.removeStorageSync(STORAGE_KEY_OLD);
             progressUpdateTrigger.value++;
-            Taro.showToast({ title: "已删除", icon: "success", duration: 1500 });
+            Taro.showToast({ title: "已删除", icon: "success", duration: 1000 });
           } catch (error) {
             console.error("delete old progress failed", error);
             Taro.showToast({ title: "删除失败", icon: "none" });
           }
         } else {
           clearProgress(type);
-          Taro.showToast({ title: "已删除", icon: "success", duration: 1500 });
+          Taro.showToast({ title: "已删除", icon: "success", duration: 1000 });
         }
       }
     },
