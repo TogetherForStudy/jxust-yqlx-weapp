@@ -1,7 +1,9 @@
 <template>
-  <view class="min-h-screen bg-gray-50">
-    <!-- 用户信息头部 -->
-    <view class="bg-gradient-to-br from-blue-500 to-indigo-600 pt-8 pb-8">
+  <view class="min-h-screen bg-gray-50 flex flex-col justify-between">
+    <!-- 主要内容区域 -->
+    <view>
+      <!-- 用户信息头部 -->
+      <view class="bg-gradient-to-br from-blue-500 to-indigo-600 pt-8 pb-8">
       <view v-if="!authStore.isLoggedIn" class="text-center px-4">
         <text class="text-white text-lg font-medium block mb-1">未登录</text>
       </view>
@@ -149,9 +151,11 @@
         登录
       </view>
     </view>
+    </view>
+    <!-- 主要内容区域结束 -->
 
-    <!-- 底部安全区域 -->
-    <view class="absolute bottom-0 left-0 right-0 p-4">
+    <!-- 底部开源项目信息 -->
+    <view class="p-4 mt-4">
       <view class="flex flex-col gap-1 justify-center items-center">
         <text class="text-xs text-gray-400"> 江理一起来学开源项目 </text>
         <text class="text-xs text-gray-400">
@@ -169,6 +173,7 @@
 import { ref, computed, onMounted } from "vue";
 import { useAuthStore } from "../../stores/auth";
 import Taro from "@tarojs/taro";
+import { useDidShow } from "@tarojs/taro";
 import { courseTableAPI, pointsAPI } from "../../api/index";
 
 const authStore = useAuthStore();
@@ -313,6 +318,13 @@ onMounted(async () => {
   // 页面初始化时不需要自动打开编辑资料弹窗
   if (authStore.isLoggedIn) {
     await fetchUserPoints();
+  }
+});
+
+// 页面显示时刷新积分
+useDidShow(() => {
+  if (authStore.isLoggedIn) {
+    fetchUserPoints();
   }
 });
 

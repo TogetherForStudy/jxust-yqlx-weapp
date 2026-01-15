@@ -3,7 +3,8 @@
   <view class="px-4">
     <view class="flex justify-between items-center mb-2">
       <text class="text-gray-800 font-medium">学习清单</text>
-      <view v-if="authStore.isLoggedIn" @tap="showAddModal = true"
+      <!-- 非空状态时显示在右上角 -->
+      <view v-if="authStore.isLoggedIn && (stats.total_count > 0)" @tap="showAddModal = true"
         class="bg-green-500 text-white px-2 py-1 rounded-lg text-xs">
         <text class="i-lucide-plus w-3 h-3 mr-1"></text>
         添加
@@ -20,139 +21,169 @@
       <!-- 未登录状态 -->
       <view v-else-if="!authStore.isLoggedIn" class="flex flex-col items-center justify-center py-8">
         <view class="i-lucide-clipboard-list text-2xl text-gray-400 mb-2"></view>
-        <text class="text-gray-500 text-sm">登录使用学习清单</text>
+        <text class="text-gray-500 text-sm">化繁为简 · 分而治之</text>
       </view>
 
       <!-- 空状态 -->
-      <view v-else-if="pendingTasks.length === 0 && completedTasks.length === 0"
+      <view v-else-if="stats.total_count === 0"
         class="flex flex-col items-center justify-center py-8">
         <view class="i-lucide-clipboard text-2xl text-gray-400 mb-2"></view>
-        <text class="text-gray-700 font-medium">暂无学习任务</text>
-        <text class="text-gray-500 text-sm">帮你记住学习计划</text>
+        <text class="text-gray-500 text-sm mb-4">化繁为简 · 分而治之</text>
+        <!-- 空状态时显示在提示下方 -->
+        <view v-if="authStore.isLoggedIn" @tap="showAddModal = true"
+          class="bg-green-500 text-white px-2 py-1 rounded-lg text-sm flex items-center">
+          <text class="i-lucide-plus w-4 h-4 mr-1"></text>
+          添加任务
+        </view>
       </view>
 
       <!-- 学习任务列表 -->
       <view v-else class="p-3">
-        <!-- 统计信息 -->
-        <view class="flex justify-between items-center mb-3 px-1">
-          <text class="text-sm text-gray-600">
-            待完成 {{ stats.pending_count }} · 已完成
-            {{ stats.completed_count }}
-          </text>
-          <view @tap="toggleCompletedTasks" class="flex items-center text-xs text-gray-500">
-            <text class="mr-1">{{
-              showCompleted ? "隐藏已完成" : "显示已完成"
-              }}</text>
-            <text :class="showCompleted ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'
-              " class="w-3 h-3"></text>
+        <!-- Tab 切换（按钮组样式） -->
+        <view class="flex gap-0 mb-3 p-1 bg-gray-100 rounded-lg">
+          <view 
+            @tap="switchToCompletedTab" 
+            class="flex-1 text-center py-1 text-sm font-medium rounded-md transition-all"
+            :class="activeTab === 'completed' 
+              ? 'bg-white text-green-600 shadow-sm' 
+              : 'text-gray-600'"
+          >
+            已完成({{ stats.completed_count }})
           </view>
+          <view 
+            @tap="switchToPendingTab" 
+            class="flex-1 text-center py-1 text-sm font-medium rounded-md transition-all"
+            :class="activeTab === 'pending' 
+              ? 'bg-white text-green-600 shadow-sm' 
+              : 'text-gray-600'"
+          >
+            待完成({{ stats.pending_count }})
+          </view>
+          
         </view>
 
-        <scroll-view :scroll-y="true" class="max-h-72" @scrolltolower="loadMoreTasks" :lower-threshold="100">
-          <view v-if="pendingTasks.length === 0" class="flex flex-col items-center justify-center py-8">
-            <view class="i-lucide-clipboard text-2xl text-gray-400 mb-2"></view>
-            <text class="text-gray-700 font-medium">全部任务已完成</text>
-            <text class="text-gray-500 text-sm">劳逸结合 · 爱自己</text>
-          </view>
-          <!-- 待完成任务 -->
-          <view class="space-y-2">
-            <view v-for="task in pendingTasks" :key="`pending-${task.id}`"
-              class="relative p-3 border rounded-lg" :class="getTaskBorderClass(task)"
-              @tap="showEditTaskModal(task)">
-              <!-- 任务内容 -->
-              <view class="flex items-start gap-3">
-                <!-- 优先级指示器 -->
-                <view class="w-1 h-4 rounded-full flex-shrink-0 mt-0.5" :class="getPriorityColorClass(task.priority)">
-                </view>
-
-                <view class="flex-1 min-w-0">
-                  <!-- 任务标题和右上角操作区 -->
-                  <view class="flex items-start justify-between gap-2">
-                    <text class="text-sm font-medium text-gray-900 line-clamp-2 flex-1">
-                      {{ task.title }}
-                    </text>
-
-                    <!-- 右上角操作区 -->
-                    <view class="flex items-center gap-2 flex-shrink-0">
-                      <!-- 天数提醒 -->
-                      <view v-if="getDaysLeftBadge(task.due_date, task.status)"
-                        class="px-1.5 py-0.5 rounded text-xs font-medium" :class="getDaysLeftBadgeClass(task.due_date, task.status)
-                          ">
-                        {{ getDaysLeftBadge(task.due_date, task.status) }}
-                      </view>
-
-                      <!-- 完成按钮 -->
-                      <view @tap.stop="toggleTaskStatus(task.id)"
-                        class="flex-shrink-0 w-5 h-5 border-2 border-gray-300 rounded-full flex items-center justify-center active:bg-gray-100">
-                        <text v-if="task.status === 2" class="i-lucide-check w-3 h-3 text-green-500"></text>
-                      </view>
-                    </view>
+          <!-- 待完成任务列表 -->
+          <scroll-view 
+            v-show="activeTab === 'pending'" 
+            :scroll-y="true" 
+          class="max-h-72" 
+            @scrolltolower="loadMorePendingTasks" 
+            :lower-threshold="100"
+          >
+            <view v-if="pendingTasks.length === 0" class="flex flex-col items-center justify-center py-8">
+              <view class="i-lucide-clipboard text-2xl text-gray-400 mb-2"></view>
+              <text class="text-gray-500 text-sm">劳逸结合 · 爱自己</text>
+            </view>
+            
+            <view v-else class="space-y-2">
+              <view v-for="task in pendingTasks" :key="`pending-${task.id}`"
+                class="relative p-3 border rounded-lg" :class="getTaskBorderClass(task)"
+                @tap="showEditTaskModal(task)">
+                <!-- 任务内容 -->
+                <view class="flex items-start gap-3">
+                  <!-- 优先级指示器 -->
+                  <view class="w-1 h-4 rounded-full flex-shrink-0 mt-0.5" :class="getPriorityColorClass(task.priority)">
                   </view>
 
-                  <!-- 任务描述 -->
-                  <text v-if="task.description" class="text-xs text-gray-600 line-clamp-1 mt-1">
-                    {{ task.description }}
-                  </text>
-                </view>
-              </view>
-            </view>
-          </view>
+                  <view class="flex-1 min-w-0">
+                    <!-- 任务标题和右上角操作区 -->
+                    <view class="flex items-start justify-between gap-2">
+                      <text class="text-sm font-medium text-gray-900 line-clamp-2 flex-1">
+                        {{ task.title }}
+                      </text>
 
-          <!-- 已完成任务 -->
-          <view v-if="showCompleted && completedTasks.length > 0" class="mt-4">
-            <view class="border-t border-gray-100 pt-3">
-              <text class="text-xs text-gray-500 mb-2 block">已完成的任务</text>
-              <view class="space-y-2">
-                <view v-for="task in completedTasks" :key="`completed-${task.id}`"
-                  class="relative p-3 border border-green-200 rounded-lg bg-green-50" @tap="showEditTaskModal(task)">
-                  <!-- 任务内容 -->
-                  <view class="flex items-start gap-3">
-                    <!-- 完成指示器 -->
-                    <view class="w-1 h-4 rounded-full bg-green-400 flex-shrink-0 mt-0.5"></view>
-
-                    <view class="flex-1 min-w-0">
-                      <!-- 任务标题和右上角操作区 -->
-                      <view class="flex items-start justify-between gap-2">
-                        <text class="text-sm font-medium text-gray-700 line-through line-clamp-2 flex-1">
-                          {{ task.title }}
-                        </text>
+                      <!-- 右上角操作区 -->
+                      <view class="flex items-center gap-2 flex-shrink-0">
+                        <!-- 天数提醒 -->
+                        <view v-if="getDaysLeftBadge(task.due_date, task.status)"
+                          class="px-1.5 py-0.5 rounded text-xs font-medium" :class="getDaysLeftBadgeClass(task.due_date, task.status)
+                            ">
+                          {{ getDaysLeftBadge(task.due_date, task.status) }}
+                        </view>
 
                         <!-- 完成按钮 -->
                         <view @tap.stop="toggleTaskStatus(task.id)"
-                          class="flex-shrink-0 w-5 h-5 border-2 border-green-400 rounded-full flex items-center justify-center bg-green-400 active:bg-green-500">
-                          <text class="i-lucide-check w-3 h-3 text-white"></text>
+                          class="flex-shrink-0 w-5 h-5 border-2 border-gray-300 rounded-full flex items-center justify-center active:bg-gray-100">
+                          <text v-if="task.status === 2" class="i-lucide-check w-3 h-3 text-green-500"></text>
                         </view>
                       </view>
+                    </view>
 
-                      <!-- 完成时间 -->
-                      <view class="flex items-center gap-1 mt-1">
-                        <text class="i-lucide-check-circle w-3 h-3 text-green-500"></text>
-                        <text class="text-xs text-green-600">
-                          {{
-                            formatCompletedTime(
-                              task.completed_at || task.updated_at
-                            )
-                          }}
-                        </text>
+                    <!-- 任务描述 -->
+                    <text v-if="task.description" class="text-xs text-gray-600 line-clamp-1 mt-1">
+                      {{ task.description }}
+                    </text>
+                  </view>
+                </view>
+              </view>
+            </view>
+
+            <!-- 加载更多指示器 -->
+            <view v-if="pendingTasks.length > 0" class="text-center py-2">
+              <text v-if="isLoadingMorePending" class="text-gray-500 text-sm">加载中...</text>
+              <text v-else-if="!hasMorePendingData" class="text-gray-400 text-xs">已加载全部</text>
+            </view>
+          </scroll-view>
+
+          <!-- 已完成任务列表 -->
+          <scroll-view 
+            v-show="activeTab === 'completed'" 
+            :scroll-y="true" 
+          class="max-h-72" 
+            @scrolltolower="loadMoreCompletedTasks" 
+            :lower-threshold="100"
+          >
+            <view v-if="completedTasks.length === 0" class="flex flex-col items-center justify-center py-8">
+              <view class="i-lucide-check-circle text-2xl text-gray-400 mb-2"></view>
+              <text class="text-gray-500 text-sm">还没有完成的任务</text>
+            </view>
+            
+            <view v-else class="space-y-2">
+              <view v-for="task in completedTasks" :key="`completed-${task.id}`"
+                class="relative p-3 border border-green-200 rounded-lg bg-green-50" @tap="showEditTaskModal(task)">
+                <!-- 任务内容 -->
+                <view class="flex items-start gap-3">
+                  <!-- 完成指示器 -->
+                  <view class="w-1 h-4 rounded-full bg-green-400 flex-shrink-0 mt-0.5"></view>
+
+                  <view class="flex-1 min-w-0">
+                    <!-- 任务标题和右上角操作区 -->
+                    <view class="flex items-start justify-between gap-2">
+                      <text class="text-sm font-medium text-gray-700 line-clamp-2 flex-1">
+                        {{ task.title }}
+                      </text>
+
+                      <!-- 完成按钮 -->
+                      <view @tap.stop="toggleTaskStatus(task.id)"
+                        class="flex-shrink-0 w-5 h-5 border-2 border-green-400 rounded-full flex items-center justify-center bg-green-400 active:bg-green-500">
+                        <text class="i-lucide-check w-3 h-3 text-white"></text>
                       </view>
+                    </view>
+
+                    <!-- 完成时间 -->
+                    <view class="flex items-center gap-1 mt-1">
+                      <text class="i-lucide-check-circle w-3 h-3 text-green-500"></text>
+                      <text class="text-xs text-green-600">
+                        {{
+                          formatCompletedTime(
+                            task.completed_at || task.updated_at
+                          )
+                        }}
+                      </text>
                     </view>
                   </view>
                 </view>
               </view>
             </view>
-          </view>
 
-          <!-- 加载更多指示器 -->
-          <view v-if="isLoadingMore || hasMoreData" class="text-center py-4">
-            <text v-if="isLoadingMore" class="text-gray-500 text-sm">加载中...</text>
-            <text v-else-if="
-              !hasMoreData &&
-              (pendingTasks.length > 0 || completedTasks.length > 0)
-            " class="text-gray-400 text-sm">已加载全部</text>
-          </view>
-        </scroll-view>
+            <!-- 加载更多指示器 -->
+            <view v-if="completedTasks.length > 0" class="text-center py-2">
+              <text v-if="isLoadingMoreCompleted" class="text-gray-500 text-sm">加载中...</text>
+              <text v-else-if="!hasMoreCompletedData" class="text-gray-400 text-xs">已加载全部</text>
+            </view>
+          </scroll-view>
+        </view>
       </view>
-    </view>
 
     <!-- 添加学习任务弹窗 -->
     <view v-if="showAddModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-end justify-center z-50"
@@ -343,7 +374,7 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted } from "vue";
+import { computed, ref } from "vue";
 import Taro from "@tarojs/taro";
 import { useAuthStore } from "../../../stores/auth";
 import { useStudyTaskStore } from "../../../stores/study-tasks";
@@ -360,15 +391,21 @@ const studyTaskStore = useStudyTaskStore();
 // 响应式数据
 const showAddModal = ref(false);
 const showEditModal = ref(false);
-const showCompleted = ref(false);
+const activeTab = ref('pending'); // 当前激活的tab: 'pending' 或 'completed'
 const submitting = ref(false);
 const currentTask = ref(null);
 
-// 分页相关
-const currentPage = ref(1);
-const pageSize = ref(10);
-const isLoadingMore = ref(false);
-const hasMoreData = ref(true);
+// 待完成任务分页相关
+const pendingCurrentPage = ref(1);
+const pendingPageSize = ref(10);
+const isLoadingMorePending = ref(false);
+const hasMorePendingData = ref(true);
+
+// 已完成任务分页相关
+const completedCurrentPage = ref(1);
+const completedPageSize = ref(10);
+const isLoadingMoreCompleted = ref(false);
+const hasMoreCompletedData = ref(true);
 
 // 新增任务数据
 const newTask = ref({
@@ -432,38 +469,6 @@ const parseDate = (dateStr) => {
 };
 
 // 工具方法
-const formatDueDate = (dateStr) => {
-  if (!dateStr) return "";
-
-  const date = parseDate(dateStr);
-  if (!date || isNaN(date.getTime())) return "";
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const dateOnly = new Date(date);
-  dateOnly.setHours(0, 0, 0, 0);
-
-  const diffTime = dateOnly - today;
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-  let dateText = "";
-  if (diffDays === 0) dateText = "今天";
-  else if (diffDays === 1) dateText = "明天";
-  else if (diffDays === -1) dateText = "昨天";
-  else if (diffDays > 0) dateText = `${diffDays}天后`;
-  else dateText = `${Math.abs(diffDays)}天前`;
-
-  // 检查是否有具体时间（不是00:00）
-  const hasTime = date.getHours() !== 0 || date.getMinutes() !== 0;
-  if (hasTime) {
-    const timeStr = `${String(date.getHours()).padStart(2, "0")}:${String(
-      date.getMinutes()
-    ).padStart(2, "0")}`;
-    return `${dateText} ${timeStr}`;
-  }
-  return dateText;
-};
 
 const formatCompletedTime = (dateStr) => {
   // 如果没有完成时间，返回默认文本
@@ -600,17 +605,7 @@ const showEditTaskModal = (task) => {
   showEditModal.value = true;
 };
 
-// 格式化日期为picker所需格式 (YYYY-MM-DD)
-const formatDateForPicker = (dateStr) => {
-  if (!dateStr) return "";
 
-  const date = new Date(dateStr);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
-};
 
 // 分离日期和时间
 const separateDateAndTime = (dateTimeStr) => {
@@ -855,14 +850,14 @@ const loadData = async (reset = true) => {
   if (!isLoading.value) {
     try {
       if (reset) {
-        currentPage.value = 1;
-        hasMoreData.value = true;
+        pendingCurrentPage.value = 1;
+        hasMorePendingData.value = true;
       }
 
       // 只请求未完成的任务（status=1）
       const response = await studyTaskStore.fetchStudyTasks({
-        page: currentPage.value,
-        size: pageSize.value,
+        page: pendingCurrentPage.value,
+        size: pendingPageSize.value,
         status: 1, // 只获取待完成的任务
       });
 
@@ -875,72 +870,127 @@ const loadData = async (reset = true) => {
         // 如果返回的数据少于pageSize，说明没有更多数据了
         // 或者如果当前已加载的未完成任务数量已经达到或超过pending_count，也没有更多数据了
         const currentPendingCount = pendingTasks.value.length;
-        hasMoreData.value = returnedCount === pageSize.value &&
+        hasMorePendingData.value = returnedCount === pendingPageSize.value &&
                            currentPendingCount < stats.value.pending_count;
       } else {
-        hasMoreData.value = false;
+        hasMorePendingData.value = false;
       }
     } catch (error) {
       console.error("获取学习任务列表失败:", error);
-      hasMoreData.value = false;
+      hasMorePendingData.value = false;
     }
   }
 };
 
-// 加载更多数据
-const loadMoreTasks = async () => {
-  if (isLoadingMore.value || !hasMoreData.value || !authStore.isLoggedIn) {
+// 加载更多待完成任务
+const loadMorePendingTasks = async () => {
+  if (isLoadingMorePending.value || !authStore.isLoggedIn || !hasMorePendingData.value) {
     return;
   }
 
-  isLoadingMore.value = true;
+  isLoadingMorePending.value = true;
   try {
-    currentPage.value++;
+    pendingCurrentPage.value++;
     // 只请求未完成的任务（status=1）
     const response = await studyTaskStore.fetchStudyTasks({
-      page: currentPage.value,
-      size: pageSize.value,
+      page: pendingCurrentPage.value,
+      size: pendingPageSize.value,
       status: 1, // 只获取待完成的任务
       append: true, // 标记为追加数据，不替换现有数据
     });
 
     // 判断是否还有更多数据
-    // 基于未完成任务的数量来判断
     if (response && response.data) {
       const returnedCount = response.data.length;
       const currentPendingCount = pendingTasks.value.length;
-      // 如果返回的数据少于pageSize，说明没有更多数据了
-      // 或者如果当前已加载的未完成任务数量已经达到或超过pending_count，也没有更多数据了
-      hasMoreData.value = returnedCount === pageSize.value &&
+      hasMorePendingData.value = returnedCount === pendingPageSize.value &&
                          currentPendingCount < stats.value.pending_count;
     } else {
-      hasMoreData.value = false;
+      hasMorePendingData.value = false;
     }
   } catch (error) {
-    console.error("加载更多任务失败:", error);
-    currentPage.value--; // 回退页码
-    hasMoreData.value = false;
+    console.error("加载更多待完成任务失败:", error);
+    pendingCurrentPage.value--; // 回退页码
+    hasMorePendingData.value = false;
   } finally {
-    isLoadingMore.value = false;
+    isLoadingMorePending.value = false;
   }
 };
 
-// 切换显示已完成任务
-const toggleCompletedTasks = async () => {
-  showCompleted.value = !showCompleted.value;
+// 加载更多已完成任务
+const loadMoreCompletedTasks = async () => {
+  if (isLoadingMoreCompleted.value || !authStore.isLoggedIn || !hasMoreCompletedData.value) {
+    return;
+  }
 
-  // 如果显示已完成任务，且还没有加载过，则加载已完成任务
-  if (showCompleted.value && completedTasks.value.length === 0 && stats.value.completed_count > 0) {
+  isLoadingMoreCompleted.value = true;
+  try {
+    completedCurrentPage.value++;
+    const response = await studyTaskStore.fetchCompletedStudyTasks({
+      status: 2,
+      page: completedCurrentPage.value,
+      size: completedPageSize.value,
+      append: true, // 标记为追加数据
+    });
+
+    // 判断是否还有更多已完成任务
+    if (response && response.data) {
+      const returnedCount = response.data.length;
+      const currentCompletedCount = completedTasks.value.length;
+      hasMoreCompletedData.value = returnedCount === completedPageSize.value &&
+                                     currentCompletedCount < stats.value.completed_count;
+    } else {
+      hasMoreCompletedData.value = false;
+    }
+  } catch (error) {
+    console.error("加载更多已完成任务失败:", error);
+    completedCurrentPage.value--;
+    hasMoreCompletedData.value = false;
+  } finally {
+    isLoadingMoreCompleted.value = false;
+  }
+};
+
+// 切换到待完成Tab
+const switchToPendingTab = async () => {
+  // 如果当前已经是待完成tab，不需要切换
+  if (activeTab.value === 'pending') return;
+
+  // 先加载数据（如果需要的话）
+  if (pendingTasks.value.length === 0 && stats.value.pending_count > 0 && !isLoading.value) {
     try {
+      await loadData(true);
+    } catch (error) {
+      console.error("加载待完成任务失败:", error);
+    }
+  }
+
+  // 数据准备好后再切换视图
+  activeTab.value = 'pending';
+};
+
+// 切换到已完成Tab
+const switchToCompletedTab = async () => {
+  // 如果当前已经是已完成tab，不需要切换
+  if (activeTab.value === 'completed') return;
+
+  // 先加载数据（如果需要的话）
+  if (completedTasks.value.length === 0 && stats.value.completed_count > 0) {
+    try {
+      completedCurrentPage.value = 1;
+      hasMoreCompletedData.value = true;
       await studyTaskStore.fetchCompletedStudyTasks({
         status: 2,
-        page: 1,
-        size: 20, // 先加载前20条已完成任务
+        page: completedCurrentPage.value,
+        size: completedPageSize.value,
       });
     } catch (error) {
       console.error("加载已完成任务失败:", error);
     }
   }
+
+  // 数据准备好后再切换视图
+  activeTab.value = 'completed';
 };
 
 // 页面显示时刷新数据

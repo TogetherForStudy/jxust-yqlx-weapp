@@ -43,7 +43,7 @@
         <!-- 反向计算 -->
         <view
           @tap="openReverseCalcModal"
-          class="bg-gradient-to-br from-blue-400 to-blue-500 rounded-xl shadow-sm p-2 active:opacity-90 transition-opacity"
+          class="bg-blue-400 rounded-xl p-2 active:opacity-90 transition-opacity"
         >
           <view class="flex flex-col items-center justify-center">
             <text class="i-lucide-calculator w-5 h-5 text-white mb-1"></text>
@@ -54,7 +54,7 @@
         <!-- 保研均分 -->
         <view
           @tap="openGraduateModal"
-          class="bg-gradient-to-br from-blue-400 to-blue-500 rounded-xl shadow-sm p-2 active:opacity-90 transition-opacity"
+          class="bg-blue-400 rounded-xl p-2 active:opacity-90 transition-opacity"
         >
           <view class="flex flex-col items-center justify-center">
             <text class="i-lucide-graduation-cap w-5 h-5 text-white mb-1"></text>
@@ -65,7 +65,7 @@
         <!-- 添加课程 -->
         <view
           @tap="openAddModal"
-          class="bg-gradient-to-br from-blue-400 to-blue-500 rounded-xl shadow-sm p-2 active:opacity-90 transition-opacity"
+          class="bg-blue-400 rounded-xl p-2 active:opacity-90 transition-opacity"
         >
           <view class="flex flex-col items-center justify-center">
             <text class="i-lucide-plus w-5 h-5 text-white mb-1"></text>
@@ -119,7 +119,7 @@
 
               <!-- 课程信息 -->
               <view class="flex-1" @tap="toggleCourseSelection(index)">
-                <text class="text-gray-800 font-medium text-sm block mb-1">
+                <text class="text-gray-800 font-medium text-sm mb-1 line-clamp-1">
                   {{ course.courseName }}
                 </text>
                 <view class="flex items-center space-x-4 text-xs text-gray-500">
@@ -305,7 +305,7 @@
         <!-- 说明文本 -->
         <view class="bg-blue-50 rounded-lg p-3 mb-3">
           <text class="text-blue-700 text-xs leading-relaxed">
-            2026届保研各专业绩点平均及加分平均数据
+            {{ graduateYear }}届保研各专业绩点平均及加分平均数据
           </text>
         </view>
 
@@ -410,6 +410,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import Taro from '@tarojs/taro'
+import { configAPI } from '../../api'
 
 // 当前输入的课程信息
 const currentCourse = ref({
@@ -444,73 +445,11 @@ const reverseCalcResult = ref(null)
 // 保研均分查询弹窗相关
 const showGraduateModal = ref(false)
 
+// 保研年份
+const graduateYear = ref(2026)
+
 // 保研专业数据
-const graduateMajorData = [
-  { name: '财务管理', gpa: '90.13', bonus: '1.80' },
-  { name: '日语', gpa: '89.93', bonus: '0.00' },
-  { name: '国际经济与贸易', gpa: '89.73', bonus: '2.30' },
-  { name: '会计学', gpa: '89.71', bonus: '1.96' },
-  { name: '英语', gpa: '89.62', bonus: '0.14' },
-  { name: '社会体育指导与管理', gpa: '89.52', bonus: '1.06' },
-  { name: '信息与计算科学', gpa: '89.49', bonus: '0.24' },
-  { name: '信息安全', gpa: '89.38', bonus: '1.92' },
-  { name: '电气工程及其自动化', gpa: '89.28', bonus: '1.00' },
-  { name: '汉语国际教育', gpa: '89.25', bonus: '0.00' },
-  { name: '电子科学与技术（中外）', gpa: '89.23', bonus: '0.00' },
-  { name: '行政管理', gpa: '88.92', bonus: '0.15' },
-  { name: '地理信息科学', gpa: '88.90', bonus: '0.13' },
-  { name: '电子信息工程', gpa: '88.75', bonus: '0.96' },
-  { name: '虚拟现实技术', gpa: '88.73', bonus: '1.43' },
-  { name: '计算机科学与技术', gpa: '88.71', bonus: '1.15' },
-  { name: '人力资源管理', gpa: '88.70', bonus: '1.51' },
-  { name: '工程管理', gpa: '88.69', bonus: '0.00' },
-  { name: '金融学', gpa: '88.48', bonus: '0.00' },
-  { name: '工商管理', gpa: '88.35', bonus: '0.10' },
-  { name: '人工智能', gpa: '88.34', bonus: '1.10' },
-  { name: '材料成型及控制工程', gpa: '88.20', bonus: '2.40' },
-  { name: '工程造价', gpa: '87.85', bonus: '0.83' },
-  { name: '应用化学', gpa: '87.54', bonus: '1.12' },
-  { name: '软件工程(软件开发)', gpa: '87.52', bonus: '0.65' },
-  { name: '产品设计', gpa: '87.39', bonus: '0.23' },
-  { name: '给排水科学与工程', gpa: '87.33', bonus: '0.00' },
-  { name: '应急管理', gpa: '87.23', bonus: '0.00' },
-  { name: '测绘工程', gpa: '87.11', bonus: '0.91' },
-  { name: '数字媒体艺术', gpa: '86.69', bonus: '0.14' },
-  { name: '电子科学与技术', gpa: '86.62', bonus: '1.17' },
-  { name: '软件工程(金融学)', gpa: '86.58', bonus: '1.38' },
-  { name: '法学', gpa: '86.48', bonus: '0.09' },
-  { name: '软件工程(智能制造工程)', gpa: '86.39', bonus: '0.53' },
-  { name: '自动化', gpa: '86.24', bonus: '0.18' },
-  { name: '生物工程', gpa: '86.13', bonus: '0.41' },
-  { name: '土木工程', gpa: '86.10', bonus: '0.51' },
-  { name: '金属材料工程', gpa: '86.10', bonus: '0.54' },
-  { name: '建筑环境与能源应用工程', gpa: '85.95', bonus: '1.17' },
-  { name: '建筑学', gpa: '85.95', bonus: '0.00' },
-  { name: '新能源科学与工程', gpa: '85.92', bonus: '0.05' },
-  { name: '电子信息科学与技术', gpa: '85.86', bonus: '0.21' },
-  { name: '机械工程', gpa: '85.78', bonus: '1.20' },
-  { name: '环境设计', gpa: '85.48', bonus: '0.39' },
-  { name: '软件工程(土木工程)', gpa: '85.47', bonus: '0.00' },
-  { name: '智能制造工程', gpa: '85.24', bonus: '0.70' },
-  { name: '安全工程', gpa: '84.91', bonus: '0.00' },
-  { name: '软件工程(会计学)', gpa: '84.81', bonus: '0.15' },
-  { name: '采矿工程（中外）', gpa: '84.74', bonus: '0.25' },
-  { name: '能源与动力工程', gpa: '84.65', bonus: '0.15' },
-  { name: '材料科学与工程', gpa: '84.59', bonus: '0.15' },
-  { name: '城乡规划', gpa: '84.59', bonus: '1.30' },
-  { name: '车辆工程', gpa: '84.47', bonus: '1.00' },
-  { name: '软件工程(物联网工程)', gpa: '84.41', bonus: '0.29' },
-  { name: '化学工程与工艺', gpa: '84.34', bonus: '0.80' },
-  { name: '机械电子工程', gpa: '84.33', bonus: '0.77' },
-  { name: '机器人工程', gpa: '84.32', bonus: '1.30' },
-  { name: '矿物加工工程', gpa: '84.22', bonus: '0.07' },
-  { name: '冶金工程', gpa: '83.75', bonus: '0.35' },
-  { name: '地质工程', gpa: '83.54', bonus: '0.09' },
-  { name: '采矿工程', gpa: '82.91', bonus: '0.34' },
-  { name: '环境工程', gpa: '82.75', bonus: '0.13' },
-  { name: '矿业类', gpa: '82.01', bonus: '0.00' },
-  { name: '智能科学与技术', gpa: '81.51', bonus: '0.00' }
-]
+const graduateMajorData = ref([])
 
 // 是否可以添加
 const canAdd = computed(() => {
@@ -880,9 +819,34 @@ const loadFromLocalStorage = () => {
   }
 }
 
+// 加载保研专业数据
+const loadGraduateData = async () => {
+  try {
+    const response = await configAPI.getConfig('bygpa')
+    if (response && response.value) {
+      // 解析 value 字段中的 JSON 字符串
+      const configData = JSON.parse(response.value)
+      if (configData.year) {
+        graduateYear.value = configData.year
+      }
+      if (configData.data && Array.isArray(configData.data)) {
+        graduateMajorData.value = configData.data
+      }
+    }
+  } catch (error) {
+    console.error('加载保研专业数据失败:', error)
+    Taro.showToast({
+      title: '加载数据失败',
+      icon: 'error',
+      duration: 1500
+    })
+  }
+}
+
 // 页面加载时恢复数据
 onMounted(() => {
   loadFromLocalStorage()
+  loadGraduateData()
 })
 
 Taro.useShareAppMessage((res) => {

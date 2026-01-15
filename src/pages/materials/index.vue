@@ -220,18 +220,18 @@
         class="bg-white p-4 active:bg-gray-50"
         @tap="enterCategory(category)"
       >
-        <view class="flex items-center justify-between">
-          <view class="flex items-center space-x-3">
+        <view class="flex items-center justify-between gap-3">
+          <view class="flex items-center gap-3 flex-1 min-w-0">
             <view
-              class="w-6 h-6 bg-gradient-to-br from-orange-300 to-orange-400 rounded flex items-center justify-center"
+              class="w-6 h-6 bg-gradient-to-br from-orange-300 to-orange-400 rounded flex items-center justify-center flex-shrink-0"
             >
               <text class="i-lucide-folder text-white w-4 h-4"></text>
             </view>
-            <view>
-              <text class="text-gray-800 font-medium">{{ category.name }}</text>
+            <view class="flex-1 min-w-0">
+              <text class="text-gray-800 font-medium line-clamp-2 break-all">{{ category.name }}</text>
             </view>
           </view>
-          <text class="i-lucide-chevron-right text-gray-400 w-5 h-5"></text>
+          <text class="i-lucide-chevron-right text-gray-400 w-5 h-5 flex-shrink-0"></text>
         </view>
       </view>
 

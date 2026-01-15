@@ -16,20 +16,74 @@
     </view>
 
     <!-- 筛选栏 -->
-    <view class="bg-white px-4 py-3 border-b border-gray-100 shrink-0">
-      <view class="flex space-x-2">
-        <view
-          v-for="filter in statusFilters"
-          :key="filter.value"
-          @tap="selectStatusFilter(filter.value)"
-          :class="[
-            'px-3 py-1 rounded-md text-sm border transition-colors duration-200',
-            selectedStatus === filter.value
-              ? 'bg-blue-500 text-white border-blue-500'
-              : 'bg-gray-50 text-gray-600 border-gray-200',
-          ]"
-        >
-          {{ filter.label }}
+    <view class="bg-white px-4 py-2.5 border-b border-gray-100 shrink-0">
+      <view class="flex justify-between items-center gap-3">
+        <view class="flex space-x-2">
+          <view
+            v-for="filter in statusFilters"
+            :key="filter.value"
+            @tap="selectStatusFilter(filter.value)"
+            :class="[
+              'px-2.5 py-1 rounded text-sm border transition-colors duration-200',
+              selectedStatus === filter.value
+                ? 'bg-blue-500 text-white border-blue-500'
+                : 'bg-gray-50 text-gray-600 border-gray-200',
+            ]"
+          >
+            {{ filter.label }}
+          </view>
+        </view>
+        
+        <!-- 分页控件 -->
+        <view v-if="total > 0" class="flex items-center space-x-1 shrink-0">
+          <!-- 首页 -->
+          <view 
+            @tap="goToFirstPage"
+            :class="[
+              'p-1.5 rounded flex items-center justify-center',
+              currentPage === 1 ? 'text-gray-300' : 'text-blue-600 active:bg-blue-50'
+            ]"
+          >
+            <text class="i-lucide-chevrons-left w-4 h-4"></text>
+          </view>
+          
+          <!-- 上一页 -->
+          <view 
+            @tap="goToPrevPage"
+            :class="[
+              'p-1.5 rounded flex items-center justify-center',
+              currentPage === 1 ? 'text-gray-300' : 'text-blue-600 active:bg-blue-50'
+            ]"
+          >
+            <text class="i-lucide-chevron-left w-4 h-4"></text>
+          </view>
+          
+          <!-- 页码 -->
+          <view class="px-2 py-1 text-sm text-gray-600 flex items-center">
+            {{ currentPage }}/{{ totalPages }}
+          </view>
+          
+          <!-- 下一页 -->
+          <view 
+            @tap="goToNextPage"
+            :class="[
+              'p-1.5 rounded flex items-center justify-center',
+              currentPage === totalPages ? 'text-gray-300' : 'text-blue-600 active:bg-blue-50'
+            ]"
+          >
+            <text class="i-lucide-chevron-right w-4 h-4"></text>
+          </view>
+          
+          <!-- 末页 -->
+          <view 
+            @tap="goToLastPage"
+            :class="[
+              'p-1.5 rounded flex items-center justify-center',
+              currentPage === totalPages ? 'text-gray-300' : 'text-blue-600 active:bg-blue-50'
+            ]"
+          >
+            <text class="i-lucide-chevrons-right w-4 h-4"></text>
+          </view>
         </view>
       </view>
     </view>
@@ -55,8 +109,6 @@
       <scroll-view
         :scroll-y="true"
         class="h-full"
-        :lower-threshold="100"
-        @scrolltolower="onScrollToLower"
       >
         <view class="p-2 flex flex-wrap" style="gap: 8px;">
           <view
@@ -116,41 +168,23 @@
           </view>
 
           <!-- 首次加载状态 -->
-          <view v-if="loading && currentPage === 1" class="w-full text-center py-8">
+          <view v-if="loading" class="w-full text-center py-8">
             <view class="inline-flex items-center space-x-2">
               <view class="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></view>
               <text class="text-gray-500 text-sm">加载中...</text>
             </view>
           </view>
 
-          <!-- 加载更多状态 -->
-          <view v-if="isLoadingMore" class="w-full text-center py-4">
-            <view class="inline-flex items-center space-x-2">
-              <view class="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></view>
-              <text class="text-gray-400 text-sm">加载更多中...</text>
-            </view>
-          </view>
-
-          <!-- 底部加载提示 -->
-          <view v-if="hasMore && !loading && !isLoadingMore && filteredHeroes.length > 0" class="w-full text-center py-4">
-            <text class="text-gray-400 text-sm">滚动加载更多</text>
-          </view>
-
-          <!-- 没有更多数据提示 -->
-          <view v-if="!hasMore && !loading && !isLoadingMore && filteredHeroes.length > 0" class="w-full text-center py-4">
-            <text class="text-gray-400 text-sm">—— 没有更多数据了 ——</text>
-          </view>
-
           <!-- 空状态 -->
           <view
             v-if="!loading && filteredHeroes.length === 0"
-            class="text-center py-12"
+            class="w-full flex flex-col items-center justify-center py-12"
           >
             <text
-              class="i-lucide-trophy w-12 h-12 text-gray-300 mb-4 block mx-auto"
+              class="i-lucide-trophy w-12 h-12 text-gray-300 mb-4"
             ></text>
-            <text class="text-gray-500">暂无英雄榜数据</text>
-            <view @tap="showCreateModal" class="mt-4">
+            <text class="text-gray-500 block mb-2">暂无英雄榜数据</text>
+            <view @tap="showCreateModal" class="mt-2">
               <text class="text-blue-500 text-sm">点击添加第一个英雄</text>
             </view>
           </view>
@@ -305,7 +339,6 @@ const searchKeyword = ref('');
 const currentPage = ref(1);
 const pageSize = ref(20);
 const total = ref(0);
-const hasMore = ref(false);
 
 // 弹窗状态
 const showForm = ref(false);
@@ -327,8 +360,8 @@ const heroForm = ref({
 // 状态筛选选项
 const statusFilters = computed(() => [
   { label: "全部", value: null },
-  { label: "显示中", value: true },
-  { label: "已隐藏", value: false },
+  { label: "显示", value: true },
+  { label: "隐藏", value: false },
 ]);
 
 // 计算属性 - 由于筛选在后端完成，直接返回原数组
@@ -338,6 +371,10 @@ const filteredHeroes = computed(() => {
 
 const canSave = computed(() => {
   return heroForm.value.name.trim().length > 0 && !saving.value;
+});
+
+const totalPages = computed(() => {
+  return Math.ceil(total.value / pageSize.value) || 1;
 });
 
 // API调用方法
@@ -358,22 +395,12 @@ const fetchHeroes = async (keyword = '', isShow = null, page = 1, size = 20) => 
     const response = await heroAPI.searchHeroes(params);
 
     if (response && response.data) {
-      if (page === 1) {
-        heroes.value = response.data;
-      } else {
-        // 如果是加载更多，则追加数据
-        heroes.value = [...heroes.value, ...response.data];
-      }
-
+      heroes.value = response.data;
       total.value = response.total || 0;
       currentPage.value = page;
-      hasMore.value = heroes.value.length < total.value;
     } else {
-      if (page === 1) {
-        heroes.value = [];
-      }
+      heroes.value = [];
       total.value = 0;
-      hasMore.value = false;
     }
   } catch (error) {
     console.error("获取英雄榜失败:", error);
@@ -422,13 +449,11 @@ const selectStatusFilter = async (status) => {
 
   // 重新加载数据
   currentPage.value = 1;
-  isLoadingMore.value = false;
   await fetchHeroes(searchKeyword.value.trim(), selectedStatus.value, 1);
 };
 
 const refreshData = async () => {
   currentPage.value = 1;
-  isLoadingMore.value = false;
   await fetchHeroes(searchKeyword.value.trim(), selectedStatus.value, 1);
   Taro.showToast({
     title: "刷新成功",
@@ -436,10 +461,8 @@ const refreshData = async () => {
   });
 };
 
-// 搜索和滚动相关方法
+// 搜索相关方法
 let searchTimer = null;
-let loadMoreTimer = null;
-const isLoadingMore = ref(false);
 
 const onSearchInput = (e) => {
   searchKeyword.value = e.detail.value;
@@ -454,7 +477,6 @@ const onSearchInput = (e) => {
 
 const performSearch = async () => {
   currentPage.value = 1;
-  isLoadingMore.value = false;
   await fetchHeroes(searchKeyword.value.trim(), selectedStatus.value, 1);
 };
 
@@ -463,27 +485,25 @@ const clearSearch = () => {
   performSearch();
 };
 
-const loadMore = async () => {
-  if (hasMore.value && !loading.value && !isLoadingMore.value) {
-    isLoadingMore.value = true;
-    try {
-      await fetchHeroes(searchKeyword.value.trim(), selectedStatus.value, currentPage.value + 1);
-    } finally {
-      isLoadingMore.value = false;
-    }
-  }
+// 分页导航方法
+const goToFirstPage = async () => {
+  if (currentPage.value === 1) return;
+  await fetchHeroes(searchKeyword.value.trim(), selectedStatus.value, 1);
 };
 
-// 滚动到底部的处理
-const onScrollToLower = () => {
-  // 防抖处理，防止连续触发
-  if (loadMoreTimer) {
-    clearTimeout(loadMoreTimer);
-  }
+const goToPrevPage = async () => {
+  if (currentPage.value === 1) return;
+  await fetchHeroes(searchKeyword.value.trim(), selectedStatus.value, currentPage.value - 1);
+};
 
-  loadMoreTimer = setTimeout(() => {
-    loadMore();
-  }, 300); // 300ms防抖延迟
+const goToNextPage = async () => {
+  if (currentPage.value >= totalPages.value) return;
+  await fetchHeroes(searchKeyword.value.trim(), selectedStatus.value, currentPage.value + 1);
+};
+
+const goToLastPage = async () => {
+  if (currentPage.value === totalPages.value) return;
+  await fetchHeroes(searchKeyword.value.trim(), selectedStatus.value, totalPages.value);
 };
 
 // 表单相关方法
@@ -645,10 +665,6 @@ onUnmounted(() => {
   if (searchTimer) {
     clearTimeout(searchTimer);
     searchTimer = null;
-  }
-  if (loadMoreTimer) {
-    clearTimeout(loadMoreTimer);
-    loadMoreTimer = null;
   }
 });
 </script>

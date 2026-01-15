@@ -216,7 +216,6 @@
               <input
                 v-model="grantPointsForm.points"
                 placeholder="正数增加，负数扣除"
-                type="number"
                 class="border-solid border-[1px] border-gray-300 rounded-lg p-2"
               />
               <text class="text-xs text-gray-500 mt-1 block">

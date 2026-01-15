@@ -3,13 +3,13 @@
   <view class="min-h-screen bg-gray-50">
     <view class="p-4 space-y-4 pb-16">
       <view class="bg-white rounded-2xl p-4 shadow-sm">
-        <view class="flex items-center justify-between">
+        <view class="flex items-center justify-between gap-2">
           <view>
-            <view class="text-lg font-semibold text-gray-900">
-              {{ projectInfo.name }}
-            </view>
+            <view class="text-base font-semibold text-gray-900 line-clamp-1">
+            {{ projectInfo.name }}
           </view>
-          <view v-if="onlineCount !== null" class="flex items-center gap-1 text-xs text-gray-500">
+          </view>
+          <view v-if="onlineCount !== null" class="flex items-center gap-1 text-xs text-gray-500 flex-shrink-0">
             <text>{{ onlineCount }} 人一起在学</text>
           </view>
         </view>
@@ -24,6 +24,15 @@
             <view>
               <view class="text-base font-medium text-gray-900">复习设置</view>
               <view class="text-xs text-gray-400 mt-1">选择模式、题目来源和顺序</view>
+            </view>
+            <!-- 清空错题本按钮 -->
+            <view v-if="useWrongBook && wrongBookIds.length > 0">
+              <view
+                class="px-3 py-1 text-xs rounded-full border border-red-200 text-red-600 bg-red-50 active:scale-[0.98] transition-all duration-150"
+                @tap="clearWrongBook"
+              >
+                清空错题本
+              </view>
             </view>
           </view>
 
@@ -205,6 +214,7 @@
       </view>
 
       <view
+        id="question-container"
         v-if="currentQuestion"
         class="relative bg-white rounded-2xl p-5 shadow-sm"
       >
@@ -807,7 +817,7 @@ const extractQuestionIds = (res) => {
   return [];
 };
 
-const loadQuestionDetail = async (index) => {
+const loadQuestionDetail = async (index, shouldScroll = false) => {
   if (index < 0 || index >= questionIds.value.length) {
     currentQuestion.value = null;
     return;
@@ -831,11 +841,74 @@ const loadQuestionDetail = async (index) => {
     isSliding.value = false;
     currentQuestion.value = normalizeQuestion(res);
     saveProgress();
+    
+    // 只有通过按钮切换时才自动滚动到题目
+    if (shouldScroll) {
+      await nextTick();
+      scrollToQuestion();
+    }
   } catch (error) {
     console.error("loadQuestionDetail error", error);
     Taro.showToast({ title: "题目加载失败", icon: "none" });
   } finally {
     loadingQuestion.value = false;
+  }
+};
+
+/**
+ * 检查题目是否在可视区域内，如果不在则自动滚动到题目位置
+ */
+const scrollToQuestion = () => {
+  try {
+    // 获取系统信息
+    const systemInfo = Taro.getSystemInfoSync();
+    const windowHeight = systemInfo.windowHeight || 667; // 默认值作为备用
+
+    // 创建选择器查询
+    const query = Taro.createSelectorQuery();
+    
+    // 查询题目容器的位置信息
+    query.select('#question-container').boundingClientRect();
+    
+    // 查询页面滚动位置
+    query.selectViewport().scrollOffset();
+    
+    query.exec((res) => {
+      if (!res || res.length < 2) {
+        return;
+      }
+      
+      const questionRect = res[0];
+      const scrollInfo = res[1];
+      
+      // 如果没有获取到题目容器信息，则不进行滚动
+      if (!questionRect) {
+        return;
+      }
+      
+      const { top, height } = questionRect;
+      const { scrollTop } = scrollInfo;
+      
+      // 检查题目是否完全在可视区域内
+      const isTopVisible = top >= 0;
+      const isBottomVisible = (top + height) <= windowHeight;
+      const isFullyVisible = isTopVisible && isBottomVisible;
+      
+      // 如果题目没有完全显示，则滚动到题目位置
+      if (!isFullyVisible) {
+        // 计算需要滚动到的位置，留出一些顶部空间（20px）
+        const targetScrollTop = scrollTop + top - 20;
+        
+        Taro.pageScrollTo({
+          scrollTop: Math.max(0, targetScrollTop),
+          duration: 300, // 平滑滚动300ms
+        }).catch((err) => {
+          console.warn("滚动到题目位置失败", err);
+        });
+      }
+    });
+  } catch (error) {
+    console.warn("scrollToQuestion error", error);
   }
 };
 
@@ -1031,7 +1104,7 @@ const getOptionStatus = (question, optionKey, subId = null) => {
   return "base";
 };
 
-const handleSubmit = () => {
+const handleSubmit = async () => {
   if (!canSubmit.value || !currentQuestion.value) return;
   const question = currentQuestion.value;
 
@@ -1069,6 +1142,10 @@ const handleSubmit = () => {
   ) {
     addToWrongBook(question.id, false);
   }
+
+  // 提交答案后滚动到题目位置，确保答案解析完全可见
+  await nextTick();
+  scrollToQuestion();
 };
 
 const onTextAnswerInput = (event) => {
@@ -1093,7 +1170,7 @@ const goNextQuestion = async () => {
     clearProgress(currentType);
     return;
   }
-  await loadQuestionDetail(nextIndex);
+  await loadQuestionDetail(nextIndex, true);
 };
 
 const goPrevQuestion = async () => {
@@ -1104,7 +1181,7 @@ const goPrevQuestion = async () => {
     return;
   }
   sessionFinished.value = false;
-  await loadQuestionDetail(prevIndex);
+  await loadQuestionDetail(prevIndex, true);
 };
 
 const handleSliderChanging = (event) => {
@@ -1268,6 +1345,37 @@ const toggleWrongBook = () => {
   }
 };
 
+const clearWrongBook = async () => {
+  if (!wrongBookIds.value.length) {
+    Taro.showToast({ title: "错题本已经是空的", icon: "none" });
+    return;
+  }
+
+  try {
+    const res = await Taro.showModal({
+      title: "清空错题本",
+      content: `确定要清空错题本吗？将删除 ${wrongBookIds.value.length} 道题目和错题本的学习与考试记录`,
+      confirmText: "清空",
+      cancelText: "取消",
+      confirmColor: "#ef4444",
+    });
+
+    if (res.confirm) {
+      // 清空错题本数据
+      wrongBookIds.value = [];
+      saveWrongBook();
+      
+      // 同时清除错题本的暂存进度
+      clearProgress('wrongbook');
+      
+      Taro.showToast({ title: "已清空错题本", icon: "success", duration: 1500 });
+    }
+  } catch (error) {
+    console.error("clear wrong book failed", error);
+    Taro.showToast({ title: "清空失败", icon: "none" });
+  }
+};
+
 const saveProgress = () => {
   if (!mode.value || !questionIds.value.length || currentIndex.value < 0) return;
   try {
@@ -1347,6 +1455,15 @@ const restoreProgress = async () => {
 };
 
 const handleBackToSelection = async () => {
+  // 检查是否是错题本模式且错题本为空
+  if (useWrongBook.value && wrongBookIds.value.length === 0) {
+    // 错题本已清空，清除之前的错题本进度，不保存新进度
+    clearProgress('wrongbook');
+    resetSession();
+    Taro.showToast({ title: "错题本已空，已清除进度", icon: "none", duration: 1500 });
+    return;
+  }
+
   // 暂存当前进度
   if (mode.value && questionIds.value.length && currentIndex.value >= 0) {
     saveProgress();

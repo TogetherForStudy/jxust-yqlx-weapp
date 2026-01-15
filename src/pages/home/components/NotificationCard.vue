@@ -22,7 +22,7 @@
       <!-- 未登录状态 -->
       <view v-else-if="!authStore.isLoggedIn" class="flex flex-col items-center justify-center py-8">
         <view class="i-lucide-info text-2xl text-gray-400 mb-2"></view>
-        <text class="text-gray-500 text-sm">登录使用信息海洋</text>
+        <text class="text-gray-500 text-sm">让信息差无所遁形</text>
       </view>
 
       <!-- 无通知状态 -->
@@ -153,6 +153,13 @@ const formatDate = (dateString) => {
 const hasScheduleData = (notification) => {
   return notification.schedule?.time_slots && Array.isArray(notification.schedule.time_slots) && notification.schedule.time_slots.length > 0
 }
+
+// 页面显示时检查并加载数据（处理首次登录场景）
+Taro.useDidShow(async () => {
+  if (authStore.isLoggedIn && notificationStore.notifications.length === 0) {
+    await loadNotifications()
+  }
+})
 
 </script>
 

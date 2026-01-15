@@ -14,7 +14,7 @@
             <text class="i-lucide-file-text text-white w-6 h-6"></text>
           </view>
           <view class="flex-1 min-w-0">
-            <text class="text-gray-800 font-bold text-base break-all" :user-select="true">
+            <text class="text-gray-800 font-bold text-base line-clamp-2 break-all" :user-select="true">
               {{ material.file_name }}
             </text>
             <view class="flex items-center space-x-3 mt-2 text-xs text-gray-400">
@@ -337,7 +337,7 @@ const handleDownload = async () => {
     // 显示引导弹窗
     Taro.showModal({
       title: '获取资料',
-      content: `请前往"江理一起来学"公众号，回复"资料"获取下载链接。\n\n然后按照路径查找：\n${material.value.category_path || '根目录'} > ${material.value.file_name}`,
+      content: `请前往"江理一起来学"公众号（不是小程序客服），回复"资料"获取下载链接。\n\n然后按照路径查找：\n${material.value.category_path || '根目录'} > ${material.value.file_name}`,
       confirmText: '我知道了',
       showCancel: false,
       success: () => {

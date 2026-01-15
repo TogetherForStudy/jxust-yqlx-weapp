@@ -3,8 +3,9 @@
   <view class="px-4">
     <view class="flex justify-between items-center mb-2">
       <text class="text-gray-800 font-medium">倒数日</text>
+      <!-- 非空状态时显示在右上角 -->
       <view
-        v-if="authStore.isLoggedIn"
+        v-if="authStore.isLoggedIn && countdowns.length > 0"
         @tap="showAddModal = true"
         class="bg-blue-500 text-white px-2 py-1 rounded-lg text-xs"
       >
@@ -23,14 +24,22 @@
       <!-- 未登录状态 -->
       <view v-else-if="!authStore.isLoggedIn" class="flex flex-col items-center justify-center py-8">
         <view class="i-lucide-clock text-2xl text-gray-400 mb-2"></view>
-        <text class="text-gray-500 text-sm">登录使用倒数日</text>
+        <text class="text-gray-500 text-sm">纪念 · 期待</text>
       </view>
 
       <!-- 空状态 -->
       <view v-else-if="countdowns.length === 0" class="flex flex-col items-center justify-center py-8">
         <view class="i-lucide-calendar text-2xl text-gray-400 mb-2"></view>
-        <text class="text-gray-700 font-medium">暂无倒数日</text>
-        <text class="text-gray-500 text-sm">纪念 · 期待</text>
+        <text class="text-gray-500 text-sm mb-4">纪念 · 期待</text>
+        <!-- 空状态时显示在提示下方 -->
+        <view
+          v-if="authStore.isLoggedIn"
+          @tap="showAddModal = true"
+          class="bg-blue-500 text-white px-2 py-1 rounded-lg text-sm font-medium flex items-center"
+        >
+          <text class="i-lucide-plus w-4 h-4 mr-1"></text>
+          添加倒数日
+        </view>
       </view>
 
       <!-- 倒数日网格布局 -->
