@@ -314,6 +314,11 @@ onMounted(() => {
 // 页面显示时也更新一次状态
 Taro.useDidShow(() => {
   forceUpdate.value++
+  
+  // 如果登录了但没有数据，则加载数据（处理首次登录场景）
+  if (authStore.isLoggedIn && authStore.userClass && Object.keys(scheduleStore.courseData).length === 0) {
+    loadData()
+  }
 })
 
 // 页面卸载时清理定时器

@@ -91,7 +91,7 @@
             <view
               v-for="transaction in transactions"
               :key="transaction.id"
-              class="px-4 py-3 border-b border-gray-50 flex items-center justify-between"
+              class="px-4 py-3 border-b border-gray-50 flex items-center justify-between gap-4"
             >
               <view class="flex-1">
                 <text class="text-gray-800 text-sm block">{{ transaction.description }}</text>
@@ -148,7 +148,7 @@
                     :key="source"
                     class="bg-green-50 rounded-lg p-3 border border-green-200"
                   >
-                    <view class="flex items-center justify-between">
+                    <view class="flex items-center justify-between gap-4">
                       <text class="text-sm font-medium text-gray-800">{{ getSourceName(source) }}</text>
                       <text class="text-sm font-semibold text-green-600">+{{ stats.earned || 0 }}</text>
                     </view>

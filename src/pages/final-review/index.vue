@@ -55,7 +55,7 @@
           class="bg-white rounded-2xl p-4 shadow-sm active:scale-[0.98] transition-transform duration-150"
           @tap="openProject(project)"
         >
-          <view class="flex justify-between">
+          <view class="flex justify-between gap-4">
             <view>
               <text class="text-base font-semibold text-gray-900">
                 {{ project.name || project.title }}

@@ -76,7 +76,7 @@
 
     <!-- 搜索提示 -->
     <view v-if="!hasSearched && !isLoading" class="bg-white rounded-lg shadow-sm p-8 text-center">
-      <view class="text-gray-500">仅有 2 次绑定机会</view>
+      <view v-if="isOnlyUserBasic" class="text-gray-500">仅有 2 次绑定机会</view>
       <view class="text-gray-500">请输入班级名称进行搜索</view>
       <view class="text-sm text-gray-400 mt-2">如：25软件1班</view>
     </view>
@@ -110,7 +110,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import Taro from '@tarojs/taro'
 import { useScheduleStore } from '../../../stores/schedule'
 import { useAuthStore } from '../../../stores/auth'
@@ -121,6 +121,13 @@ defineOptions({
 
 const scheduleStore = useScheduleStore()
 const authStore = useAuthStore()
+
+// 计算属性：判断用户是否只有 user_basic 角色标签
+const isOnlyUserBasic = computed(() => {
+  const roleTags = authStore.userInfo?.role_tags || []
+  return roleTags.length === 1 && roleTags[0] === 'user_basic'
+})
+
 // 搜索相关
 const searchKeyword = ref('')
 const searchResults = ref([])
