@@ -103,6 +103,12 @@ export const useScheduleStore = defineStore('schedule', {
       return state.currentWeek >= 1 && state.currentWeek <= state.maxWeeks
     },
 
+    // 判断当前真实日期是否在学期周内（用于显示"假期中"提示）
+    isInSemesterWeek: (state) => {
+      const realWeek = state.calculateWeekNumber()
+      return realWeek >= 1 && realWeek <= state.maxWeeks
+    },
+
     // 获取所有学期列表
     semesterList: (state) => {
       return state.semesterConfig?.semesters || []

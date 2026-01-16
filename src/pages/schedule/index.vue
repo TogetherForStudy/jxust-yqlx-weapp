@@ -89,6 +89,16 @@
           当前学期：{{ scheduleStore.semester }}
         </view>
       </view>
+
+      <!-- 假期中提示 - 学期一致但不在任何周内 -->
+      <view
+        v-if="!scheduleStore.isSemesterMismatch && !scheduleStore.isInSemesterWeek"
+        class="fixed bottom-0 left-0 right-0 z-40 flex justify-center pb-8"
+      >
+        <view class="bg-blue-50 text-blue-600 px-4 py-2 rounded-full text-xs">
+          假期中
+        </view>
+      </view>
     </view>
 
     <!-- 加载状态 -->
