@@ -244,6 +244,13 @@
       </view>
     </view>
 
+    <!-- 新学期变更提示弹窗 -->
+    <semester-change-modal
+      :visible="showSemesterChangeModal"
+      :new-semester="newSemesterName"
+      @confirm="handleSemesterChangeConfirm"
+    />
+
     <!-- 学期切换弹窗 -->
     <view v-if="showSemesterModal" class="fixed inset-0 z-50 flex items-center justify-center">
       <!-- 遮罩层 -->
@@ -307,6 +314,7 @@ import { useAuthStore } from '../../stores/auth'
 import ScheduleTable from './components/ScheduleTable.vue'
 import CourseDetailModal from './components/CourseDetailModal.vue'
 import CourseEditModal from './components/CourseEditModal.vue'
+import SemesterChangeModal from './components/SemesterChangeModal.vue'
 
 // 定义组件名称
 defineOptions({
@@ -322,6 +330,8 @@ const selectedCourse = ref(null)
 const showWeekSelector = ref(false)
 const showHelpModal = ref(false)
 const showSemesterModal = ref(false)
+const showSemesterChangeModal = ref(false)
+const newSemesterName = ref('')
 
 // 编辑相关状态
 const editModalVisible = ref(false)
@@ -353,9 +363,9 @@ const previousWeek = () => {
 
 // 下一周
 const nextWeek = () => {
-  if (scheduleStore.currentWeek < 20) {
-  scheduleStore.setCurrentWeek(scheduleStore.currentWeek + 1)
-}
+  if (scheduleStore.currentWeek < scheduleStore.maxWeeks) {
+    scheduleStore.setCurrentWeek(scheduleStore.currentWeek + 1)
+  }
 }
 
 // 切换周末显示
@@ -481,37 +491,14 @@ const handleCloseWeekSelector = () => {
 // 处理切换学期图标点击
 const handleSemesterClick = async () => {
   try {
-    // 获取最新的学期配置（强制刷新）
+    // 强制刷新学期配置
     await scheduleStore.fetchSemesterConfig(true)
-    
-    // 检查学期是否发生变更
-    const hasChanged = scheduleStore.checkSemesterChange()
-    
-    if (hasChanged) {
-      // 学期发生变更，提示用户
-      const res = await Taro.showModal({
-        title: '新的开始',
-        content: `新学期 ${scheduleStore.semesterConfig?.current}，一起进入新学期`,
-        confirmText: '进入',
-        cancelText: '稍后'
-      })
-      
-      if (res.confirm) {
-        // 用户确认加载新学期课表
-        await scheduleStore.switchSemester(scheduleStore.semesterConfig.current)
 
-        Taro.showToast({
-          title: '已切换到新学期',
-          icon: 'success'
-        })
-      }
-    }
-    
-    // 显示学期切换弹窗
+    // 直接显示学期切换弹窗，不再检查和弹出新学期提示
     showSemesterModal.value = true
   } catch (error) {
     console.error('获取学期配置失败:', error)
-    
+
     // 即使获取失败也显示弹窗，使用缓存数据
     showSemesterModal.value = true
   }
@@ -605,37 +592,22 @@ const showHelpGuide = () => {
 const loadCourseData = async () => {
   if (authStore.userClass && !scheduleStore.isLoading) {
     try {
-      // 首先获取学期配置
-      await scheduleStore.fetchSemesterConfig()
-
-      // 检查学期是否发生变更
-      const hasChanged = scheduleStore.checkSemesterChange()
-      if (hasChanged) {
-        // 学期发生变更，提示用户
-        await Taro.showModal({
-          title: '新学期提示',
-          content: `检测到新学期 ${scheduleStore.semesterConfig?.current}，是否加载新学期课表？`,
-          confirmText: '加载',
-          cancelText: '取消'
-        }).then(async (res) => {
-          if (res.confirm) {
-            // 用户确认加载新学期课表
-            await scheduleStore.switchSemester(scheduleStore.semesterConfig.current)
-          }
-        })
+      if(scheduleStore.courseData.length === 0) {
+        await scheduleStore.initialize()
       }
 
-      // 只有在 semester 已正确设置且课程数据为空时才请求课程表
-      if (scheduleStore.semester && Object.keys(scheduleStore.courseData).length === 0) {
-        await authStore.fetchUserInfo()
-        await scheduleStore.fetchCourseTable(scheduleStore.semester)
+      // 如果学期发生变更，提示用户
+      if (scheduleStore.hasChanged) {
+        newSemesterName.value = scheduleStore.newSemester
+        showSemesterChangeModal.value = true
+      }
 
-        // 显示功能指示弹窗（包含离线数据提醒）
+      // 如果是首次加载，显示功能指示弹窗
+      if (Object.keys(scheduleStore.courseData).length > 0) {
         showHelpGuide()
       }
     } catch (error) {
       if (error.message && error.message.includes('未设置班级')) {
-        // 用户未绑定班级，显示绑定提示
         return
       }
 
@@ -644,6 +616,29 @@ const loadCourseData = async () => {
         icon: 'error'
       })
     }
+  }
+}
+
+// 处理新学期确认
+const handleSemesterChangeConfirm = async () => {
+  showSemesterChangeModal.value = false
+  try {
+    Taro.showLoading({ title: '切换中...', mask: true })
+    await scheduleStore.switchSemester(newSemesterName.value)
+    scheduleStore.hasChanged = false
+    scheduleStore.newSemester = ''
+    Taro.showToast({
+      title: '切换成功',
+      icon: 'success'
+    })
+  } catch (error) {
+    console.error('切换学期失败:', error)
+    Taro.showToast({
+      title: '切换失败',
+      icon: 'error'
+    })
+  } finally {
+    Taro.hideLoading()
   }
 }
 
