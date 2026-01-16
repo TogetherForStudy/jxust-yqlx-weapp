@@ -70,7 +70,7 @@
             >
               <text class="i-lucide-list-check text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">期末复习</text>
+            <text class="text-gray-800 font-medium text-sm">考试复习</text>
           </view>
         </view>
         <!-- 教师评价 -->
@@ -213,7 +213,7 @@
             <text class="text-gray-800 font-medium text-sm">地图</text>
           </view>
         </view>
-        <view @tap="goToNoticeToZLK" class="bg-white rounded-xl p-3 shadow-sm">
+        <!-- <view @tap="goToNoticeToZLK" class="bg-white rounded-xl p-3 shadow-sm">
           <view class="flex flex-col items-center text-center">
             <view
               class="w-8 h-8 bg-gradient-to-br from-pink-200 to-pink-400 rounded-full flex items-center justify-center mb-2"
@@ -252,7 +252,7 @@
             </view>
             <text class="text-gray-800 font-medium text-sm">模板</text>
           </view>
-        </view>
+        </view> -->
       </view>
     </view>
     <!-- INSERT_YOUR_CODE -->
@@ -336,9 +336,9 @@
             <view
               class="w-8 h-8 bg-gradient-to-br from-cyan-200 to-cyan-400 rounded-full flex items-center justify-center mb-2"
             >
-              <text class="i-lucide-code-2 text-white w-4 h-4"></text>
+              <text class="i-lucide-users text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">专业技能</text>
+            <text class="text-gray-800 font-medium text-sm">组织</text>
           </view>
         </view>
 
@@ -371,7 +371,7 @@
       </view>
     </view>
 
-    <!-- 认可 -->
+    <!-- 认可
     <view class="p-4 pt-0">
       <view class="flex justify-between items-center mb-2">
         <text class="text-gray-800 font-medium">认可</text>
@@ -404,7 +404,7 @@
           </view>
         </view>
       </view>
-    </view>
+    </view> -->
 
     <!-- 未来 -->
     <view class="p-4 pt-0">
@@ -441,11 +441,11 @@
         >
           <view class="flex flex-col items-center text-center">
             <view
-              class="w-8 h-8 bg-gradient-to-br from-yellow-100 to-yellow-300 rounded-full flex items-center justify-center mb-2"
+              class="w-8 h-8 bg-gradient-to-br from-orange-100 to-orange-300 rounded-full flex items-center justify-center mb-2"
             >
-              <text class="i-lucide-briefcase text-white w-4 h-4"></text>
+              <text class="i-lucide-clipboard-list text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">就业</text>
+            <text class="text-gray-800 font-medium text-sm">实习</text>
           </view>
         </view>
         <view
@@ -454,11 +454,11 @@
         >
           <view class="flex flex-col items-center text-center">
             <view
-              class="w-8 h-8 bg-gradient-to-br from-orange-100 to-orange-300 rounded-full flex items-center justify-center mb-2"
+              class="w-8 h-8 bg-gradient-to-br from-yellow-100 to-yellow-300 rounded-full flex items-center justify-center mb-2"
             >
-              <text class="i-lucide-clipboard-list text-white w-4 h-4"></text>
+              <text class="i-lucide-briefcase text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">实习</text>
+            <text class="text-gray-800 font-medium text-sm">就业</text>
           </view>
         </view>
         <view
