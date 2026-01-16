@@ -289,7 +289,15 @@ const loadData = async () => {
 
   if (authStore.userClass && !scheduleStore.isLoading) {
     try {
-      await scheduleStore.fetchCourseTable()
+      // 先确保学期配置已加载
+      if (!scheduleStore.semester) {
+        await scheduleStore.fetchSemesterConfig()
+      }
+      
+      // 只有在 semester 已设置时才请求课程表
+      if (scheduleStore.semester) {
+        await scheduleStore.fetchCourseTable(scheduleStore.semester)
+      }
     } catch (error) {
       console.error('获取课程表失败:', error)
     }
@@ -302,7 +310,6 @@ let statusUpdateInterval = null
 onMounted(() => {
   if (authStore.isLoggedIn && authStore.userClass && Object.keys(scheduleStore.courseData).length === 0) {
     loadData()
-    scheduleStore.setCurrentWeek(scheduleStore.currentWeekNumber)
   }
   // 每分钟更新一次课程状态（仅在非调试模式下）
   statusUpdateInterval = setInterval(() => {
