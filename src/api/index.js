@@ -419,6 +419,14 @@ export const pointsAPI = {
   }
 }
 
+// 词典相关API
+export const dictionaryAPI = {
+  // 随机获取一个词（需认证）
+  getRandomWord() {
+    return get('/api/v0/dictionary/word')
+  }
+}
+
 // RBAC权限管理相关API
 export const rbacAPI = {
   // 获取角色列表（管理员）

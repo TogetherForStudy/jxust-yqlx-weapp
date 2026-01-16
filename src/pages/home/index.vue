@@ -3,12 +3,17 @@
   <view class="min-h-screen bg-gray-50 flex flex-col">
     <!-- 顶部栏 -->
     <view v-if="authStore.isLoggedIn" class="flex items-center justify-between px-4 py-1 bg-white border-b border-gray-100">
-      <view class="flex items-center gap-1.5">
-        <text class="text-sm text-gray-600">Hi, {{ displayName }}</text>
+      <view class="flex items-center gap-1.5 flex-1 min-w-0" @tap="showWordDetail">
+        <text class="i-lucide-book w-4 h-4 text-blue-500 flex-shrink-0"></text>
+        <view v-if="dailyWord" class="flex-1 min-w-0 overflow-hidden">
+          <text class="text-sm text-gray-800 font-medium line-clamp-1">
+            {{ dailyWord.word }} 
+            <text class="text-gray-600">{{ dailyWord.trans?.[0]?.cn || '暂无翻译' }}</text>
+          </text>
+        </view>
+        <text v-else class="text-sm text-gray-400">加载中...</text>
       </view>
-      <view class="p-1.5" @tap="showSettingsModal">
-        <text class="i-lucide-settings w-4.5 h-4.5 text-gray-500"></text>
-      </view>
+      <view @tap="showSettingsModal" class="i-lucide-settings w-4.5 h-4.5 text-gray-500"></view>
     </view>
 
     <!-- 卡片区域 -->
@@ -18,6 +23,86 @@
         :key="card.name" 
         :is="card.component" 
       />
+    </view>
+
+    <!-- 每日一词详情弹窗 -->
+    <view v-if="isWordDetailVisible" class="fixed inset-0 z-50 flex items-center justify-center" @tap.self="hideWordDetail">
+      <view class="absolute inset-0 bg-black opacity-50"></view>
+      <view class="relative bg-white rounded-xl w-11/12 max-w-md max-h-[80vh] overflow-y-auto p-5 shadow-xl">
+        <view class="flex items-center justify-between mb-4">
+          <view class="flex items-center gap-2">
+            <text class="i-lucide-book w-5 h-5 text-blue-500"></text>
+            <text class="text-lg font-semibold text-gray-800">{{ dailyWord.word }}</text>
+          </view>
+          <text @tap="hideWordDetail" class="i-lucide-x w-5 h-5 text-gray-400"></text>
+        </view>
+        
+        <view v-if="dailyWord" class="space-y-4">
+          <!-- 单词 -->
+          <view class="border-b border-gray-100 pb-3">
+            <view v-if="dailyWord.phonetic_uk" class="mt-1 flex items-center gap-2">
+              <text class="text-sm text-gray-500">英 /{{ dailyWord.phonetic_uk }}/</text>
+              <text v-if="dailyWord.phonetic_us" class="text-sm text-gray-500">美 /{{ dailyWord.phonetic_us }}/</text>
+            </view>
+          </view>
+          
+          <!-- 翻译 -->
+          <view v-if="dailyWord.trans && dailyWord.trans.length > 0" class="space-y-2">
+            <text class="text-sm font-semibold text-gray-700">释义</text>
+            <view v-for="(item, index) in dailyWord.trans" :key="index" class="text-sm">
+              <text v-if="item.pos" class="text-blue-600 font-medium">{{ item.pos }} </text>
+              <text class="text-gray-700">{{ item.cn }}</text>
+            </view>
+          </view>
+          
+          <!-- 例句 -->
+          <view v-if="dailyWord.sentences && dailyWord.sentences.length > 0" class="space-y-2">
+            <text class="text-sm font-semibold text-gray-700">例句</text>
+            <view v-for="(item, index) in dailyWord.sentences" :key="index" class="space-y-1">
+              <text class="text-sm text-gray-800 block">{{ item.c }}</text>
+              <text class="text-sm text-gray-500 block">{{ item.cn }}</text>
+            </view>
+          </view>
+          
+          <!-- 短语 -->
+          <view v-if="dailyWord.phrases && dailyWord.phrases.length > 0" class="space-y-2">
+            <text class="text-sm font-semibold text-gray-700">常用短语</text>
+            <view v-for="(item, index) in dailyWord.phrases" :key="index" class="space-y-1">
+              <text class="text-sm text-gray-800 block">{{ item.c }}</text>
+              <text class="text-sm text-gray-500 block">{{ item.cn }}</text>
+            </view>
+          </view>
+          
+          <!-- 同义词 -->
+          <view v-if="dailyWord.synos && dailyWord.synos.length > 0" class="space-y-2">
+            <text class="text-sm font-semibold text-gray-700">同义词</text>
+            <view v-for="(item, index) in dailyWord.synos" :key="index" class="space-y-1">
+              <text v-if="item.pos" class="text-sm text-blue-600 font-medium block">{{ item.pos }}</text>
+              <text class="text-sm text-gray-700 block">{{ item.cn }}</text>
+              <text v-if="item.ws" class="text-sm text-gray-500 block">{{ item.ws.join(', ') }}</text>
+            </view>
+          </view>
+          
+          <!-- 相关词 -->
+          <view v-if="dailyWord.rel_words && dailyWord.rel_words.rels && dailyWord.rel_words.rels.length > 0" class="space-y-2">
+            <text class="text-sm font-semibold text-gray-700">相关词</text>
+            <view class="text-sm text-gray-600 mb-1">词根: {{ dailyWord.rel_words.root }}</view>
+            <view v-for="(rel, index) in dailyWord.rel_words.rels" :key="index" class="space-y-1">
+              <text v-if="rel.pos" class="text-sm text-blue-600 font-medium block">{{ rel.pos }}</text>
+              <view v-if="rel.words" class="space-y-1">
+                <view v-for="(word, wIndex) in rel.words" :key="wIndex" class="pl-2">
+                  <text class="text-sm text-gray-800">{{ word.c }}</text>
+                  <text class="text-sm text-gray-500"> - {{ word.cn }}</text>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+        
+        <view v-else class="text-center py-8 text-gray-400">
+          加载中...
+        </view>
+      </view>
     </view>
 
     <!-- 设置弹窗 -->
@@ -93,8 +178,15 @@ import StudyTaskCard from './components/StudyTaskCard.vue'
 import NotificationCard from './components/NotificationCard.vue'
 import { useAuthStore } from '../../stores/auth'
 import { useShareAppMessage, useShareTimeline } from '@tarojs/taro'
+import { dictionaryAPI } from '../../api'
 
 const authStore = useAuthStore()
+
+const updateManager = Taro.getUpdateManager()
+
+// 每日一词
+const dailyWord = ref(null)
+const isWordDetailVisible = ref(false)
 
 // 用户昵称
 const displayName = computed(() => {
@@ -203,8 +295,43 @@ const resetOrder = () => {
   })
 }
 
+// 获取每日一词
+const fetchDailyWord = async () => {
+  try {
+    dailyWord.value = await dictionaryAPI.getRandomWord()
+  } catch (error) {
+    console.error('获取每日一词失败:', error)
+  }
+}
+
+// 显示单词详情
+const showWordDetail = () => {
+  if (dailyWord.value) {
+    isWordDetailVisible.value = true
+  }
+}
+
+// 隐藏单词详情
+const hideWordDetail = () => {
+  isWordDetailVisible.value = false
+}
+
 onMounted(() => {
   initCardOrder()
+  fetchDailyWord()
+})
+
+updateManager.onUpdateReady(function () {
+  wx.showModal({
+    title: '更新提示',
+    content: '重新启动小程序以使用新版本',
+    success: function (res) {
+      if (res.confirm) {
+        // 新的版本已经下载好，调用 applyUpdate 应用新版本并重启
+        updateManager.applyUpdate()
+      }
+    }
+  })
 })
 
 useShareAppMessage((res) => {
