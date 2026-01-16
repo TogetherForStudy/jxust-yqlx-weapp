@@ -141,7 +141,8 @@ const todayCourses = computed(() => {
   // 依赖 forceUpdate 来强制重新计算时间状态
   forceUpdate.value
 
-  if (!scheduleStore.courseData || Object.keys(scheduleStore.courseData).length === 0) {
+  // 使用 currentCourseData 而不是 courseData，确保显示的是配置中current学期的课表
+  if (!scheduleStore.currentCourseData || Object.keys(scheduleStore.currentCourseData).length === 0) {
     return []
   }
 
@@ -151,7 +152,7 @@ const todayCourses = computed(() => {
   // 遍历今天的5个时间段
   for (let period = 1; period <= 5; period++) {
     const courseIndex = todayIndex * 5 + period
-    const courseData = scheduleStore.courseData[courseIndex.toString()]
+    const courseData = scheduleStore.currentCourseData[courseIndex.toString()]
 
     if (courseData) {
       // 处理课程数据（可能是数组或单个对象）
@@ -308,7 +309,7 @@ const loadData = async () => {
 let statusUpdateInterval = null
 
 onMounted(() => {
-  if (authStore.isLoggedIn && authStore.userClass && Object.keys(scheduleStore.courseData).length === 0) {
+  if (authStore.isLoggedIn && authStore.userClass && Object.keys(scheduleStore.currentCourseData).length === 0) {
     loadData()
   }
   // 每分钟更新一次课程状态（仅在非调试模式下）
@@ -321,9 +322,9 @@ onMounted(() => {
 // 页面显示时也更新一次状态
 Taro.useDidShow(() => {
   forceUpdate.value++
-  
+
   // 如果登录了但没有数据，则加载数据（处理首次登录场景）
-  if (authStore.isLoggedIn && authStore.userClass && Object.keys(scheduleStore.courseData).length === 0) {
+  if (authStore.isLoggedIn && authStore.userClass && Object.keys(scheduleStore.currentCourseData).length === 0) {
     loadData()
   }
 })
