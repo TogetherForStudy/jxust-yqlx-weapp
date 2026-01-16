@@ -7,6 +7,7 @@ import { semesterCache } from '../utils/semesterCache'
 export const useScheduleStore = defineStore('schedule', {
   state: () => ({
     courseData: {},
+    currentCourseData: {}, // 用于存储配置中current学期对应的课表数据
     currentWeek: 1,
     semester: '',
     isLoading: false,
@@ -116,6 +117,14 @@ export const useScheduleStore = defineStore('schedule', {
     // 获取所有学期列表
     semesterList: (state) => {
       return state.semesterConfig?.semesters || []
+    },
+
+    // 判断当前选择的学期是否与配置中的current学期一致
+    isSemesterMismatch: (state) => {
+      if (!state.semesterConfig || !state.semesterConfig.current) {
+        return false
+      }
+      return state.semester !== state.semesterConfig.current
     }
   },
 
@@ -461,6 +470,14 @@ export const useScheduleStore = defineStore('schedule', {
           }
         }
 
+        // 如果用户选择的学期与配置中的current学期不一致，同时加载current学期的课表
+        if (this.semesterConfig && this.semesterConfig.current && semester !== this.semesterConfig.current) {
+          await this.fetchCurrentSemesterCourseTable()
+        } else {
+          // 如果一致，currentCourseData 和 courseData 使用同一份数据
+          this.currentCourseData = this.courseData
+        }
+
         return result
       } catch (error) {
         console.error('获取课程表失败:', error)
@@ -481,6 +498,73 @@ export const useScheduleStore = defineStore('schedule', {
         throw error
       } finally {
         this.isLoading = false
+      }
+    },
+
+    /**
+     * 获取配置中current学期的课程表（用于首页今日课程显示）
+     * @param {boolean} forceRefresh - 是否强制刷新
+     */
+    async fetchCurrentSemesterCourseTable(forceRefresh = false) {
+      if (!this.semesterConfig || !this.semesterConfig.current) {
+        return
+      }
+
+      const currentSemester = this.semesterConfig.current
+
+      try {
+        // 获取当前用户的班级ID
+        const authStore = await import('./auth').then(m => m.useAuthStore())
+        const currentClassId = authStore.userClass
+
+        let lastModified = null
+
+        // 非强制刷新时，尝试使用缓存的时间戳
+        if (!forceRefresh && currentClassId) {
+          if (courseTableCache.isCacheValid(currentSemester, currentClassId)) {
+            lastModified = courseTableCache.getCachedTimestamp(currentSemester)
+          } else {
+            courseTableCache.clearCache(currentSemester)
+          }
+        } else if (forceRefresh) {
+          courseTableCache.clearCache(currentSemester)
+        }
+
+        // 请求服务器
+        const result = await courseTableAPI.getCourseTable({
+          semester: currentSemester,
+          last_modified: lastModified
+        })
+
+        if (result.has_changes) {
+          // 服务器返回了新数据
+          this.currentCourseData = result.course_data || {}
+
+          // 保存到缓存
+          courseTableCache.saveCourseTable(
+            currentSemester,
+            result.course_data,
+            result.last_modified,
+            result.class_id
+          )
+        } else {
+          // 数据无变化，使用本地缓存
+          const cachedData = courseTableCache.getCachedData(currentSemester)
+
+          if (cachedData) {
+            this.currentCourseData = cachedData
+          } else {
+            // 缓存丢失，强制重新获取
+            return this.fetchCurrentSemesterCourseTable(true)
+          }
+        }
+      } catch (error) {
+        console.error('获取当前学期课程表失败:', error)
+        // 失败时使用缓存数据
+        const cachedData = courseTableCache.getCachedData(currentSemester)
+        if (cachedData) {
+          this.currentCourseData = cachedData
+        }
       }
     },
 

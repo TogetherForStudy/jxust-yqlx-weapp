@@ -79,6 +79,16 @@
           @swipe-gesture="handleSwipeGesture"
         />
       </view>
+
+      <!-- 学期不一致提示 - 固定在页面底部中间 -->
+      <view
+        v-if="scheduleStore.isSemesterMismatch"
+        class="fixed bottom-0 left-0 right-0 z-40 flex justify-center pb-8"
+      >
+        <view class="bg-gray-100 text-gray-800 px-4 py-2 rounded-full text-xs">
+          当前学期：{{ scheduleStore.semester }}
+        </view>
+      </view>
     </view>
 
     <!-- 加载状态 -->
