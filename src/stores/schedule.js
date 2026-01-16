@@ -1,18 +1,24 @@
 import { defineStore } from 'pinia'
-import { courseTableAPI } from '../api'
-import { COURSE_COLORS, SEMESTER_CONFIG } from '../utils/constants'
+import { courseTableAPI, configAPI } from '../api'
+import { COURSE_COLORS } from '../utils/constants'
 import { courseTableCache } from '../utils/courseTableCache'
+import { semesterCache } from '../utils/semesterCache'
 
 export const useScheduleStore = defineStore('schedule', {
   state: () => ({
     courseData: {},
     currentWeek: 1,
-    semester: '2025-2026-1',
+    semester: '',
     isLoading: false,
-    // 学期开始时间 (写死)
-    semesterStartDate: new Date(SEMESTER_CONFIG.START_DATE),
+    // 学期开始时间（默认值，实际会从 API 获取）
+    semesterStartDate: new Date(),
     // 课程颜色映射
-    courseColors: new Map()
+    courseColors: new Map(),
+    // 学期配置
+    semesterConfig: null, // { semesters: [...], current: '2025-2026-1' }
+    // 当前学期信息
+    currentSemesterInfo: null, // { id, startDate, weeks }
+    maxWeeks: 20
   }),
 
   getters: {
@@ -34,7 +40,9 @@ export const useScheduleStore = defineStore('schedule', {
       const diffTime = today.getTime() - startDate.getTime()
       const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
       const weekNumber = Math.floor(diffDays / 7) + 1
-      return Math.max(1, weekNumber)
+
+      // 返回真实的周数，不做范围限制，允许负数和超出范围的值
+      return weekNumber
     },
 
     // 生成课程表网格数据
@@ -87,7 +95,8 @@ export const useScheduleStore = defineStore('schedule', {
 
     // 周数列表
     weekOptions: (state) => {
-      return Array.from({ length: 20 }, (_, i) => {
+      const maxWeeks = state.maxWeeks
+      return Array.from({ length: maxWeeks }, (_, i) => {
         const weekNum = i + 1
         const isCurrentWeek = weekNum === state.currentWeekNumber
         return {
@@ -96,10 +105,229 @@ export const useScheduleStore = defineStore('schedule', {
           isCurrentWeek
         }
       })
+    },
+
+    // 判断当前选择的周是否在学期内
+    isInSemester: (state) => {
+      // 检查用户选择的周是否在学期范围内
+      return state.currentWeek >= 1 && state.currentWeek <= state.maxWeeks
+    },
+
+    // 获取所有学期列表
+    semesterList: (state) => {
+      return state.semesterConfig?.semesters || []
     }
   },
 
   actions: {
+    /**
+     * 获取学期配置信息（支持缓存，每天仅请求一次）
+     * @param {boolean} forceRefresh - 是否强制刷新，忽略缓存
+     * @returns {Promise<Object>} 学期配置数据
+     */
+    async fetchSemesterConfig(forceRefresh = false) {
+      try {
+        // 检查是否需要更新缓存
+        if (!forceRefresh && !semesterCache.shouldUpdate()) {
+          const cachedConfig = semesterCache.get()
+          if (cachedConfig) {
+            this.semesterConfig = cachedConfig
+            this.updateCurrentSemesterInfo()
+            return cachedConfig
+          }
+        }
+
+        // 从API获取学期配置
+        const response = await configAPI.getConfig('semesters')
+
+        // 验证响应数据结构
+        if (response?.value) {
+          // 尝试解析 value（可能是 JSON 字符串）
+          let configData = response.value
+          if (typeof configData === 'string') {
+            try {
+              configData = JSON.parse(configData)
+            } catch (e) {
+              console.error('学期配置 JSON 解析失败:', e.message)
+            }
+          }
+
+          // 保存到缓存
+          semesterCache.save(configData)
+          this.semesterConfig = configData
+
+          // 根据情况决定是否更新学期和周数：
+          // - 首次加载时：更新学期和周数
+          // - 强制刷新时：如果学期未初始化则初始化，否则保持不变；不更新周数
+          const shouldUpdateSemester = !forceRefresh || !this.semester
+          this.updateCurrentSemesterInfo(!forceRefresh, shouldUpdateSemester)
+
+          return configData
+        } else {
+          console.error('API 响应缺少 value 字段，响应键:', response ? Object.keys(response) : 'response 为空')
+        }
+      } catch (error) {
+        console.error('获取学期配置失败:', error)
+
+        // 失败时尝试使用缓存
+        const cachedConfig = semesterCache.get()
+        if (cachedConfig) {
+          this.semesterConfig = cachedConfig
+          // 使用缓存时不更新学期和周数
+          this.updateCurrentSemesterInfo(false, false)
+          return cachedConfig
+        }
+
+        throw error
+      }
+    },
+
+    /**
+     * 更新当前学期信息
+     * @param {boolean} updateCurrentWeek - 是否更新当前周数（默认true）
+     * @param {boolean} updateSemester - 是否更新当前学期（默认true）
+     */
+    updateCurrentSemesterInfo(updateCurrentWeek = true, updateSemester = true) {
+      if (!this.semesterConfig) {
+        console.warn('semesterConfig 未初始化')
+        return
+      }
+
+      if (!this.semesterConfig.semesters || !Array.isArray(this.semesterConfig.semesters)) {
+        console.error('semesterConfig.semesters 不是有效数组')
+        return
+      }
+
+      if (!this.semesterConfig.current) {
+        console.error('semesterConfig.current 未定义')
+        return
+      }
+
+      // 确定目标学期ID：
+      // 1. 如果不需要更新学期，使用当前已选择的学期
+      // 2. 如果需要更新学期，优先使用用户手动选择的学期，其次使用配置中的 current
+      let targetSemesterId
+      if (!updateSemester) {
+        targetSemesterId = this.semester
+      } else {
+        const userSelected = semesterCache.getUserSelectedSemester()
+        targetSemesterId = userSelected || this.semesterConfig.current
+      }
+
+      const targetSemester = this.semesterConfig.semesters.find(
+        s => s.id === targetSemesterId
+      )
+
+      if (targetSemester) {
+        this.currentSemesterInfo = targetSemester
+
+        // 只有在需要更新学期时才修改 this.semester
+        if (updateSemester) {
+          this.semester = targetSemester.id
+        }
+
+        this.maxWeeks = targetSemester.weeks
+        this.semesterStartDate = new Date(targetSemester.startDate)
+
+        // 仅在需要时更新当前周数
+        if (updateCurrentWeek) {
+          // 学期配置更新后，重新计算当前周数
+          const now = new Date()
+          const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+          const startDate = new Date(
+            this.semesterStartDate.getFullYear(),
+            this.semesterStartDate.getMonth(),
+            this.semesterStartDate.getDate()
+          )
+          const diffTime = today.getTime() - startDate.getTime()
+          const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+          const realWeek = Math.floor(diffDays / 7) + 1
+
+          // 判断当前日期是否在学期范围内
+          // 如果在范围内，显示当前周；否则默认显示第一周
+          if (realWeek >= 1 && realWeek <= this.maxWeeks) {
+            this.setCurrentWeek(realWeek)
+          } else {
+            // 假期中，默认显示第一周
+            this.setCurrentWeek(1)
+          }
+        }
+      } else {
+        console.warn(`未找到目标学期: ${targetSemesterId}`)
+      }
+    },
+
+    /**
+     * 切换学期
+     * @param {string} semesterId - 学期ID
+     */
+    async switchSemester(semesterId) {
+      const semester = this.semesterConfig?.semesters.find(s => s.id === semesterId)
+      if (!semester) {
+        throw new Error('学期不存在')
+      }
+
+      // 更新当前学期信息（不自动更新周数）
+      this.currentSemesterInfo = semester
+      this.semester = semester.id
+      this.maxWeeks = semester.weeks
+      this.semesterStartDate = new Date(semester.startDate)
+
+      // 保存用户手动选择的学期到独立存储
+      semesterCache.saveUserSelectedSemester(semesterId)
+
+      // 计算当前周数
+      const now = new Date()
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+      const startDate = new Date(
+        this.semesterStartDate.getFullYear(),
+        this.semesterStartDate.getMonth(),
+        this.semesterStartDate.getDate()
+      )
+      const diffTime = today.getTime() - startDate.getTime()
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+      const realWeek = Math.floor(diffDays / 7) + 1
+
+      // 判断当前日期是否在学期范围内
+      if (realWeek >= 1 && realWeek <= this.maxWeeks) {
+        // 在学期范围内，跳转到当前周
+        this.setCurrentWeek(realWeek)
+      } else {
+        // 不在学期范围内（假期中），跳转到第一周
+        this.setCurrentWeek(1)
+      }
+
+      // 清除课程表缓存并重新加载
+      courseTableCache.clearCache(semesterId)
+      await this.fetchCourseTable(semesterId, true)
+    },
+
+    /**
+     * 检查学期是否发生变更
+     * @returns {boolean} 如果学期发生变更返回true
+     * 注意：此方法假设 semesterConfig 已经被加载（通过 fetchSemesterConfig 调用）
+     */
+    checkSemesterChange() {
+      try {
+        const cachedSemester = semesterCache.getCurrentSemester()
+
+        // 直接使用已加载的 semesterConfig，避免重复调用 fetchSemesterConfig 导致副作用
+        if (!this.semesterConfig) {
+          console.warn('semesterConfig 未加载，无法检查学期变更')
+          return false
+        }
+
+        if (cachedSemester && this.semesterConfig.current !== cachedSemester) {
+          return true
+        }
+
+        return false
+      } catch (error) {
+        console.error('检查学期变更失败:', error)
+        return false
+      }
+    },
+
     // 生成hash码
     hashCode(str) {
       let hash = 0
@@ -211,7 +439,7 @@ export const useScheduleStore = defineStore('schedule', {
         if (result.has_changes) {
           // 服务器返回了新数据
           this.courseData = result.course_data || {}
-          this.semester = result.semester || semester || SEMESTER_CONFIG.CURRENT
+          this.semester = result.semester || semester || this.semester
 
           // 保存到缓存
           courseTableCache.saveCourseTable(
@@ -226,7 +454,7 @@ export const useScheduleStore = defineStore('schedule', {
 
           if (cachedData) {
             this.courseData = cachedData
-            this.semester = result.semester || semester || SEMESTER_CONFIG.CURRENT
+            this.semester = result.semester || semester || this.semester
           } else {
             // 缓存丢失，强制重新获取
             return this.fetchCourseTable(semester, true)
@@ -241,7 +469,7 @@ export const useScheduleStore = defineStore('schedule', {
         const cachedData = courseTableCache.getCachedData(semester)
         if (cachedData) {
           this.courseData = cachedData
-          this.semester = semester || SEMESTER_CONFIG.CURRENT
+          this.semester = semester || this.semester
           // 不抛出错误，使用缓存数据
           return {
             course_data: cachedData,
@@ -260,12 +488,12 @@ export const useScheduleStore = defineStore('schedule', {
     async searchClass(keyword, page = 1, size = 10) {
       try {
         const response = await courseTableAPI.searchClass({ keyword, page, size })
-          return {
-            classes: response.list || [],
-            total: response.total || 0,
-            page: response.page || page,
-            size: response.size || size
-          }
+        return {
+          classes: response.list || [],
+          total: response.total || 0,
+          page: response.page || page,
+          size: response.size || size
+        }
       } catch (error) {
         console.error('搜索班级失败:', error)
         throw error
@@ -357,9 +585,9 @@ export const useScheduleStore = defineStore('schedule', {
     isSameCourse(course1, course2) {
       if (!course1 || !course2) return false
       return course1.course === course2.course &&
-             course1.teacher === course2.teacher &&
-             course1.week === course2.week &&
-             course1.classroom === course2.classroom
+        course1.teacher === course2.teacher &&
+        course1.week === course2.week &&
+        course1.classroom === course2.classroom
     },
 
     // 计算课程格子索引（从1开始）

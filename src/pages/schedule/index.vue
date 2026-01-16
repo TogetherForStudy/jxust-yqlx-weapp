@@ -35,7 +35,7 @@
             class="text-sm font-medium mx-2 transition-all duration-200"
             :class="{ 'animate-pulse  text-blue-500 scale-125': previousWeekAnimate || nextWeekAnimate }"
           >
-            第{{ scheduleStore.currentWeek }}周
+            {{ scheduleStore.isInSemester ? `第${scheduleStore.currentWeek}周` : '假期中' }}
           </view>
           <view
             @tap="nextWeek"
@@ -45,24 +45,32 @@
           </view>
         </view>
 
-        <!-- 右侧帮助按钮和非本周课程控制 -->
-        <view class="flex items-center justify-end gap-2">
+        <!-- 右侧功能按钮 -->
+        <view class="flex items-center justify-end gap-3">
           <view
             @tap="showHelpModal = true"
             class="i-lucide-help-circle w-4 h-4 text-gray-500 active:text-blue-500"
           ></view>
           <view
+            @tap="toggleWeekend"
+            :class="showWeekend ? 'text-blue-500' : 'text-gray-500'"
+            class="i-lucide-calendar-days w-4 h-4 active:scale-110 transition-all"
+          ></view>
+          <view
             @tap="toggleNotCurrentWeek"
-            class="text-xs px-3 py-1 rounded"
-            :class="showNotCurrentWeek ? 'bg-blue-500 text-white' : 'bg-gray-100 text-black'"
-          >
-            显示全部
-          </view>
+            :class="showNotCurrentWeek ? 'text-blue-500' : 'text-gray-500'"
+            class="i-lucide-eye w-4 h-4 active:scale-110 transition-all"
+          ></view>
+          <view
+            @tap="handleSemesterClick"
+            class="i-lucide-calendar-range w-4 h-4 text-gray-500 active:text-blue-500"
+          ></view>
         </view>
       </view>
 
       <!-- 课程表网格 -->
       <view class="flex-1 overflow-hidden">
+        <!-- 课程表 -->
         <schedule-table
           :show-weekend="showWeekend"
           :show-not-current-week="showNotCurrentWeek"
@@ -225,6 +233,59 @@
         </view>
       </view>
     </view>
+
+    <!-- 学期切换弹窗 -->
+    <view v-if="showSemesterModal" class="fixed inset-0 z-50 flex items-center justify-center">
+      <!-- 遮罩层 -->
+      <view
+        class="absolute inset-0 bg-black bg-opacity-50"
+        @tap="showSemesterModal = false"
+      ></view>
+
+      <!-- 弹窗内容 -->
+      <view class="relative bg-white rounded-lg mx-6 max-w-sm w-full">
+        <!-- 标题 -->
+        <view class="flex items-center justify-between gap-2 px-6 pt-4 pb-3">
+          <view class="flex items-center gap-2">
+            <view class="i-lucide-calendar-range w-5 h-5 text-gray-400"></view>
+          <view class="text-gray-800">切换学期</view>
+          </view>
+          <view @tap="showSemesterModal = false" class="i-lucide-x w-5 h-5 text-gray-400"></view>
+        </view>
+
+        <!-- 学期列表 -->
+        <view class="px-6 py-4 max-h-96 overflow-y-auto">
+          <view class="space-y-2">
+            <view
+              v-for="semester in scheduleStore.semesterList"
+              :key="semester.id"
+              @tap="handleSemesterSelect(semester.id)"
+              class="flex items-center justify-between px-3 py-2 rounded-lg border-2 transition-all active:scale-98"
+              :class="semester.id === scheduleStore.semester ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-gray-50 active:bg-gray-100'"
+            >
+              <view class="flex-1">
+                <view :class="semester.id === scheduleStore.semester ? 'text-blue-600' : 'text-gray-800'">
+                  {{ semester.id }}
+                </view>
+                <view class="text-xs text-gray-500 mt-1">
+                  {{ formatSemesterInfo(semester) }}
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <!-- 底部按钮 -->
+        <view class="px-6 pb-4 pt-4">
+          <view
+            @tap="showSemesterModal = false"
+            class="bg-gray-100 text-gray-700 text-center py-2 px-4 rounded-lg font-medium active:bg-gray-200"
+          >
+            取消
+          </view>
+        </view>
+      </view>
+    </view>
   </view>
 </template>
 
@@ -250,6 +311,7 @@ const showNotCurrentWeek = ref(false)
 const selectedCourse = ref(null)
 const showWeekSelector = ref(false)
 const showHelpModal = ref(false)
+const showSemesterModal = ref(false)
 
 // 编辑相关状态
 const editModalVisible = ref(false)
@@ -282,8 +344,8 @@ const previousWeek = () => {
 // 下一周
 const nextWeek = () => {
   if (scheduleStore.currentWeek < 20) {
-    scheduleStore.setCurrentWeek(scheduleStore.currentWeek + 1)
-  }
+  scheduleStore.setCurrentWeek(scheduleStore.currentWeek + 1)
+}
 }
 
 // 切换周末显示
@@ -406,6 +468,79 @@ const handleCloseWeekSelector = () => {
   showWeekSelector.value = false
 }
 
+// 处理切换学期图标点击
+const handleSemesterClick = async () => {
+  try {
+    // 获取最新的学期配置（强制刷新）
+    await scheduleStore.fetchSemesterConfig(true)
+    
+    // 检查学期是否发生变更
+    const hasChanged = scheduleStore.checkSemesterChange()
+    
+    if (hasChanged) {
+      // 学期发生变更，提示用户
+      const res = await Taro.showModal({
+        title: '新的开始',
+        content: `新学期 ${scheduleStore.semesterConfig?.current}，一起进入新学期`,
+        confirmText: '进入',
+        cancelText: '稍后'
+      })
+      
+      if (res.confirm) {
+        // 用户确认加载新学期课表
+        await scheduleStore.switchSemester(scheduleStore.semesterConfig.current)
+
+        Taro.showToast({
+          title: '已切换到新学期',
+          icon: 'success'
+        })
+      }
+    }
+    
+    // 显示学期切换弹窗
+    showSemesterModal.value = true
+  } catch (error) {
+    console.error('获取学期配置失败:', error)
+    
+    // 即使获取失败也显示弹窗，使用缓存数据
+    showSemesterModal.value = true
+  }
+}
+
+// 格式化学期信息
+const formatSemesterInfo = (semester) => {
+  const startDate = new Date(semester.startDate)
+  const formattedDate = `${startDate.getFullYear()}-${String(startDate.getMonth() + 1).padStart(2, '0')}-${String(startDate.getDate()).padStart(2, '0')}`
+  return `开始日期: ${formattedDate}`
+}
+
+// 处理学period切换
+const handleSemesterSelect = async (semesterId) => {
+  if (semesterId === scheduleStore.semester) {
+    showSemesterModal.value = false
+    return
+  }
+
+  try {
+    Taro.showLoading({ title: '加载中...', mask: true })
+    await scheduleStore.switchSemester(semesterId)
+    showSemesterModal.value = false
+    
+    Taro.showToast({
+      title: '切换成功',
+      icon: 'success'
+    })
+  } catch (error) {
+    console.error('切换学期失败:', error)
+    Taro.showToast({
+      title: '切换失败',
+      icon: 'error'
+    })
+  } finally {
+    Taro.hideLoading()
+  }
+}
+
 // 处理手势动画
 const handleSwipeGesture = (direction) => {
   if (direction === 'previous') {
@@ -460,12 +595,31 @@ const showHelpGuide = () => {
 const loadCourseData = async () => {
   if (authStore.userClass && !scheduleStore.isLoading) {
     try {
-      if (Object.keys(scheduleStore.courseData).length === 0) {
-        await authStore.fetchUserInfo()
-        await scheduleStore.fetchCourseTable()
+      // 首先获取学期配置
+      await scheduleStore.fetchSemesterConfig()
 
-        // 设置当前周为系统计算的当前周
-        scheduleStore.setCurrentWeek(scheduleStore.currentWeekNumber)
+      // 检查学期是否发生变更
+      const hasChanged = scheduleStore.checkSemesterChange()
+      if (hasChanged) {
+        // 学期发生变更，提示用户
+        await Taro.showModal({
+          title: '新学期提示',
+          content: `检测到新学期 ${scheduleStore.semesterConfig?.current}，是否加载新学期课表？`,
+          confirmText: '加载',
+          cancelText: '取消'
+        }).then(async (res) => {
+          if (res.confirm) {
+            // 用户确认加载新学期课表
+            await scheduleStore.switchSemester(scheduleStore.semesterConfig.current)
+          }
+        })
+      }
+
+      // 只有在 semester 已正确设置且课程数据为空时才请求课程表
+      if (scheduleStore.semester && Object.keys(scheduleStore.courseData).length === 0) {
+        await authStore.fetchUserInfo()
+        await scheduleStore.fetchCourseTable(scheduleStore.semester)
+
         // 显示功能指示弹窗（包含离线数据提醒）
         showHelpGuide()
       }

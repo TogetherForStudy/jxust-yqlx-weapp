@@ -29,9 +29,7 @@
             <text class="i-lucide-grip-vertical w-4 h-4 text-gray-400"></text>
             <text class="text-base font-medium text-gray-800">卡片顺序</text>
           </view>
-          <view @tap="hideSettingsModal" class="p-1">
-            <text class="i-lucide-x w-5 h-5 text-gray-400"></text>
-          </view>
+          <text @tap="hideSettingsModal" class="i-lucide-x w-5 h-5 text-gray-400"></text>
         </view>
         
         <view class="text-xs text-gray-400 mb-4">点击箭头调整顺序</view>
