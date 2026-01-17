@@ -178,6 +178,7 @@ const openProject = (project) => {
     id: project.id,
     name: project.name || project.title || "期末复习项目",
     desc: project.description || "",
+    version: project.version || "0",
   });
   Taro.navigateTo({
     url: `/pages/final-review/detail/index?${params.toString()}`,

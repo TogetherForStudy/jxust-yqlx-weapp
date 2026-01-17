@@ -7,7 +7,7 @@
         <text class="i-lucide-book w-4 h-4 text-blue-500 flex-shrink-0"></text>
         <view v-if="dailyWord" class="flex-1 min-w-0 overflow-hidden">
           <text class="text-sm text-gray-800 font-medium line-clamp-1">
-            {{ dailyWord.word }} 
+            {{ dailyWord.word }}
             <text class="text-gray-600">{{ dailyWord.trans?.[0]?.cn || '暂无翻译' }}</text>
           </text>
         </view>
@@ -18,10 +18,10 @@
 
     <!-- 卡片区域 -->
     <view class="flex flex-col space-y-4 py-4">
-      <component 
-        v-for="card in orderedCards" 
-        :key="card.name" 
-        :is="card.component" 
+      <component
+        v-for="card in orderedCards"
+        :key="card.name"
+        :is="card.component"
       />
     </view>
 
@@ -36,7 +36,7 @@
           </view>
           <text @tap="hideWordDetail" class="i-lucide-x w-5 h-5 text-gray-400"></text>
         </view>
-        
+
         <view v-if="dailyWord" class="space-y-4">
           <!-- 单词 -->
           <view class="border-b border-gray-100 pb-3">
@@ -45,7 +45,7 @@
               <text v-if="dailyWord.phonetic_us" class="text-sm text-gray-500">美 /{{ dailyWord.phonetic_us }}/</text>
             </view>
           </view>
-          
+
           <!-- 翻译 -->
           <view v-if="dailyWord.trans && dailyWord.trans.length > 0" class="space-y-2">
             <text class="text-sm font-semibold text-gray-700">释义</text>
@@ -54,7 +54,7 @@
               <text class="text-gray-700">{{ item.cn }}</text>
             </view>
           </view>
-          
+
           <!-- 例句 -->
           <view v-if="dailyWord.sentences && dailyWord.sentences.length > 0" class="space-y-2">
             <text class="text-sm font-semibold text-gray-700">例句</text>
@@ -63,7 +63,7 @@
               <text class="text-sm text-gray-500 block">{{ item.cn }}</text>
             </view>
           </view>
-          
+
           <!-- 短语 -->
           <view v-if="dailyWord.phrases && dailyWord.phrases.length > 0" class="space-y-2">
             <text class="text-sm font-semibold text-gray-700">常用短语</text>
@@ -72,7 +72,7 @@
               <text class="text-sm text-gray-500 block">{{ item.cn }}</text>
             </view>
           </view>
-          
+
           <!-- 同义词 -->
           <view v-if="dailyWord.synos && dailyWord.synos.length > 0" class="space-y-2">
             <text class="text-sm font-semibold text-gray-700">同义词</text>
@@ -82,7 +82,7 @@
               <text v-if="item.ws" class="text-sm text-gray-500 block">{{ item.ws.join(', ') }}</text>
             </view>
           </view>
-          
+
           <!-- 相关词 -->
           <view v-if="dailyWord.rel_words && dailyWord.rel_words.rels && dailyWord.rel_words.rels.length > 0" class="space-y-2">
             <text class="text-sm font-semibold text-gray-700">相关词</text>
@@ -98,7 +98,7 @@
             </view>
           </view>
         </view>
-        
+
         <view v-else class="text-center py-8 text-gray-400">
           加载中...
         </view>
@@ -116,9 +116,9 @@
           </view>
           <text @tap="hideSettingsModal" class="i-lucide-x w-5 h-5 text-gray-400"></text>
         </view>
-        
+
         <view class="text-xs text-gray-400 mb-4">点击箭头调整顺序</view>
-        
+
         <!-- 卡片列表 -->
         <view class="space-y-2">
           <view
@@ -130,17 +130,17 @@
               <text :class="card.iconClass + ' w-4 h-4'"></text>
               <text class="text-gray-700">{{ card.label }}</text>
             </view>
-            
+
             <view class="flex items-center gap-1">
-              <view 
-                @tap="moveUp(index)" 
+              <view
+                @tap="moveUp(index)"
                 class="p-1.5 rounded hover:bg-gray-200 transition-colors"
                 :class="{ 'opacity-30': index === 0 }"
               >
                 <text class="i-lucide-chevron-up w-4 h-4 text-gray-500"></text>
               </view>
-              <view 
-                @tap="moveDown(index)" 
+              <view
+                @tap="moveDown(index)"
                 class="p-1.5 rounded hover:bg-gray-200 transition-colors"
                 :class="{ 'opacity-30': index === sortableCards.length - 1 }"
               >
@@ -149,16 +149,16 @@
             </view>
           </view>
         </view>
-        
+
         <view class="flex gap-2.5 mt-5">
-          <view 
-            @tap="resetOrder" 
+          <view
+            @tap="resetOrder"
             class="flex-1 py-2.5 bg-gray-100 rounded-lg text-center text-sm text-gray-600 font-medium"
           >
             恢复默认
           </view>
-          <view 
-            @tap="saveOrder" 
+          <view
+            @tap="saveOrder"
             class="flex-1 py-2.5 bg-blue-500 rounded-lg text-center text-sm text-white font-medium"
           >
             保存
@@ -188,11 +188,6 @@ const updateManager = Taro.getUpdateManager()
 const dailyWord = ref(null)
 const isWordDetailVisible = ref(false)
 
-// 用户昵称
-const displayName = computed(() => {
-  return authStore.userInfo?.nickname || authStore.userInfo?.name || '同学'
-})
-
 // 默认卡片配置
 const defaultCards = [
   { name: 'TodayCourse', label: '今日课程', iconClass: 'i-lucide-book-open text-blue-500', component: TodayCourse },
@@ -208,7 +203,7 @@ const sortableCards = ref([])
 
 // 按顺序排列的卡片
 const orderedCards = computed(() => {
-  return cardOrder.value.map(name => 
+  return cardOrder.value.map(name =>
     defaultCards.find(card => card.name === name)
   ).filter(Boolean)
 })
@@ -249,7 +244,7 @@ const hideSettingsModal = () => {
 // 向上移动
 const moveUp = (index) => {
   if (index === 0) return
-  
+
   const temp = [...sortableCards.value]
   // 交换位置
   ;[temp[index - 1], temp[index]] = [temp[index], temp[index - 1]]
@@ -259,7 +254,7 @@ const moveUp = (index) => {
 // 向下移动
 const moveDown = (index) => {
   if (index === sortableCards.value.length - 1) return
-  
+
   const temp = [...sortableCards.value]
   // 交换位置
   ;[temp[index], temp[index + 1]] = [temp[index + 1], temp[index]]
@@ -297,6 +292,13 @@ const resetOrder = () => {
 
 // 获取每日一词
 const fetchDailyWord = async () => {
+  // 只在登录状态下请求每日一词
+  if (!authStore.isLoggedIn) {
+    return
+  }
+  if(dailyWord.value) {
+    return
+  }
   try {
     dailyWord.value = await dictionaryAPI.getRandomWord()
   } catch (error) {
@@ -318,6 +320,9 @@ const hideWordDetail = () => {
 
 onMounted(() => {
   initCardOrder()
+})
+
+Taro.useDidShow(async () => {
   fetchDailyWord()
 })
 

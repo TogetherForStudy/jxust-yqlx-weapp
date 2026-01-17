@@ -173,7 +173,6 @@
 import { ref, computed, onMounted } from "vue";
 import { useAuthStore } from "../../stores/auth";
 import Taro from "@tarojs/taro";
-import { useDidShow } from "@tarojs/taro";
 import { courseTableAPI, pointsAPI } from "../../api/index";
 
 const authStore = useAuthStore();
@@ -318,13 +317,6 @@ onMounted(async () => {
   // 页面初始化时不需要自动打开编辑资料弹窗
   if (authStore.isLoggedIn) {
     await fetchUserPoints();
-  }
-});
-
-// 页面显示时刷新积分
-useDidShow(() => {
-  if (authStore.isLoggedIn) {
-    fetchUserPoints();
   }
 });
 
