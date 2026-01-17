@@ -411,6 +411,7 @@ const projectInfo = ref({
   id: projectId,
   name: decodeParam(router.params?.name) || "期末复习项目",
   description: decodeParam(router.params?.desc || ""),
+  version: router.params?.version || null, // 从路由参数获取版本号
 });
 
 const mode = ref(null); // 'study' | 'practice'
@@ -430,6 +431,7 @@ const wrongBookIds = ref([]);
 const showAnswer = ref(true); // 学习模式下控制答案显示/隐藏
 const onlineCount = ref(null); // 在线人数
 const onlineCountTimer = ref(null); // 在线人数轮询定时器ID
+const sessionVersion = ref(null); // 当前会话使用的version（新建会话时使用URL的version，恢复进度时使用记录中的version）
 
 const answerState = reactive({
   optionKey: "",
@@ -752,6 +754,8 @@ const startSession = async (selectedMode) => {
   // 不清除进度，保留所有类型的暂存记录
   // 用户可以通过返回选择界面来暂存当前进度
   mode.value = selectedMode;
+  // 新建会话时，使用URL中的最新version
+  sessionVersion.value = projectInfo.value.version;
   await loadQuestionIds();
 };
 
@@ -841,7 +845,7 @@ const loadQuestionDetail = async (index, shouldScroll = false) => {
     isSliding.value = false;
     currentQuestion.value = normalizeQuestion(res);
     saveProgress();
-    
+
     // 只有通过按钮切换时才自动滚动到题目
     if (shouldScroll) {
       await nextTick();
@@ -866,39 +870,39 @@ const scrollToQuestion = () => {
 
     // 创建选择器查询
     const query = Taro.createSelectorQuery();
-    
+
     // 查询题目容器的位置信息
     query.select('#question-container').boundingClientRect();
-    
+
     // 查询页面滚动位置
     query.selectViewport().scrollOffset();
-    
+
     query.exec((res) => {
       if (!res || res.length < 2) {
         return;
       }
-      
+
       const questionRect = res[0];
       const scrollInfo = res[1];
-      
+
       // 如果没有获取到题目容器信息，则不进行滚动
       if (!questionRect) {
         return;
       }
-      
+
       const { top, height } = questionRect;
       const { scrollTop } = scrollInfo;
-      
+
       // 检查题目是否完全在可视区域内
       const isTopVisible = top >= 0;
       const isBottomVisible = (top + height) <= windowHeight;
       const isFullyVisible = isTopVisible && isBottomVisible;
-      
+
       // 如果题目没有完全显示，则滚动到题目位置
       if (!isFullyVisible) {
         // 计算需要滚动到的位置，留出一些顶部空间（20px）
         const targetScrollTop = scrollTop + top - 20;
-        
+
         Taro.pageScrollTo({
           scrollTop: Math.max(0, targetScrollTop),
           duration: 300, // 平滑滚动300ms
@@ -1229,30 +1233,8 @@ const recordProgress = async () => {
 
 const resetSession = () => {
   mode.value = null;
+  sessionVersion.value = null;
   resetSessionState();
-};
-
-const fetchProjectMeta = async () => {
-  if (!projectId || projectInfo.value.description) return;
-  try {
-    const res = await questionsAPI.getProjects();
-    const list = Array.isArray(res?.projects)
-      ? res.projects
-      : Array.isArray(res?.data)
-        ? res.data
-        : Array.isArray(res)
-          ? res
-          : [];
-    const target = list.find((item) => Number(item.id) === projectId);
-    if (target) {
-      projectInfo.value = {
-        ...projectInfo.value,
-        ...target,
-      };
-    }
-  } catch (error) {
-    console.error("fetchProjectMeta error", error);
-  }
 };
 
 const fetchOnlineCount = async () => {
@@ -1271,7 +1253,6 @@ const fetchOnlineCount = async () => {
   }
 };
 
-onMounted(fetchProjectMeta);
 onMounted(() => {
   // 不再自动恢复进度，让用户主动选择接续进度
   loadWrongBook();
@@ -1364,10 +1345,10 @@ const clearWrongBook = async () => {
       // 清空错题本数据
       wrongBookIds.value = [];
       saveWrongBook();
-      
+
       // 同时清除错题本的暂存进度
       clearProgress('wrongbook');
-      
+
       Taro.showToast({ title: "已清空错题本", icon: "success", duration: 1500 });
     }
   } catch (error) {
@@ -1387,6 +1368,7 @@ const saveProgress = () => {
       questionIds: questionIds.value,
       currentIndex: currentIndex.value,
       timestamp: Date.now(),
+      version: sessionVersion.value, // 使用当前会话的version（新建会话时是最新的，恢复进度时是记录中的）
     };
 
     // 根据类型和来源选择存储键
@@ -1509,11 +1491,34 @@ const resumeProgress = async (progress) => {
         }
       }
     }
+    console.log("Resuming progress:", progress);
+    console.log("Current project version:", projectInfo.value);
+    // 检查项目版本是否有更新
+    if (progress.version && projectInfo.value.version && progress.version !== projectInfo.value.version) {
+      const modeText = progress.type === 'study' ? '学习模式' : progress.type === 'practice' ? '考试模式' : '错题本';
+      const res = await Taro.showModal({
+        title: "题库已更新",
+        content: `题库内容已更新，暂存的${modeText}记录可能已过期。建议重新进入${progress.type === 'study' ? '学习' : '考试'}模式。`,
+        confirmText: "重新开始",
+        cancelText: "仍要恢复",
+        confirmColor: "#6366F1",
+      });
+
+      if (res.confirm) {
+        // 用户选择重新开始，删除旧的暂存记录
+        deleteProgress(progress.type, progress.isOldVersion);
+        return;
+      }
+      // 用户选择仍要恢复，继续执行
+    }
 
     // 如果是旧版记录，迁移到新格式
     if (progress.isOldVersion) {
       migrateOldProgress(progress);
     }
+
+    // 恢复记录中的version，如果记录中没有version则使用当前最新的version
+    sessionVersion.value = progress.version !== undefined ? progress.version : projectInfo.value.version;
 
     // 恢复模式，如果缺失则根据类型推断
     if (!progress.mode) {
