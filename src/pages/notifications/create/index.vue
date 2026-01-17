@@ -37,11 +37,11 @@
               v-model="form.content"
               placeholder="请详细描述信息内容，支持换行和简单格式..."
               class="border-solid border-[1px] border-gray-400 rounded-lg p-2 box-border w-full"
-              :maxlength="1000"
+              :maxlength="10000"
             />
             <view class="flex justify-between items-center mt-1">
               <text v-if="errors.content" class="text-red-500 text-xs">{{ errors.content }}</text>
-              <text class="text-gray-400 text-xs ml-auto">{{ form.content.length }}/1000</text>
+              <text class="text-gray-400 text-xs ml-auto">{{ form.content.length }}/10000</text>
             </view>
           </view>
 

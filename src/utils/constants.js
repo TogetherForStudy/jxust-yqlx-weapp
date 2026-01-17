@@ -106,10 +106,3 @@ export const PAGINATION = {
   DEFAULT_SIZE: 10,
   MAX_SIZE: 100
 }
-
-// 学期配置
-export const SEMESTER_CONFIG = {
-  // 学期开始时间 (可根据实际情况调整)
-  START_DATE: '2025-09-08',
-  CURRENT: '2025-2026-1'
-}

@@ -41,7 +41,7 @@
             :key="item.id"
             class="bg-white rounded-lg px-4 py-2 shadow-sm"
           >
-            <view class="flex justify-between items-center py-1">
+            <view class="flex justify-between items-center py-1 gap-4">
               <!-- 课程名称 -->
               <text class="text-gray-800">{{
                 item.course_name || '未知课程'
