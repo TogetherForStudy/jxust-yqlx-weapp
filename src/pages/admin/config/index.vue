@@ -58,78 +58,76 @@
         :lower-threshold="100"
         @scrolltolower="onScrollToLower"
       >
-        <view class="p-4 space-y-4">
+        <view class="bg-white">
           <view
             v-for="config in filteredConfigs"
             :key="config.key"
-            class="bg-white rounded-lg shadow-sm"
+            class="border-b border-gray-100 px-4 py-3 flex items-center hover:bg-gray-50 transition-colors"
           >
-            <!-- 配置头部 -->
-            <view class="px-4 pt-4 pb-2 border-b border-gray-100">
-              <view class="flex justify-between items-start">
-                <view class="flex-1">
-                  <view class="flex items-center mb-1">
-                    <text class="text-lg font-medium text-gray-800 mr-2 max-w-[60%] truncate">{{
-                      config.key
-                    }}</text>
-                    <view
-                      :class="[
-                        'px-2 py-0.5 rounded text-xs',
-                        getTypeClass(config.value_type),
-                      ]"
-                    >
-                      {{ config.value_type }}
-                    </view>
-                  </view>
-                  <text v-if="config.description" class="text-sm text-gray-600">
-                    {{ config.description }}
-                  </text>
-                </view>
-              </view>
-            </view>
-
-            <!-- 配置值 -->
-            <view class="px-4 py-3">
-              <view class="bg-gray-50 p-3 rounded-lg">
-                <text class="text-sm text-gray-500 block mb-1">配置值:</text>
+            <!-- 左侧：类型图标 -->
+            <view class="flex-shrink-0 mr-3">
+              <view
+                :class="[
+                  'w-8 h-8 rounded-lg flex items-center justify-center',
+                  getTypeBgClass(config.value_type),
+                ]"
+              >
                 <text
                   :class="[
-                    'text-sm break-all',
-                    config.value_type === 'json' ? 'font-mono' : '',
+                    'w-4 h-4',
+                    getTypeIconClass(config.value_type),
+                    getTypeTextClass(config.value_type),
                   ]"
-                >
-                  {{ formatConfigValue(config.value, config.value_type) }}
-                </text>
+                ></text>
               </view>
             </view>
 
-            <!-- 操作按钮 -->
-            <view class="px-4 py-3 border-t border-gray-100">
-              <view class="flex space-x-3">
+            <!-- 中间：配置信息 -->
+            <view class="flex-1 min-w-0 mr-3">
+              <view class="flex items-center mb-0.5">
+                <text class="text-sm font-semibold text-gray-800 truncate mr-2">
+                  {{ config.key }}
+                </text>
                 <view
-                  @tap="showEditModal(config)"
-                  class="flex-1 py-2 px-4 bg-blue-50 text-blue-600 rounded-lg text-center text-sm"
+                  :class="[
+                    'px-1.5 py-0.5 rounded text-xs flex-shrink-0',
+                    getTypeClass(config.value_type),
+                  ]"
                 >
-                  编辑
+                  {{ config.value_type }}
                 </view>
-                <view
-                  @tap="copyConfigValue(config)"
-                  class="flex-1 py-2 px-4 bg-green-50 text-green-600 rounded-lg text-center text-sm"
-                >
-                  复制值
-                </view>
-                <view
-                  @tap="showDeleteConfirm(config)"
-                  class="py-2 px-4 bg-red-50 text-red-600 rounded-lg text-center text-sm"
-                >
-                  删除
-                </view>
+              </view>
+              <text v-if="config.description" class="text-xs text-gray-500 line-clamp-1">
+                {{ config.description }}
+              </text>
+              <text v-else class="text-xs text-gray-400 italic">无描述</text>
+            </view>
+
+            <!-- 右侧：操作按钮 -->
+            <view class="flex items-center space-x-1 flex-shrink-0">
+              <view
+                @tap.stop="copyConfigValue(config)"
+                class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 active:bg-gray-200 transition-colors"
+              >
+                <text class="i-lucide-copy w-4 h-4 text-gray-600"></text>
+              </view>
+              <view
+                @tap.stop="showEditModal(config)"
+                class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-blue-50 active:bg-blue-100 transition-colors"
+              >
+                <text class="i-lucide-edit w-4 h-4 text-blue-600"></text>
+              </view>
+              <view
+                @tap.stop="showDeleteConfirm(config)"
+                class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-red-50 active:bg-red-100 transition-colors"
+              >
+                <text class="i-lucide-trash-2 w-4 h-4 text-red-600"></text>
               </view>
             </view>
           </view>
 
           <!-- 首次加载状态 -->
-          <view v-if="loading && currentPage === 1" class="text-center py-8">
+          <view v-if="loading && currentPage === 1" class="text-center py-12">
             <view class="inline-flex items-center space-x-2">
               <view class="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></view>
               <text class="text-gray-500 text-sm">加载中...</text>
@@ -137,7 +135,7 @@
           </view>
 
           <!-- 加载更多状态 -->
-          <view v-if="isLoadingMore" class="text-center py-4">
+          <view v-if="isLoadingMore" class="text-center py-4 bg-white border-t border-gray-100">
             <view class="inline-flex items-center space-x-2">
               <view class="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></view>
               <text class="text-gray-400 text-sm">加载更多中...</text>
@@ -145,24 +143,24 @@
           </view>
 
           <!-- 底部加载提示 -->
-          <view v-if="hasMore && !loading && !isLoadingMore && filteredConfigs.length > 0" class="text-center py-4">
+          <view v-if="hasMore && !loading && !isLoadingMore && filteredConfigs.length > 0" class="text-center py-4 bg-white border-t border-gray-100">
             <text class="text-gray-400 text-sm">滚动加载更多</text>
           </view>
 
           <!-- 没有更多数据提示 -->
-          <view v-if="!hasMore && !loading && !isLoadingMore && filteredConfigs.length > 0" class="text-center py-4">
+          <view v-if="!hasMore && !loading && !isLoadingMore && filteredConfigs.length > 0" class="text-center py-4 bg-white border-t border-gray-100">
             <text class="text-gray-400 text-sm">没有更多数据</text>
           </view>
 
           <!-- 空状态 -->
           <view
             v-if="!loading && filteredConfigs.length === 0"
-            class="text-center py-12"
+            class="text-center py-16 bg-white"
           >
             <text
               class="i-lucide-settings w-12 h-12 text-gray-300 mb-4 block mx-auto"
             ></text>
-            <text class="text-gray-500">暂无配置数据</text>
+            <text class="text-gray-500 block mb-2">暂无配置数据</text>
             <view @tap="showCreateModal" class="mt-4">
               <text class="text-blue-500 text-sm">点击添加第一个配置</text>
             </view>
@@ -463,6 +461,37 @@ const getTypeClass = (type) => {
   };
   return classMap[type] || "bg-gray-100 text-gray-600";
 };
+
+const getTypeBgClass = (type) => {
+  const classMap = {
+    string: "bg-blue-50",
+    number: "bg-green-50",
+    boolean: "bg-yellow-50",
+    json: "bg-purple-50",
+  };
+  return classMap[type] || "bg-gray-50";
+};
+
+const getTypeTextClass = (type) => {
+  const classMap = {
+    string: "text-blue-600",
+    number: "text-green-600",
+    boolean: "text-yellow-600",
+    json: "text-purple-600",
+  };
+  return classMap[type] || "text-gray-600";
+};
+
+const getTypeIconClass = (type) => {
+  const iconMap = {
+    string: "i-lucide-text",
+    number: "i-lucide-hash",
+    boolean: "i-lucide-toggle-left",
+    json: "i-lucide-braces",
+  };
+  return iconMap[type] || "i-lucide-circle";
+};
+
 
 const formatConfigValue = (value, type) => {
   if (type === "json") {

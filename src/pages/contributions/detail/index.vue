@@ -10,7 +10,7 @@
         <!-- 投稿头部 -->
         <view class="mb-4">
           <!-- 标题 -->
-          <text class="font-bold text-base text-gray-800 leading-tight block mb-3">
+          <text class="font-bold text-base text-gray-800 leading-tight block mb-3" :user-select="true">
             {{ contribution.title }}
           </text>
 
@@ -57,7 +57,7 @@
         <!-- 投稿内容 -->
         <view class="mb-2">
           <view class="text-gray-700 leading-relaxed">
-            <text class="whitespace-pre-wrap">{{ contribution.content }}</text>
+            <text class="whitespace-pre-wrap break-words" :user-select="true">{{ contribution.content }}</text>
           </view>
         </view>
 

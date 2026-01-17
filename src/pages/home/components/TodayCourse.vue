@@ -20,6 +20,13 @@
           <text class="text-gray-500 text-sm">绑定课表后查看今日课程</text>
         </view>
 
+        <!-- 非当前学期状态 -->
+        <view v-else-if="scheduleStore.isSemesterMismatch" class="flex flex-col items-center justify-center py-8">
+          <view class="i-lucide-info text-2xl text-orange-500 mb-2"></view>
+          <text class="text-gray-700 font-medium">非本学期课表</text>
+          <text class="text-gray-500 text-sm">查看今日课程需切换至当前学期</text>
+        </view>
+
         <!-- 今日无课程状态 -->
         <view v-else-if="todayCourses.length === 0" class="flex flex-col items-center justify-center py-8">
           <view class="i-lucide-coffee text-2xl text-green-500 mb-2"></view>
@@ -121,13 +128,13 @@ const authStore = useAuthStore()
 // 用于强制更新时间状态的响应式变量
 const forceUpdate = ref(0)
 
-// 时间段配置
+// 时间段配置（带完整时间信息）
 const timeSlots = [
-  { period: 1, label: '1-2节', time: '08:30-10:05' },
-  { period: 2, label: '3-4节', time: '10:25-12:00' },
-  { period: 3, label: '5-6节', time: '14:00-15:35' },
-  { period: 4, label: '7-8节', time: '15:55-17:30' },
-  { period: 5, label: '9-10节', time: '19:00-20:35' }
+  { period: 1, label: '1-2节', time: '08:30-10:05', startMinutes: 510, endMinutes: 605 },
+  { period: 2, label: '3-4节', time: '10:25-12:00', startMinutes: 625, endMinutes: 720 },
+  { period: 3, label: '5-6节', time: '14:00-15:35', startMinutes: 840, endMinutes: 935 },
+  { period: 4, label: '7-8节', time: '15:55-17:30', startMinutes: 955, endMinutes: 1050 },
+  { period: 5, label: '9-10节', time: '19:00-20:35', startMinutes: 1140, endMinutes: 1235 }
 ]
 
 // 获取今天是星期几 (0=周日, 1=周一, ..., 6=周六)
@@ -141,34 +148,51 @@ const todayCourses = computed(() => {
   // 依赖 forceUpdate 来强制重新计算时间状态
   forceUpdate.value
 
-  if (!scheduleStore.courseData || Object.keys(scheduleStore.courseData).length === 0) {
+  if (!scheduleStore.todayCourseData || Object.keys(scheduleStore.todayCourseData).length === 0) {
     return []
   }
 
   const todayIndex = getTodayIndex()
   const courses = []
+  const currentMinutes = getCurrentMinutes()
 
   // 遍历今天的5个时间段
   for (let period = 1; period <= 5; period++) {
     const courseIndex = todayIndex * 5 + period
-    const courseData = scheduleStore.courseData[courseIndex.toString()]
+    const courseData = scheduleStore.todayCourseData[courseIndex.toString()]
 
     if (courseData) {
+      // 获取时间段信息
+      const slot = timeSlots.find(s => s.period === period)
+      if (!slot) continue
+
+      // 计算时间状态
+      let timeStatus, remainingMinutes = 0, minutesToStart = 0
+
+      if (currentMinutes < slot.startMinutes) {
+        timeStatus = 'upcoming'
+        minutesToStart = slot.startMinutes - currentMinutes
+      } else if (currentMinutes >= slot.startMinutes && currentMinutes <= slot.endMinutes) {
+        timeStatus = 'ongoing'
+        remainingMinutes = slot.endMinutes - currentMinutes
+      } else {
+        timeStatus = 'finished'
+      }
+
       // 处理课程数据（可能是数组或单个对象）
       const coursesArray = Array.isArray(courseData) ? courseData : [courseData]
 
-        coursesArray.forEach(course => {
-        const isInCurrentWeek = scheduleStore.isCourseInTodayWeek(course.week)
+      coursesArray.forEach(course => {
+        const isInCurrentWeek = isCourseInTodayWeek(course.week)
         // 只添加今天周的课程
         if (isInCurrentWeek) {
-          const timeStatus = getCourseTimeStatus(period)
           courses.push({
             ...course,
             period,
             isInCurrentWeek: true,
             timeStatus,
-            remainingMinutes: timeStatus === 'ongoing' ? getRemainingMinutes(period) : 0,
-            minutesToStart: timeStatus === 'upcoming' ? getMinutesToStart(period) : 0
+            remainingMinutes,
+            minutesToStart
           })
         }
       })
@@ -190,64 +214,10 @@ const getTimeSlotTime = (period) => {
   return slot ? slot.time : ''
 }
 
-// 解析时间字符串为分钟数（从00:00开始计算）
-const parseTimeToMinutes = (timeStr) => {
-  const [hours, minutes] = timeStr.split(':').map(Number)
-  return hours * 60 + minutes
-}
-
-// 获取真实当前时间的分钟数（不受调试模式影响）
-const getRealCurrentMinutes = () => {
+// 获取当前时间的分钟数
+const getCurrentMinutes = () => {
   const now = new Date()
   return now.getHours() * 60 + now.getMinutes()
-}
-
-// 获取当前时间的分钟数（调试模式下返回调试时间）
-const getCurrentMinutes = () => {
-  return getRealCurrentMinutes()
-}
-
-// 判断课程时间状态
-const getCourseTimeStatus = (period) => {
-  const slot = timeSlots.find(s => s.period === period)
-  if (!slot) return 'upcoming'
-
-  const [startTime, endTime] = slot.time.split('-')
-  const startMinutes = parseTimeToMinutes(startTime)
-  const endMinutes = parseTimeToMinutes(endTime)
-  const currentMinutes = getCurrentMinutes()
-
-  if (currentMinutes < startMinutes) {
-    return 'upcoming' // 还没开始
-  } else if (currentMinutes >= startMinutes && currentMinutes <= endMinutes) {
-    return 'ongoing' // 正在进行
-  } else {
-    return 'finished' // 已结束
-  }
-}
-
-// 获取剩余分钟数（仅对正在进行的课程）
-const getRemainingMinutes = (period) => {
-  const slot = timeSlots.find(s => s.period === period)
-  if (!slot) return 0
-
-  const [, endTime] = slot.time.split('-')
-  const endMinutes = parseTimeToMinutes(endTime)
-  const currentMinutes = getCurrentMinutes()
-
-  return Math.max(0, endMinutes - currentMinutes)
-}
-
-// 获取距离上课的分钟数（仅对未开始的课程）
-const getMinutesToStart = (period) => {
-  const slot = timeSlots.find(s => s.period === period)
-  if (!slot) return 0
-
-  const [startTime] = slot.time.split('-')
-  const startMinutes = parseTimeToMinutes(startTime)
-  const currentMinutes = getCurrentMinutes()
-
-  return Math.max(0, startMinutes - currentMinutes)
 }
 
 // 获取时间段颜色指示器类
@@ -282,12 +252,15 @@ const getCourseStatusClass = (timeStatus, minutesToStart = 0) => {
 
 // 加载数据
 const loadData = async () => {
-  if (authStore.userClass && !scheduleStore.isLoading) {
-    try {
-      await scheduleStore.fetchCourseTable()
-    } catch (error) {
-      console.error('获取课程表失败:', error)
-    }
+  // 未登录时不发起请求
+  if (!authStore.isLoggedIn || !authStore.userClass || scheduleStore.isLoading) {
+    return
+  }
+
+  try {
+    await scheduleStore.initialize()
+  } catch (error) {
+    console.error('获取课程表失败:', error)
   }
 }
 
@@ -295,11 +268,10 @@ const loadData = async () => {
 let statusUpdateInterval = null
 
 onMounted(() => {
-  if (authStore.userClass && Object.keys(scheduleStore.courseData).length === 0) {
+  if (authStore.isLoggedIn && authStore.userClass && Object.keys(scheduleStore.courseData).length === 0) {
     loadData()
-    scheduleStore.setCurrentWeek(scheduleStore.currentWeekNumber)
   }
-  // 每分钟更新一次课程状态（仅在非调试模式下）
+  // 每分钟更新一次课程状态
   statusUpdateInterval = setInterval(() => {
     // 更新强制刷新变量，触发计算属性重新计算
     forceUpdate.value++
@@ -309,6 +281,11 @@ onMounted(() => {
 // 页面显示时也更新一次状态
 Taro.useDidShow(() => {
   forceUpdate.value++
+
+  // 如果登录了但没有数据，则加载数据（处理首次登录场景）
+  if (authStore.isLoggedIn && authStore.userClass && Object.keys(scheduleStore.courseData).length === 0) {
+    loadData()
+  }
 })
 
 // 页面卸载时清理定时器

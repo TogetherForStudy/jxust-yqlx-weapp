@@ -183,6 +183,13 @@ const isToday = (dateString) => {
 // 回到当前周
 const goToCurrentWeek = () => {
   const currentWeekNumber = scheduleStore.currentWeekNumber
+  
+  // 检查当前周是否在学期范围内
+  // 如果不在范围内（假期中），则不进行跳转并提示用户
+  if (currentWeekNumber < 1 || currentWeekNumber > scheduleStore.maxWeeks) {
+    return
+  }
+  
   scheduleStore.setCurrentWeek(currentWeekNumber)
 }
 
