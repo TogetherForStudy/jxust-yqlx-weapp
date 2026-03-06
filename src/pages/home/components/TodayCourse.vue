@@ -15,9 +15,10 @@
         </view>
 
         <!-- 未绑定班级状态 -->
-        <view v-else-if="!authStore.userClass" class="flex flex-col items-center justify-center py-8">
+        <view v-else-if="!authStore.userClass" class="flex flex-col items-center justify-center py-8" :class="{ 'active:bg-gray-50': authStore.isLoggedIn }" @tap="authStore.isLoggedIn && goToBindClass()">
           <view class="i-lucide-book-open text-2xl text-gray-400 mb-2"></view>
           <text class="text-gray-500 text-sm">绑定课表后查看今日课程</text>
+          <text v-if="authStore.isLoggedIn" class="text-blue-500 text-xs mt-1">点击前往绑定 ›</text>
         </view>
 
         <!-- 非当前学期状态 -->
@@ -41,70 +42,163 @@
           <text class="text-gray-500 text-sm">学习一天啦，好好休息</text>
         </view>
 
-        <!-- 有课程时显示课程列表 -->
+        <!-- 有课程时显示课程列表（按时间段分组） -->
         <view v-else class="m-2 space-y-1">
           <view
-            v-for="(course, index) in todayCourses"
-            :key="`${course.period}-${course.course}`"
-            class="flex items-center active:bg-gray-50 transition-all duration-200 border border-transparent"
-            :class="[
-              { 'border-t border-gray-100': index > 0 },
-              getCourseStatusClass(course.timeStatus, course.minutesToStart)
-            ]"
+            v-for="(group, gIndex) in groupedCourses"
+            :key="group.period"
           >
-            <!-- 左侧彩色指示条 -->
-            <view class="flex-shrink-0 mr-2">
+            <!-- 单门课程：直接显示 -->
+            <template v-if="group.courses.length === 1">
               <view
-                class="w-1 h-12 rounded-full"
-                :class="getTimeSlotColorClass(course.timeStatus, course.minutesToStart)"
-              ></view>
-            </view>
-
-            <!-- 中间课程信息 -->
-            <view class="flex-1 min-w-0">
-              <!-- 课程名称 -->
-              <view class="font-semibold text-gray-900 text-sm mb-1 truncate">
-                {{ course.course }}
-              </view>
-
-              <!-- 教师和教室信息 -->
-              <view class="grid grid-cols-3 text-sm text-gray-600">
-                <view class="flex items-center col-span-1">
-                  <view class="i-lucide-user w-3 h-3 mr-1.5 text-gray-400 shrink-0"></view>
-                  <text class="truncate">{{ course.teacher }}</text>
+                class="flex items-center active:bg-gray-50 transition-all duration-200 border border-transparent"
+                :class="[
+                  { 'border-t border-gray-100': gIndex > 0 },
+                  getCourseStatusClass(group.courses[0].timeStatus, group.courses[0].minutesToStart)
+                ]"
+              >
+                <view class="flex-shrink-0 mr-2">
+                  <view
+                    class="w-1 h-12 rounded-full"
+                    :class="getTimeSlotColorClass(group.courses[0].timeStatus, group.courses[0].minutesToStart)"
+                  ></view>
                 </view>
-                <view class="flex items-center col-span-2">
-                  <view class="i-lucide-map-pin w-3 h-3 mx-1.5 text-gray-400 shrink-0"></view>
-                  <text class="truncate">{{ course.classroom }}</text>
+                <view class="flex-1 min-w-0">
+                  <view class="font-semibold text-gray-900 text-sm mb-1 truncate">
+                    {{ group.courses[0].course }}
+                  </view>
+                  <view class="grid grid-cols-3 text-sm text-gray-600">
+                    <view class="flex items-center col-span-1">
+                      <view class="i-lucide-user w-3 h-3 mr-1.5 text-gray-400 shrink-0"></view>
+                      <text class="truncate">{{ group.courses[0].teacher }}</text>
+                    </view>
+                    <view class="flex items-center col-span-2">
+                      <view class="i-lucide-map-pin w-3 h-3 mx-1.5 text-gray-400 shrink-0"></view>
+                      <text class="truncate">{{ group.courses[0].classroom }}</text>
+                    </view>
+                  </view>
+                </view>
+                <view class="flex-shrink-0 text-right">
+                  <view class="text-sm font-medium text-gray-800 mb-1 w-24">
+                    {{ getTimeSlotTime(group.period) }}
+                  </view>
+                  <view>
+                    <view v-if="group.courses[0].timeStatus === 'ongoing'" class="text-sm text-green-600 font-medium">
+                      {{ group.courses[0].remainingMinutes }}分钟后下课
+                    </view>
+                    <view v-else-if="group.courses[0].timeStatus === 'upcoming' && group.courses[0].minutesToStart <= 20" class="text-sm text-orange-600 font-medium">
+                      {{ group.courses[0].minutesToStart }}分钟后上课
+                    </view>
+                  </view>
                 </view>
               </view>
-            </view>
+            </template>
 
-            <!-- 右侧时间和状态信息 -->
-            <view class="flex-shrink-0 text-right">
-              <!-- 课程时间 -->
-              <view class="text-sm font-medium text-gray-800 mb-1 w-24">
-                {{ getTimeSlotTime(course.period) }}
-              </view>
-
-              <!-- 课程状态 -->
+            <!-- 多门课程：折叠显示 -->
+            <template v-else>
               <view>
-                <!-- 正在进行 -->
+                <!-- 第一门课程（始终显示） -->
                 <view
-                  v-if="course.timeStatus === 'ongoing'"
-                  class="text-sm text-green-600 font-medium"
+                  class="flex items-center active:bg-gray-50 transition-all duration-200 border border-transparent"
+                  :class="getCourseStatusClass(group.courses[0].timeStatus, group.courses[0].minutesToStart)"
                 >
-                  {{ course.remainingMinutes }}分钟后下课
+                  <view class="flex-shrink-0 mr-2">
+                    <view
+                      class="w-1 h-12 rounded-full"
+                      :class="getTimeSlotColorClass(group.courses[0].timeStatus, group.courses[0].minutesToStart)"
+                    ></view>
+                  </view>
+                  <view class="flex-1 min-w-0">
+                    <view class="font-semibold text-gray-900 text-sm mb-1 truncate">
+                      {{ group.courses[0].course }}
+                    </view>
+                    <view class="grid grid-cols-3 text-sm text-gray-600">
+                      <view class="flex items-center col-span-1">
+                        <view class="i-lucide-user w-3 h-3 mr-1.5 text-gray-400 shrink-0"></view>
+                        <text class="truncate">{{ group.courses[0].teacher }}</text>
+                      </view>
+                      <view class="flex items-center col-span-2">
+                        <view class="i-lucide-map-pin w-3 h-3 mx-1.5 text-gray-400 shrink-0"></view>
+                        <text class="truncate">{{ group.courses[0].classroom }}</text>
+                      </view>
+                    </view>
+                  </view>
+                  <view class="flex-shrink-0 text-right">
+                    <view class="text-sm font-medium text-gray-800 mb-1 w-24">
+                      {{ getTimeSlotTime(group.period) }}
+                    </view>
+                    <view>
+                      <view v-if="group.courses[0].timeStatus === 'ongoing'" class="text-sm text-green-600 font-medium">
+                        {{ group.courses[0].remainingMinutes }}分钟后下课
+                      </view>
+                      <view v-else-if="group.courses[0].timeStatus === 'upcoming' && group.courses[0].minutesToStart <= 20" class="text-sm text-orange-600 font-medium">
+                        {{ group.courses[0].minutesToStart }}分钟后上课
+                      </view>
+                    </view>
+                  </view>
                 </view>
-                <!-- 即将开始 - 20分钟内显示倒计时 -->
+
+                <!-- 展开/收起窄条（固定在第一条下方） -->
                 <view
-                  v-else-if="course.timeStatus === 'upcoming' && course.minutesToStart <= 20"
-                  class="text-sm text-orange-600 font-medium"
+                  @tap="togglePeriod(group.period)"
+                  class="flex items-center justify-center py-1 bg-gray-50 active:bg-gray-100 transition-colors"
+                  :class="expandedPeriods[group.period] ? '' : 'rounded-b-lg'"
                 >
-                  {{ course.minutesToStart }}分钟后上课
+                  <text class="text-xs text-gray-400 mr-1">
+                    {{ expandedPeriods[group.period] ? '收起' : `还有${group.courses.length - 1}门课` }}
+                  </text>
+                  <view
+                    class="i-lucide-chevron-down w-3 h-3 text-gray-400 transition-transform duration-200"
+                    :class="{ 'rotate-180': expandedPeriods[group.period] }"
+                  ></view>
+                </view>
+
+                <!-- 展开后的其余课程 -->
+                <view v-if="expandedPeriods[group.period]" class="space-y-1">
+                  <view
+                    v-for="(course, cIndex) in group.courses.slice(1)"
+                    :key="`${group.period}-${cIndex}-${course.course}`"
+                    class="flex items-center active:bg-gray-50 transition-all duration-200 border border-transparent"
+                    :class="getCourseStatusClass(course.timeStatus, course.minutesToStart)"
+                  >
+                    <view class="flex-shrink-0 mr-2">
+                      <view
+                        class="w-1 h-12 rounded-full"
+                        :class="getTimeSlotColorClass(course.timeStatus, course.minutesToStart)"
+                      ></view>
+                    </view>
+                    <view class="flex-1 min-w-0">
+                      <view class="font-semibold text-gray-900 text-sm mb-1 truncate">
+                        {{ course.course }}
+                      </view>
+                      <view class="grid grid-cols-3 text-sm text-gray-600">
+                        <view class="flex items-center col-span-1">
+                          <view class="i-lucide-user w-3 h-3 mr-1.5 text-gray-400 shrink-0"></view>
+                          <text class="truncate">{{ course.teacher }}</text>
+                        </view>
+                        <view class="flex items-center col-span-2">
+                          <view class="i-lucide-map-pin w-3 h-3 mx-1.5 text-gray-400 shrink-0"></view>
+                          <text class="truncate">{{ course.classroom }}</text>
+                        </view>
+                      </view>
+                    </view>
+                    <view class="flex-shrink-0 text-right">
+                      <view class="text-sm font-medium text-gray-800 mb-1 w-24">
+                        {{ getTimeSlotTime(course.period) }}
+                      </view>
+                      <view>
+                        <view v-if="course.timeStatus === 'ongoing'" class="text-sm text-green-600 font-medium">
+                          {{ course.remainingMinutes }}分钟后下课
+                        </view>
+                        <view v-else-if="course.timeStatus === 'upcoming' && course.minutesToStart <= 20" class="text-sm text-orange-600 font-medium">
+                          {{ course.minutesToStart }}分钟后上课
+                        </view>
+                      </view>
+                    </view>
+                  </view>
                 </view>
               </view>
-            </view>
+            </template>
           </view>
         </view>
       </view>
@@ -112,23 +206,32 @@
   </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, onBeforeUnmount, ref } from 'vue'
 import Taro from '@tarojs/taro'
 import { useScheduleStore } from '../../../stores/schedule'
 import { useAuthStore } from '../../../stores/auth'
 
-// 定义组件名称
 defineOptions({
   name: 'TodayCourse'
+})
+
+const props = defineProps({
+  debugDate: {
+    type: Date,
+    default: null
+  }
 })
 
 const scheduleStore = useScheduleStore()
 const authStore = useAuthStore()
 
-// 用于强制更新时间状态的响应式变量
-const forceUpdate = ref(0)
+const goToBindClass = () => {
+  Taro.navigateTo({ url: '/pages/schedule/schedule-bind/index' })
+}
 
-// 时间段配置（带完整时间信息）
+const forceUpdate = ref(0)
+const expandedPeriods = ref({})
+
 const timeSlots = [
   { period: 1, label: '1-2节', time: '08:30-10:05', startMinutes: 510, endMinutes: 605 },
   { period: 2, label: '3-4节', time: '10:25-12:00', startMinutes: 625, endMinutes: 720 },
@@ -137,36 +240,40 @@ const timeSlots = [
   { period: 5, label: '9-10节', time: '19:00-20:35', startMinutes: 1140, endMinutes: 1235 }
 ]
 
-// 获取今天是星期几 (0=周日, 1=周一, ..., 6=周六)
+const getNow = () => props.debugDate || new Date()
+
 const getTodayIndex = () => {
-  const today = new Date().getDay()
-  return today === 0 ? 6 : today - 1 // 转换为 0=周一, 6=周日
+  const today = getNow().getDay()
+  return today === 0 ? 6 : today - 1
 }
 
-// 计算今日课程
+const getCurrentMinutes = () => {
+  const now = getNow()
+  return now.getHours() * 60 + now.getMinutes()
+}
+
 const todayCourses = computed(() => {
-  // 依赖 forceUpdate 来强制重新计算时间状态
   forceUpdate.value
 
-  if (!scheduleStore.todayCourseData || Object.keys(scheduleStore.todayCourseData).length === 0) {
+  if (!scheduleStore.courseData || Object.keys(scheduleStore.courseData).length === 0) {
     return []
   }
 
   const todayIndex = getTodayIndex()
   const courses = []
   const currentMinutes = getCurrentMinutes()
+  const debugWeek = props.debugDate
+    ? scheduleStore.calculateWeekNumber(props.debugDate)
+    : null
 
-  // 遍历今天的5个时间段
   for (let period = 1; period <= 5; period++) {
     const courseIndex = todayIndex * 5 + period
-    const courseData = scheduleStore.todayCourseData[courseIndex.toString()]
+    const courseData = scheduleStore.courseData[courseIndex.toString()]
 
     if (courseData) {
-      // 获取时间段信息
       const slot = timeSlots.find(s => s.period === period)
       if (!slot) continue
 
-      // 计算时间状态
       let timeStatus, remainingMinutes = 0, minutesToStart = 0
 
       if (currentMinutes < slot.startMinutes) {
@@ -179,12 +286,12 @@ const todayCourses = computed(() => {
         timeStatus = 'finished'
       }
 
-      // 处理课程数据（可能是数组或单个对象）
       const coursesArray = Array.isArray(courseData) ? courseData : [courseData]
 
       coursesArray.forEach(course => {
-        const isInCurrentWeek = isCourseInTodayWeek(course.week)
-        // 只添加今天周的课程
+        const isInCurrentWeek = debugWeek !== null
+          ? scheduleStore.isCourseInWeek(course.week, debugWeek)
+          : scheduleStore.isCourseInTodayWeek(course.week)
         if (isInCurrentWeek) {
           courses.push({
             ...course,
@@ -202,6 +309,22 @@ const todayCourses = computed(() => {
   return courses
 })
 
+// 按时间段分组
+const groupedCourses = computed(() => {
+  const groups = new Map()
+  for (const course of todayCourses.value) {
+    if (!groups.has(course.period)) {
+      groups.set(course.period, { period: course.period, courses: [] })
+    }
+    groups.get(course.period).courses.push(course)
+  }
+  return Array.from(groups.values())
+})
+
+const togglePeriod = (period) => {
+  expandedPeriods.value[period] = !expandedPeriods.value[period]
+}
+
 // 检查是否所有课程都已结束
 const allCoursesFinished = computed(() => {
   if (todayCourses.value.length === 0) return false
@@ -212,12 +335,6 @@ const allCoursesFinished = computed(() => {
 const getTimeSlotTime = (period) => {
   const slot = timeSlots.find(s => s.period === period)
   return slot ? slot.time : ''
-}
-
-// 获取当前时间的分钟数
-const getCurrentMinutes = () => {
-  const now = new Date()
-  return now.getHours() * 60 + now.getMinutes()
 }
 
 // 获取时间段颜色指示器类
@@ -288,8 +405,7 @@ Taro.useDidShow(() => {
   }
 })
 
-// 页面卸载时清理定时器
-Taro.useUnload(() => {
+onBeforeUnmount(() => {
   if (statusUpdateInterval) {
     clearInterval(statusUpdateInterval)
     statusUpdateInterval = null

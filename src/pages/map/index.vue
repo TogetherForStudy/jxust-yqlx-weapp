@@ -68,8 +68,8 @@
                 :src="campus.imageUrl"
                 mode="widthFix"
                 class="w-full rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200"
-                @error="onImageError(campus)"
-                @load="onImageLoad(campus)"
+                @error="(e) => onImageError(campus, e)"
+                @load="() => onImageLoad(campus)"
                 @tap="previewImage(campus.imageUrl)"
               />
               <text class="text-xs text-gray-500 text-center mt-2 block">点击图片预览</text>
@@ -91,7 +91,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import Taro from '@tarojs/taro'
 import { configAPI } from '../../api/index.js'
 import { getSignedImageUrl } from '../../utils/index.js'
@@ -161,26 +161,29 @@ const toggleCampus = (campus) => {
   }
 }
 
+let isMounted = true
+onBeforeUnmount(() => { isMounted = false })
+
 // 加载校区地图
 const loadCampusMap = async (campus) => {
   try {
     campus.loading = true
     campus.error = ''
 
-    // 1. 获取地图配置路径
     const response = await configAPI.getConfig(campus.key)
+    if (!isMounted) return
 
     if (!response || !response.value) {
       campus.error = `未获取到${campus.name}地图数据`
       return
     }
 
-    // 2. 使用签名URL获取图片（支持缓存和token）
     const signedUrl = await getSignedImageUrl(response.value)
+    if (!isMounted) return
     campus.imageUrl = signedUrl
   } catch (err) {
+    if (!isMounted) return
     console.error(`获取${campus.name}地图失败:`, err)
-    // 根据错误类型提供更具体的错误信息
     if (err.message?.includes('图片路径不能为空')) {
       campus.error = '地图配置无效'
     } else if (err.message?.includes('获取图片签名失败')) {
@@ -189,7 +192,7 @@ const loadCampusMap = async (campus) => {
       campus.error = '获取地图失败，请稍后重试'
     }
   } finally {
-    campus.loading = false
+    if (isMounted) campus.loading = false
   }
 }
 

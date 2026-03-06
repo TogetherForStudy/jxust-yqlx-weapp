@@ -27,3 +27,5 @@ coverage
 
 package-lock.json
 .VSCodeCounter
+temp/
+CLAUDE.md

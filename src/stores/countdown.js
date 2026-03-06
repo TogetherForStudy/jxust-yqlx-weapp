@@ -1,11 +1,5 @@
 import { defineStore } from 'pinia'
-import {
-  getCountdowns,
-  getCountdownDetail,
-  createCountdown as apiCreateCountdown,
-  updateCountdown as apiUpdateCountdown,
-  deleteCountdown as apiDeleteCountdown
-} from '../utils/request'
+import { countdownAPI } from '../api'
 
 export const useCountdownStore = defineStore('countdown', {
   state: () => ({
@@ -21,7 +15,7 @@ export const useCountdownStore = defineStore('countdown', {
   getters: {
     // 按目标日期排序的倒数日列表
     sortedCountdowns: (state) => {
-      return state.countdowns.sort((a, b) => {
+      return [...state.countdowns].sort((a, b) => {
         const dateA = new Date(a.target_date)
         const dateB = new Date(b.target_date)
         return dateA - dateB
@@ -68,7 +62,7 @@ export const useCountdownStore = defineStore('countdown', {
       this.error = null
 
       try {
-        const data = await getCountdowns()
+        const data = await countdownAPI.getList()
         this.countdowns = data || []
         this.isFetchData = true
         return data
@@ -84,7 +78,7 @@ export const useCountdownStore = defineStore('countdown', {
     // 获取倒数日详情
     async fetchCountdownDetail(id) {
       try {
-        const data = await getCountdownDetail(id)
+        const data = await countdownAPI.getDetail(id)
 
         // 更新本地列表中的对应项
         const index = this.countdowns.findIndex(item => item.id === id)
@@ -102,7 +96,7 @@ export const useCountdownStore = defineStore('countdown', {
     // 创建倒数日
     async createCountdown(countdownData) {
       try {
-        const data = await apiCreateCountdown(countdownData)
+        const data = await countdownAPI.create(countdownData)
 
         // 将新创建的倒数日添加到列表中
         if (data) {
@@ -119,7 +113,7 @@ export const useCountdownStore = defineStore('countdown', {
     // 更新倒数日
     async updateCountdown(id, countdownData) {
       try {
-        const data = await apiUpdateCountdown(id, countdownData)
+        const data = await countdownAPI.update(id, countdownData)
 
         // 更新本地列表中的对应项
         const index = this.countdowns.findIndex(item => item.id === id)
@@ -140,7 +134,7 @@ export const useCountdownStore = defineStore('countdown', {
     // 删除倒数日
     async deleteCountdown(id) {
       try {
-        await apiDeleteCountdown(id)
+        await countdownAPI.delete(id)
 
         // 从本地列表中移除
         const index = this.countdowns.findIndex(item => item.id === id)
@@ -173,18 +167,14 @@ export const useCountdownStore = defineStore('countdown', {
       return diffDays
     },
 
-    // 格式化日期显示
     formatDate(dateStr) {
-      const date = new Date(dateStr)
-      const now = new Date()
-      const diffTime = date - now
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+      const daysLeft = this.calculateDaysLeft(dateStr)
 
-      if (diffDays === 0) return '今天'
-      if (diffDays === 1) return '明天'
-      if (diffDays === -1) return '昨天'
-      if (diffDays > 0) return `${diffDays}天后`
-      return `${Math.abs(diffDays)}天前`
+      if (daysLeft === 0) return '今天'
+      if (daysLeft === 1) return '明天'
+      if (daysLeft === -1) return '昨天'
+      if (daysLeft > 0) return `${daysLeft}天后`
+      return `${Math.abs(daysLeft)}天前`
     },
 
     // 获取倒数日状态

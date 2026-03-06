@@ -554,13 +554,13 @@ const totalSelectedCredits = computed(() => {
     }, 0)
 })
 
-// 百分制转五分制
+// 百分制转五分制（线性换算）
 const convertToFivePoint = (score) => {
-  if (score >= 90) return 5
-  if (score >= 80) return 4
-  if (score >= 70) return 3
-  if (score >= 60) return 2
-  return 1
+  // 线性换算公式：GPA = (分数 - 50) / 10
+  // 100分=5.0, 90分=4.0, 80分=3.0, 70分=2.0, 60分=1.0, 50分=0.0
+  const gpa = (score - 50) / 10
+  // 限制在 0-5 范围内
+  return Math.max(0, Math.min(5, gpa))
 }
 
 // 百分制转四分制

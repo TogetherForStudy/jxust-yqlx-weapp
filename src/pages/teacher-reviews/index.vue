@@ -338,7 +338,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onUnmounted } from "vue";
+import { ref, computed } from "vue";
 import Taro from "@tarojs/taro";
 import { useReviewsStore } from "../../stores/reviews";
 import { useAuthStore } from "../../stores/auth";
@@ -356,7 +356,6 @@ const refreshing = ref(false);
 const showAddModal = ref(false);
 const submitting = ref(false);
 const campusIndex = ref(0);
-const searchTimer = ref(null);
 const hasSearched = ref(false);
 const searchResult = ref(null);
 
@@ -423,6 +422,7 @@ const canSubmit = computed(() => {
   return (
     newReview.value.teacher_name.trim() &&
     newReview.value.course_name.trim() &&
+    newReview.value.campus.trim() &&
     newReview.value.content.trim() &&
     newReview.value.attitude !== null &&
     !submitting.value
@@ -434,7 +434,9 @@ const getAttitudeText = (attitude) => reviewsStore.getAttitudeText(attitude);
 const getAttitudeClass = (attitude) => reviewsStore.getAttitudeClass(attitude);
 
 const formatDate = (dateStr) => {
+  if (!dateStr) return '';
   const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return '';
   const now = new Date();
   const diff = now - date;
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -615,12 +617,6 @@ const submitReview = async () => {
     submitting.value = false;
   }
 };
-
-onUnmounted(() => {
-  if (searchTimer.value) {
-    clearTimeout(searchTimer.value);
-  }
-});
 
 Taro.useShareAppMessage((res) => {
     if (res.from === 'button') {

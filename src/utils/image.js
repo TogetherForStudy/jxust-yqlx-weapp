@@ -52,17 +52,7 @@ const saveLocalCacheInfo = () => {
   }
 }
 
-/**
- * 生成本地文件名
- * @param {string} uri - 原始图片路径
- * @returns {string} 本地文件名
- */
-const generateLocalFileName = (uri) => {
-  // 使用 uri 生成哈希值作为文件名，保留原始扩展名
-  const hash = btoa(uri).replace(/[+/=]/g, '_')
-  const ext = uri.split('.').pop() || 'jpg'
-  return `img_${hash}.${ext}`
-}
+
 
 /**
  * 检查本地文件是否过期
@@ -535,14 +525,13 @@ export async function getLocalCacheStats() {
 
 /**
  * 手动清理过期的本地缓存文件
- * @returns {Promise<number>} 清理的文件数量
+ * @returns {Promise<number>} 清理后剩余的缓存文件数量
  */
 export async function cleanExpiredLocalCache() {
   try {
     await cleanExpiredLocalFiles()
     await manageCacheCapacity()
 
-    // 返回清理后的统计信息
     const stats = await getLocalCacheStats()
     return stats.totalCount
   } catch (error) {

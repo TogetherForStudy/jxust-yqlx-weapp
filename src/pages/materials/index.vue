@@ -157,34 +157,43 @@
     </scroll-view>
 
     <!-- 面包屑 -->
-    <view v-if="!isSearchMode && !searchFocused" class="bg-white px-4 py-3">
-      <scroll-view
-        ref="breadcrumbScrollView"
-        :scroll-x="true"
-        :scroll-left="breadcrumbScrollLeft"
-        :show-scrollbar="false"
-        class="flex items-center space-x-2 text-sm"
-      >
-        <view class="flex items-center space-x-2 whitespace-nowrap">
-          <text class="text-blue-500 flex-shrink-0" @tap="navigateToRoot">
-            江理一起来学
-          </text>
-          <template v-for="(item, index) in breadcrumb" :key="item.id">
-            <text class="text-gray-400 flex-shrink-0">/</text>
-            <text
-              :class="
-                index === breadcrumb.length - 1
-                  ? 'text-gray-800 font-medium'
-                  : 'text-blue-500'
-              "
-              class="flex-shrink-0"
-              @tap="navigateToBreadcrumb(index)"
-            >
-              {{ item.name }}
+    <view v-if="!isSearchMode && !searchFocused" class="bg-white px-4 py-3 flex items-center">
+      <view class="flex-1 min-w-0 overflow-hidden">
+        <scroll-view
+          ref="breadcrumbScrollView"
+          :scroll-x="true"
+          :scroll-left="breadcrumbScrollLeft"
+          :show-scrollbar="false"
+          class="text-sm"
+        >
+          <view class="flex items-center space-x-2 whitespace-nowrap">
+            <text class="text-blue-500 flex-shrink-0" @tap="navigateToRoot">
+              江理一起来学
             </text>
-          </template>
-        </view>
-      </scroll-view>
+            <template v-for="(item, index) in breadcrumb" :key="item.id">
+              <text class="text-gray-400 flex-shrink-0">/</text>
+              <text
+                :class="
+                  index === breadcrumb.length - 1
+                    ? 'text-gray-800 font-medium'
+                    : 'text-blue-500'
+                "
+                class="flex-shrink-0"
+                @tap="navigateToBreadcrumb(index)"
+              >
+                {{ item.name }}
+              </text>
+            </template>
+          </view>
+        </scroll-view>
+      </view>
+      <view
+        class="flex items-center ml-3 px-2 py-1 rounded-md text-xs flex-shrink-0 active:bg-gray-100"
+        @tap="toggleSort"
+      >
+        <text class="i-lucide-arrow-up-down w-3.5 h-3.5 mr-1 text-gray-500"></text>
+        <text class="text-gray-600">{{ sortBy === 'hotness' ? '热度' : '时间' }}</text>
+      </view>
     </view>
 
     <!-- 搜索结果提示 -->
@@ -328,6 +337,9 @@ const hotRankType = ref(0); // 0=总榜, 7=近七天
 const scrollTop = ref(0);
 let scrollInterval = null;
 
+// 排序
+const sortBy = ref("hotness"); // hotness | time
+
 // 面包屑导航
 const breadcrumb = ref([]);
 const currentCategoryId = ref(1); // 默认从分类ID为1开始
@@ -363,20 +375,32 @@ onUnmounted(() => {
 
 // 加载热词
 const loadHotWords = async () => {
-  const res = await materialAPI.getHotWords({ limit: 20 });
-  hotWords.value = res || [];
+  try {
+    const res = await materialAPI.getHotWords({ limit: 20 });
+    hotWords.value = res || [];
+  } catch (error) {
+    console.error('加载热词失败:', error);
+  }
 };
 
 // 加载TOP热门资料
 const loadTopMaterials = async () => {
-  const res = await materialAPI.getTopMaterials({ limit: 10 });
-  topMaterials.value = res || [];
+  try {
+    const res = await materialAPI.getTopMaterials({ limit: 10 });
+    topMaterials.value = res || [];
+  } catch (error) {
+    console.error('加载热门资料失败:', error);
+  }
 };
 
 // 加载热榜资料
 const loadHotRankMaterials = async (type = 0) => {
-  const res = await materialAPI.getTopMaterials({ limit: 50, type });
-  hotRankMaterials.value = res || [];
+  try {
+    const res = await materialAPI.getTopMaterials({ limit: 50, type });
+    hotRankMaterials.value = res || [];
+  } catch (error) {
+    console.error('加载热榜资料失败:', error);
+  }
 };
 
 // 切换热榜类型
@@ -474,6 +498,13 @@ const exitSearchMode = () => {
   }
 };
 
+// 切换排序
+const toggleSort = () => {
+  sortBy.value = sortBy.value === 'hotness' ? 'time' : 'hotness';
+  currentPage.value = 1;
+  loadData();
+};
+
 // 加载数据
 const loadData = async () => {
   // 首次加载用 loading，加载更多用 loadingMore
@@ -482,32 +513,35 @@ const loadData = async () => {
   } else {
     loading.value = true;
   }
-
+  try {
   // 加载分类
-  const categoryRes = await materialAPI.getCategories({
-    parent_id: currentCategoryId.value,
-  });
+      const categoryRes = await materialAPI.getCategories({
+        parent_id: currentCategoryId.value,
+      });
   if (currentPage.value > 1) {
     categories.value = [...categories.value, ...categoryRes || []];
   } else {
-    categories.value = categoryRes || [];
+      categories.value = categoryRes || [];
+    }
+    // 加载资料
+    const materialRes = await materialAPI.getMaterials({
+      category_id: currentCategoryId.value,
+      page: currentPage.value,
+      page_size: pageSize.value,
+      sort_by: sortBy.value,
+    });
+    if (currentPage.value > 1) {
+      materials.value = [...materials.value, ...materialRes.data || []];
+    } else {
+      materials.value = materialRes.data || [];
+    }
+    hasMore.value = materialRes.total > currentPage.value * pageSize.value;
+  } catch (error) {
+    console.error('加载资料数据失败:', error);
+  } finally {
+    loading.value = false;
+    loadingMore.value = false;
   }
-  // 加载资料
-  const materialRes = await materialAPI.getMaterials({
-    category_id: currentCategoryId.value,
-    page: currentPage.value,
-    page_size: pageSize.value,
-    sort_by: "hotness",
-  });
-  if (currentPage.value > 1) {
-    materials.value = [...materials.value, ...materialRes.data || []];
-  } else {
-    materials.value = materialRes.data || [];
-  }
-  hasMore.value = materialRes.total > currentPage.value * pageSize.value;
-
-  loading.value = false;
-  loadingMore.value = false;
 };
 
 // 搜索
@@ -540,21 +574,25 @@ const handleSearch = async () => {
     loadingMore.value = true;
   }
 
-  const res = await materialAPI.searchMaterials({
-    keywords: searchKeywords.value,
-    page: currentPage.value,
-    page_size: pageSize.value,
-  });
-  if (currentPage.value > 1) {
-    materials.value = [...materials.value, ...res.materials || []];
-  } else {
-    materials.value = res.materials || [];
+  try {
+    const res = await materialAPI.searchMaterials({
+      keywords: searchKeywords.value,
+      page: currentPage.value,
+      page_size: pageSize.value,
+    });
+    if (currentPage.value > 1) {
+      materials.value = [...materials.value, ...res.materials || []];
+    } else {
+      materials.value = res.materials || [];
+    }
+    searchTotal.value = res.total || 0;
+    hasMore.value = res.total > currentPage.value * pageSize.value;
+  } catch (error) {
+    console.error('搜索资料失败:', error);
+  } finally {
+    loading.value = false;
+    loadingMore.value = false;
   }
-  searchTotal.value = res.total || 0;
-  hasMore.value = res.total > currentPage.value * pageSize.value;
-
-  loading.value = false;
-  loadingMore.value = false;
 };
 
 // 快速搜索

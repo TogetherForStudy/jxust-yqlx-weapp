@@ -110,7 +110,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onBeforeUnmount } from 'vue'
 import Taro from '@tarojs/taro'
 import { useScheduleStore } from '../../../stores/schedule'
 import { useAuthStore } from '../../../stores/auth'
@@ -145,6 +145,13 @@ const isBinding = ref(false)
 
 // 防抖搜索
 let searchTimer = null
+onBeforeUnmount(() => {
+  if (searchTimer) {
+    clearTimeout(searchTimer)
+    searchTimer = null
+  }
+})
+
 const handleSearch = () => {
   if (searchTimer) {
     clearTimeout(searchTimer)
@@ -241,8 +248,14 @@ const confirmBind = async () => {
   try {
     isBinding.value = true
 
+    // 调用后端更新班级绑定
     await scheduleStore.updateClass(selectedClass.value.class_id)
-    await authStore.updateUserInfo({ class_id: selectedClass.value.class_id })
+
+    // 绑定成功后，仅更新本地用户信息（不再调用 updateProfile API）
+    const updatedUserInfo = { ...authStore.userInfo, class_id: selectedClass.value.class_id }
+    authStore.userInfo = updatedUserInfo
+    Taro.setStorageSync('userInfo', updatedUserInfo)
+
     Taro.showToast({
       title: '绑定成功',
       icon: 'success'
