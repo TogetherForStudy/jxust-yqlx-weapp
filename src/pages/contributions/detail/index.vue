@@ -291,34 +291,6 @@ const goBack = () => {
   Taro.navigateBack()
 }
 
-// 删除投稿
-const deleteContribution = async () => {
-  const result = await Taro.showModal({
-    title: '确认删除',
-    content: '确定要删除这个投稿吗？此操作不可恢复。'
-  })
-
-  if (result.confirm) {
-    try {
-      // 注意：这里需要实现删除投稿的API
-      Taro.showToast({
-        title: '删除成功',
-        icon: 'success'
-      })
-
-      setTimeout(() => {
-        Taro.navigateBack()
-      }, 1500)
-    } catch (error) {
-      console.error('删除投稿失败:', error)
-      Taro.showToast({
-        title: '删除失败',
-        icon: 'error'
-      })
-    }
-  }
-}
-
 // 工具函数
 const getStatusClass = (status) => {
   switch (status) {

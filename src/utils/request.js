@@ -66,19 +66,24 @@ const generateRequestIdentifier = (method, url, data) => {
 }
 
 // 递归排序对象的键（用于生成一致的请求标识）
-const sortObjectKeys = (obj) => {
+const sortObjectKeys = (obj, seen = new WeakSet()) => {
   if (obj === null || typeof obj !== 'object') {
     return obj
   }
 
+  if (seen.has(obj)) {
+    return '[Circular]'
+  }
+  seen.add(obj)
+
   if (Array.isArray(obj)) {
-    return obj.map(item => sortObjectKeys(item))
+    return obj.map(item => sortObjectKeys(item, seen))
   }
 
   return Object.keys(obj)
     .sort()
     .reduce((sorted, key) => {
-      sorted[key] = sortObjectKeys(obj[key])
+      sorted[key] = sortObjectKeys(obj[key], seen)
       return sorted
     }, {})
 }
@@ -113,21 +118,26 @@ const clearIdempotencyKey = (method, url, data) => {
   delete idempotencyKeyCache[identifier]
 }
 
-// 定期清理过期的缓存（每2分钟）
-setInterval(() => {
-  const now = Date.now()
-  Object.keys(idempotencyKeyCache).forEach(key => {
-    if (now - idempotencyKeyCache[key].timestamp > 2 * 60 * 1000) {
-      delete idempotencyKeyCache[key]
-    }
-  })
-}, 2 * 60 * 1000)
+// 定期清理过期的缓存（每2分钟），保存引用以便必要时清除
+let _cacheCleanupTimer = null
+const startCacheCleanup = () => {
+  if (_cacheCleanupTimer) return
+  _cacheCleanupTimer = setInterval(() => {
+    const now = Date.now()
+    Object.keys(idempotencyKeyCache).forEach(key => {
+      const cached = idempotencyKeyCache[key]
+      if (cached && now - cached.timestamp > 2 * 60 * 1000) {
+        delete idempotencyKeyCache[key]
+      }
+    })
+  }, 2 * 60 * 1000)
+}
+startCacheCleanup()
 
 // 请求拦截器
 const interceptors = {
   async request(config) {
-    // 添加认证token
-    const token = Taro.getStorageSync('token')
+    const token = useAuthStore().token
     if (token) {
       config.header = {
         ...config.header,
@@ -162,6 +172,10 @@ const interceptors = {
 
     // 处理HTTP状态码
     if (statusCode >= 200 && statusCode < 300) {
+      if (!data || typeof data !== 'object') {
+        return data
+      }
+
       // 检查业务状态码
       if (data.StatusCode === 0) {
         return data.Result
@@ -180,10 +194,18 @@ const interceptors = {
 
 // 通用请求方法
 export const request = async (options) => {
+  if (!options?.url) {
+    return Promise.reject(new Error('Request URL is required'))
+  }
+
   // 添加基础URL
   if (!options.url.startsWith('http')) {
     options.url = BASE_URL + options.url
   }
+
+  // 是否静默（不显示全局错误 Toast），由调用方自行处理错误提示
+  const silent = options.silent
+  delete options.silent
 
   // 保存原始请求信息（用于清除幂等性 Key）
   const originalMethod = options.method
@@ -198,12 +220,13 @@ export const request = async (options) => {
     .catch(error => {
       console.error('Request error:', error)
 
-      // 显示错误提示
-      Taro.showToast({
-        title: error.message || '网络错误',
-        icon: 'error',
-        duration: 2000
-      })
+      if (!silent) {
+        Taro.showToast({
+          title: error.message || error.errMsg || '网络错误',
+          icon: 'error',
+          duration: 2000
+        })
+      }
 
       return Promise.reject(error)
     }).finally(() => {
@@ -216,6 +239,10 @@ export const request = async (options) => {
 
 // GET请求
 export const get = (url, data) => {
+  if (!data) {
+    return request({ url, method: 'GET', data: {} })
+  }
+
   // 处理数组参数（如categories），转换为多个同名参数
   let processedData = { ...data }
   let urlParams = new URLSearchParams()
@@ -273,61 +300,3 @@ export const del = (url, data) => {
   })
 }
 
-// ============ 倒数日相关接口 ============
-
-// 获取用户倒数日列表
-export const getCountdowns = () => {
-  return get('/api/v0/countdowns')
-}
-
-// 获取倒数日详情
-export const getCountdownDetail = (id) => {
-  return get(`/api/v0/countdowns/${id}`)
-}
-
-// 创建倒数日
-export const createCountdown = (data) => {
-  return post('/api/v0/countdowns', data)
-}
-
-// 更新倒数日
-export const updateCountdown = (id, data) => {
-  return put(`/api/v0/countdowns/${id}`, data)
-}
-
-// 删除倒数日
-export const deleteCountdown = (id) => {
-  return del(`/api/v0/countdowns/${id}`)
-}
-
-// ============ 学习任务相关接口 ============
-
-// 获取学习任务列表
-export const getStudyTasks = (params) => {
-  return get('/api/v0/study-tasks', params)
-}
-
-// 获取学习任务详情
-export const getStudyTaskDetail = (id) => {
-  return get(`/api/v0/study-tasks/${id}`)
-}
-
-// 创建学习任务
-export const createStudyTask = (data) => {
-  return post('/api/v0/study-tasks', data)
-}
-
-// 更新学习任务
-export const updateStudyTask = (id, data) => {
-  return put(`/api/v0/study-tasks/${id}`, data)
-}
-
-// 删除学习任务
-export const deleteStudyTask = (id) => {
-  return del(`/api/v0/study-tasks/${id}`)
-}
-
-// 获取学习任务统计
-export const getStudyTaskStats = () => {
-  return get('/api/v0/study-tasks/stats')
-}

@@ -310,8 +310,8 @@ const validateForm = () => {
 
   if (!form.value.content.trim()) {
     newErrors.content = '请输入信息内容'
-  } else if (form.value.content.length > 1000) {
-    newErrors.content = '内容不能超过1000字'
+  } else if (form.value.content.length > 10000) {
+    newErrors.content = '内容不能超过10000字'
   }
 
   if (selectedCategories.value.length === 0) {

@@ -174,6 +174,10 @@ const selectCategory = (category) => {
 };
 
 const openProject = (project) => {
+  if (!project?.id) {
+    Taro.showToast({ title: '项目数据异常', icon: 'none' })
+    return
+  }
   const params = new URLSearchParams({
     id: project.id,
     name: project.name || project.title || "期末复习项目",

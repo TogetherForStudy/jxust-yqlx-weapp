@@ -47,7 +47,9 @@
             <text class="text-gray-800">我的积分</text>
           </view>
           <view class="flex items-center space-x-2">
-            <text class="text-gray-600">{{ userPoints }}</text>
+            <text v-if="!pointsLoaded && pointsLoadFailed" class="i-lucide-triangle-alert text-gray-400"></text>
+            <text v-else-if="!pointsLoaded" class="i-lucide-loader-circle text-gray-400 animate-spin"></text>
+            <text v-else class="text-gray-600">{{ userPoints }}</text>
             <text class="i-lucide-chevron-right text-gray-400"></text>
           </view>
         </view>
@@ -170,13 +172,15 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed } from "vue";
 import { useAuthStore } from "../../stores/auth";
 import Taro from "@tarojs/taro";
 import { courseTableAPI, pointsAPI } from "../../api/index";
 
 const authStore = useAuthStore();
 const userPoints = ref(0);
+const pointsLoaded = ref(false);
+const pointsLoadFailed = ref(false);
 
 // 计算属性
 const userInfo = computed(() => authStore.userInfo);
@@ -196,7 +200,6 @@ const roleTagText = computed(() => {
   const roleTags = userInfo.value?.role_tags || [];
   for (const tag of roleTagPriority) {
     if (roleTags.includes(tag)) {
-      console.log(roleTagMap[tag].text);
       return roleTagMap[tag].text;
     }
   }
@@ -303,21 +306,28 @@ const goToTermsOfService = () => {
 
 // 获取用户积分
 const fetchUserPoints = async () => {
-  if (!authStore.isLoggedIn) return;
+  if (!authStore.isLoggedIn) {
+    userPoints.value = 0;
+    pointsLoaded.value = false;
+    pointsLoadFailed.value = false;
+    return;
+  }
   try {
     const res = await pointsAPI.getPoints();
     userPoints.value = res.points || 0;
+    pointsLoaded.value = true;
+    pointsLoadFailed.value = false;
   } catch (error) {
     console.error("获取积分失败:", error);
+    if (!pointsLoaded.value) {
+      pointsLoadFailed.value = true;
+    }
   }
 };
 
-// 页面生命周期
-onMounted(async () => {
-  // 页面初始化时不需要自动打开编辑资料弹窗
-  if (authStore.isLoggedIn) {
-    await fetchUserPoints();
-  }
+// 每次页面显示时刷新积分（tab 页面切换不会触发 onMounted，需用 useDidShow）
+Taro.useDidShow(() => {
+  fetchUserPoints();
 });
 
 Taro.useShareAppMessage((res) => {

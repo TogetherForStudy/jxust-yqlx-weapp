@@ -584,7 +584,7 @@ const fetchSystemOnline = async () => {
 onMounted(() => {
   fetchSystemOnline();
   // 每 60 秒轮询一次在线人数
-  if (!systemOnlineCountTimer.value) {
+  if (authStore.isLoggedIn && !systemOnlineCountTimer.value) {
     systemOnlineCountTimer.value = setInterval(() => {
       fetchSystemOnline();
     }, 60000);
