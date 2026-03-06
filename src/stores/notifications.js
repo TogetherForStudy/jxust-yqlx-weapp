@@ -379,7 +379,7 @@ export const useNotificationStore = defineStore('notifications', {
     async fetchContributionStats() {
       try {
         const result = await contributionAPI.getContributionStats()
-        this.contributionStats = result.data || result
+        this.contributionStats = result || this.contributionStats
         return result
       } catch (error) {
         console.error('获取投稿统计失败:', error)
@@ -391,7 +391,7 @@ export const useNotificationStore = defineStore('notifications', {
     async fetchContributionStatsAdmin() {
       try {
         const result = await contributionAPI.getContributionStatsAdmin()
-        this.adminContributionStats = result.data || result
+        this.adminContributionStats = result || this.adminContributionStats
         return result
       } catch (error) {
         console.error('获取管理员投稿统计失败:', error)
@@ -403,7 +403,7 @@ export const useNotificationStore = defineStore('notifications', {
     async fetchNotificationStats() {
       try {
         const result = await notificationAPI.getNotificationStats()
-        this.notificationStats = result.data || result
+        this.notificationStats = result || this.notificationStats
         return result
       } catch (error) {
         console.error('获取通知统计失败:', error)

@@ -311,7 +311,7 @@ const showCreateModal = () => {
   currentCategory.value = null
   categoryForm.value = {
     name: '',
-    sort: Math.max(...categories.value.map(c => c.sort), 0) + 1,
+    sort: (categories.value.length > 0 ? Math.max(...categories.value.map(c => c.sort), 0) : 0) + 1,
     is_active: true
   }
   errors.value = {}

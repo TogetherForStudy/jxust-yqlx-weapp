@@ -3,6 +3,7 @@ import Taro from '@tarojs/taro'
 const CACHE_KEY = 'semester_config'
 const CACHE_TIME_KEY = 'semester_config_time'
 const USER_SELECTED_SEMESTER_KEY = 'user_selected_semester'
+const LAST_KNOWN_CURRENT_KEY = 'last_known_current_semester'
 
 /**
  * 学期配置缓存工具
@@ -110,6 +111,31 @@ export const semesterCache = {
             Taro.removeStorageSync(USER_SELECTED_SEMESTER_KEY)
         } catch (error) {
             console.error('清除用户选择的学期失败:', error)
+        }
+    },
+
+    /**
+     * 保存用户已确认的当前学期（用于检测学期变更）
+     * 仅在用户明确确认或首次加载无变更时更新
+     */
+    saveLastKnownCurrent(semesterId) {
+        try {
+            Taro.setStorageSync(LAST_KNOWN_CURRENT_KEY, semesterId)
+        } catch (error) {
+            console.error('保存已确认当前学期失败:', error)
+        }
+    },
+
+    /**
+     * 获取用户已确认的当前学期
+     * @returns {string|null}
+     */
+    getLastKnownCurrent() {
+        try {
+            return Taro.getStorageSync(LAST_KNOWN_CURRENT_KEY) || null
+        } catch (error) {
+            console.error('读取已确认当前学期失败:', error)
+            return null
         }
     }
 }

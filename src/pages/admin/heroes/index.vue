@@ -454,11 +454,15 @@ const selectStatusFilter = async (status) => {
 
 const refreshData = async () => {
   currentPage.value = 1;
-  await fetchHeroes(searchKeyword.value.trim(), selectedStatus.value, 1);
-  Taro.showToast({
-    title: "刷新成功",
-    icon: "success",
-  });
+  try {
+    await fetchHeroes(searchKeyword.value.trim(), selectedStatus.value, 1);
+    Taro.showToast({
+      title: "刷新成功",
+      icon: "success",
+    });
+  } catch (error) {
+    // fetchHeroes 内部已有错误提示
+  }
 };
 
 // 搜索相关方法

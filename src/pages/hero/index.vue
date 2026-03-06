@@ -66,11 +66,9 @@ const fetchHeroes = async () => {
     loading.value = true
     const response = await heroAPI.getHeroes()
 
-    // 假设后端返回的是字符串数组或者需要解析的格式
     if (Array.isArray(response)) {
       heroes.value = response
     } else {
-      // 如果返回的是其他格式，根据实际情况调整
       heroes.value = []
     }
   } catch (error) {

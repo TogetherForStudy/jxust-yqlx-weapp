@@ -115,16 +115,25 @@ export const useAuthStore = defineStore('auth', {
     },
 
     expireToken() {
+      if (!this.isLoggedIn && !this.token) {
+        return
+      }
+
       this.token = null
       this.userInfo = null
       this.isLoggedIn = false
-      Taro.removeStorageSync('token')
-      Taro.removeStorageSync('userInfo')
-      Taro.showToast({
-        title: '请重新登录',
-        icon: 'error'
-      })
-      Taro.navigateTo({ url: '/pages/login/index' })
+
+      try {
+        Taro.removeStorageSync('token')
+        Taro.removeStorageSync('userInfo')
+        Taro.showToast({
+          title: '请重新登录',
+          icon: 'error'
+        })
+        Taro.navigateTo({ url: '/pages/login/index' })
+      } catch (error) {
+        console.error('expireToken处理失败:', error)
+      }
     },
 
     // 更新用户信息

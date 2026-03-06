@@ -559,11 +559,15 @@ const selectTypeFilter = (type) => {
 const refreshData = async () => {
   currentPage.value = 1;
   isLoadingMore.value = false;
-  await fetchAllConfigs(1, searchKeyword.value.trim());
-  Taro.showToast({
-    title: "刷新成功",
-    icon: "success",
-  });
+  try {
+    await fetchAllConfigs(1, searchKeyword.value.trim());
+    Taro.showToast({
+      title: "刷新成功",
+      icon: "success",
+    });
+  } catch (error) {
+    // fetchAllConfigs 内部已有错误提示
+  }
 };
 
 const loadMore = async () => {
@@ -707,9 +711,10 @@ const validateConfigValue = (value, type) => {
 // 其他操作方法
 const copyConfigValue = async (config) => {
   try {
-    await Taro.setClipboardData({
-      data: config.value,
-    });
+    const value = typeof config.value === 'object'
+      ? JSON.stringify(config.value, null, 2)
+      : String(config.value ?? '')
+    await Taro.setClipboardData({ data: value });
     Taro.showToast({
       title: "已复制到剪贴板",
       icon: "success",

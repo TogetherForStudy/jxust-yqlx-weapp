@@ -74,9 +74,7 @@ class CourseTableCache {
 
       Taro.setStorageSync(dataKey, courseData)
       Taro.setStorageSync(timestampKey, timestamp.toString())
-      if (classId) {
-        Taro.setStorageSync(classIdKey, classId)
-      }
+      Taro.setStorageSync(classIdKey, classId)
 
     } catch (error) {
       console.error('保存课表缓存失败:', error)

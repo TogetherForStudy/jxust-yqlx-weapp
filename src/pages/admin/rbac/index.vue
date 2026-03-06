@@ -395,11 +395,14 @@ const fetchRoles = async () => {
     const response = await rbacAPI.getRoles();
     // 处理新的响应格式：每个项包含 role 对象、user_count 和 user_ids
     // 将数据扁平化，同时保留 user_count 和 user_ids 信息
-    roles.value = (response || []).map(item => ({
-      ...item.role,
-      user_count: item.user_count || 0,
-      user_ids: item.user_ids || []
-    }));
+    roles.value = (response || []).map(item => {
+      const role = item?.role ?? item;
+      return {
+        ...(role || {}),
+        user_count: item.user_count ?? 0,
+        user_ids: item.user_ids ?? []
+      };
+    }).filter(r => r.id != null);
   } catch (error) {
     console.error("获取角色列表失败:", error);
     Taro.showToast({

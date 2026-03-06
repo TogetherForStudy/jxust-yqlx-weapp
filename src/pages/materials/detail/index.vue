@@ -264,10 +264,16 @@ onMounted(() => {
 // 加载资料详情
 const loadMaterialDetail = async () => {
   loading.value = true
-  const res = await materialAPI.getMaterialDetail(md5.value)
-  material.value = res
-  userRating.value = res.user_rating || 0
-  loading.value = false
+  try {
+    const res = await materialAPI.getMaterialDetail(md5.value)
+    material.value = res
+    userRating.value = res?.user_rating || 0
+  } catch (error) {
+    console.error('加载资料详情失败:', error)
+    Taro.showToast({ title: '加载失败', icon: 'error' })
+  } finally {
+    loading.value = false
+  }
 }
 
 // 静默刷新特定数据（不显示加载状态，避免页面闪烁）
@@ -443,7 +449,7 @@ Taro.useShareAppMessage((res) => {
     if (res.from === 'button') {
     }
     return {
-      title: material.value.file_name,
+      title: material.value?.file_name || '资料详情',
       path: '/pages/materials/detail/index?md5=' + md5.value,
     }
   })
@@ -452,7 +458,7 @@ Taro.useShareTimeline((res) => {
     if (res.from === 'button') {
     }
     return {
-      title: material.value.file_name,
+      title: material.value?.file_name || '资料详情',
       path: '/pages/materials/detail/index?md5=' + md5.value,
     }
   })

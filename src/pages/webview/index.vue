@@ -13,13 +13,20 @@ onMounted(() => {
   const params = instance.router.params
 
   if (params.url) {
-    webviewUrl.value = decodeURIComponent(params.url)
+    try {
+      webviewUrl.value = decodeURIComponent(params.url)
+    } catch (e) {
+      webviewUrl.value = params.url
+    }
 
-    // 动态设置导航栏标题
     if (params.title) {
-      Taro.setNavigationBarTitle({
-        title: decodeURIComponent(params.title)
-      })
+      try {
+        Taro.setNavigationBarTitle({
+          title: decodeURIComponent(params.title)
+        })
+      } catch (e) {
+        Taro.setNavigationBarTitle({ title: params.title })
+      }
     }
   } else {
     Taro.showToast({

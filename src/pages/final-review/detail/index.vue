@@ -1108,7 +1108,18 @@ const getOptionStatus = (question, optionKey, subId = null) => {
   return "base";
 };
 
-const handleSubmit = async () => {
+const checkSubQuestionCompletion = () => {
+  if (!currentQuestion.value?.sub_questions?.length) return;
+  const total = currentQuestion.value.sub_questions.length;
+  const judgedCount = Object.keys(subJudgeState).filter(
+    (key) => subJudgeState[key]?.submitted
+  ).length;
+  if (judgedCount === total) {
+    handleSubmit({ skipScroll: true });
+  }
+};
+
+const handleSubmit = async ({ skipScroll = false } = {}) => {
   if (!canSubmit.value || !currentQuestion.value) return;
   const question = currentQuestion.value;
 
@@ -1147,9 +1158,11 @@ const handleSubmit = async () => {
     addToWrongBook(question.id, false);
   }
 
-  // 提交答案后滚动到题目位置，确保答案解析完全可见
-  await nextTick();
-  scrollToQuestion();
+  // 手动提交后滚动到题目位置，确保答案解析完全可见
+  if (!skipScroll) {
+    await nextTick();
+    scrollToQuestion();
+  }
 };
 
 const onTextAnswerInput = (event) => {
