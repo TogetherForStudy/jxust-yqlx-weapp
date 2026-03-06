@@ -114,7 +114,7 @@
       <!-- 通知卡片列表 -->
       <scroll-view v-else :scroll-y="true" class="h-full" @scrolltolower="loadMore" :lower-threshold="100">
         <!-- 用户投稿区 -->
-        <view v-if="authStore.isLoggedIn && authStore.userInfo.role === 1" class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 mb-4">
+        <view v-if="authStore.isLoggedIn && authStore.userInfo?.role === 0" class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 mb-4">
           <view class="flex justify-between items-center mb-3">
             <text class="text-gray-800 font-medium">贡献信息差</text>
             <text class="text-blue-500 text-sm" @tap="goToMyContributions">
@@ -224,7 +224,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from "vue";
+import { ref, computed, onMounted, onBeforeUnmount, watch } from "vue";
 import Taro, { useDidShow } from "@tarojs/taro";
 import { useNotificationStore } from "../../stores/notifications";
 import { useAuthStore } from "../../stores/auth";
@@ -255,6 +255,13 @@ const pendingContributionsCount = computed(() => {
 onMounted(async () => {
   await initPage();
   isFirstLoad.value = false; // 标记首次加载完成
+});
+
+onBeforeUnmount(() => {
+  if (searchTimer.value) {
+    clearTimeout(searchTimer.value);
+    searchTimer.value = null;
+  }
 });
 
 // 页面显示时刷新数据

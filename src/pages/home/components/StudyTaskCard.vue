@@ -450,7 +450,7 @@ const priorityOptions = [
 
 // 计算属性
 const isLoading = computed(() => studyTaskStore.isLoading);
-const pendingTasks = computed(() => studyTaskStore.pendingTasks);
+const pendingTasks = computed(() => studyTaskStore.sortedPendingTasks);
 const completedTasks = computed(() => studyTaskStore.completedTasksList);
 const stats = computed(() => studyTaskStore.stats);
 
@@ -851,33 +851,49 @@ const loadData = async (reset = true) => {
     try {
       if (reset) {
         pendingCurrentPage.value = 1;
+        completedCurrentPage.value = 1;
         hasMorePendingData.value = true;
+        hasMoreCompletedData.value = true;
       }
 
-      // 只请求未完成的任务（status=1）
-      const response = await studyTaskStore.fetchStudyTasks({
-        page: pendingCurrentPage.value,
-        size: pendingPageSize.value,
-        status: 1, // 只获取待完成的任务
-      });
+      // 并行请求：待完成任务、已完成任务、统计数据
+      const [pendingResponse, completedResponse] = await Promise.all([
+        studyTaskStore.fetchStudyTasks({
+          page: pendingCurrentPage.value,
+          size: pendingPageSize.value,
+          status: 1,
+        }),
+        studyTaskStore.fetchCompletedStudyTasks({
+          page: completedCurrentPage.value,
+          size: completedPageSize.value,
+          status: 2,
+        }),
+        studyTaskStore.fetchStudyTaskStats(),
+      ]);
 
-      await studyTaskStore.fetchStudyTaskStats();
-
-      // 判断是否还有更多数据
-      // 基于未完成任务的数量来判断
-      if (response && response.data) {
-        const returnedCount = response.data.length;
-        // 如果返回的数据少于pageSize，说明没有更多数据了
-        // 或者如果当前已加载的未完成任务数量已经达到或超过pending_count，也没有更多数据了
+      // 判断待完成任务是否还有更多数据
+      if (pendingResponse && pendingResponse.data) {
+        const returnedCount = pendingResponse.data.length;
         const currentPendingCount = pendingTasks.value.length;
         hasMorePendingData.value = returnedCount === pendingPageSize.value &&
                            currentPendingCount < stats.value.pending_count;
       } else {
         hasMorePendingData.value = false;
       }
+
+      // 判断已完成任务是否还有更多数据
+      if (completedResponse && completedResponse.data) {
+        const returnedCount = completedResponse.data.length;
+        const currentCompletedCount = completedTasks.value.length;
+        hasMoreCompletedData.value = returnedCount === completedPageSize.value &&
+                           currentCompletedCount < stats.value.completed_count;
+      } else {
+        hasMoreCompletedData.value = false;
+      }
     } catch (error) {
       console.error("获取学习任务列表失败:", error);
       hasMorePendingData.value = false;
+      hasMoreCompletedData.value = false;
     }
   }
 };
@@ -971,10 +987,9 @@ const switchToPendingTab = async () => {
 
 // 切换到已完成Tab
 const switchToCompletedTab = async () => {
-  // 如果当前已经是已完成tab，不需要切换
   if (activeTab.value === 'completed') return;
 
-  // 先加载数据（如果需要的话）
+  // 数据已在 loadData 中预加载，仅在数据为空且确实有数据时补充请求
   if (completedTasks.value.length === 0 && stats.value.completed_count > 0) {
     try {
       completedCurrentPage.value = 1;
@@ -989,7 +1004,6 @@ const switchToCompletedTab = async () => {
     }
   }
 
-  // 数据准备好后再切换视图
   activeTab.value = 'completed';
 };
 
@@ -997,7 +1011,7 @@ const switchToCompletedTab = async () => {
 Taro.useDidShow(() => {
   if (
     authStore.isLoggedIn &&
-    studyTaskStore.studyTasks.length === 0 &&
+    studyTaskStore.pendingTasks.length === 0 &&
     studyTaskStore.isFetchData == false
   ) {
     loadData();

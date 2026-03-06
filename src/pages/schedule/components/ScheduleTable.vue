@@ -21,7 +21,7 @@
           class="text-xs"
           :class="isToday(day.date) ? 'text-blue-600 font-bold' : 'text-gray-500'"
         >
-          {{ day.date }}
+          {{ day.date.split('/').slice(1).join('/') }}
         </view>
       </view>
     </view>
@@ -170,13 +170,13 @@ const getDateForDay = (dayIndex) => {
   const targetDate = new Date(weekStartDate)
   targetDate.setDate(targetDate.getDate() + dayIndex)
 
-  return `${targetDate.getMonth() + 1}/${targetDate.getDate()}`
+  return `${targetDate.getFullYear()}/${targetDate.getMonth() + 1}/${targetDate.getDate()}`
 }
 
 // 判断给定日期是否是今天
 const isToday = (dateString) => {
   const today = new Date()
-  const todayString = `${today.getMonth() + 1}/${today.getDate()}`
+  const todayString = `${today.getFullYear()}/${today.getMonth() + 1}/${today.getDate()}`
   return dateString === todayString
 }
 
@@ -304,7 +304,8 @@ const touchState = ref({
 
 // 处理触摸开始
 const handleTouchStart = (e) => {
-  const touch = e.touches[0]
+  const touch = e.touches?.[0]
+  if (!touch) return
   touchState.value = {
     startX: touch.clientX,
     startY: touch.clientY,
@@ -336,7 +337,8 @@ const handleTouchEnd = (e) => {
     return
   }
 
-  const touch = e.changedTouches[0]
+  const touch = e.changedTouches?.[0]
+  if (!touch) return
   const deltaX = touch.clientX - touchState.value.startX
   const deltaY = touch.clientY - touchState.value.startY
   const deltaTime = Date.now() - touchState.value.startTime
@@ -358,7 +360,7 @@ const handleTouchEnd = (e) => {
       }
     } else {
       // 左滑 - 切换到下一周
-      if (currentWeek < 20) { // 假设最多20周
+      if (currentWeek < scheduleStore.maxWeeks) {
         scheduleStore.setCurrentWeek(currentWeek + 1)
         // 发射手势事件，告诉父组件触发了左滑（下一周）
         emit('swipe-gesture', 'next')

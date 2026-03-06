@@ -323,22 +323,6 @@ const deleting = ref(false);
 const approveNote = ref("");
 const rejectNote = ref("");
 
-// 状态筛选选项
-const statusFilters = computed(() => [
-  { label: "全部", value: null, count: adminReviews.value.length },
-  { label: "待审核", value: REVIEW_STATUS.PENDING, count: pendingCount.value },
-  {
-    label: "已通过",
-    value: REVIEW_STATUS.APPROVED,
-    count: approvedCount.value,
-  },
-  {
-    label: "已拒绝",
-    value: REVIEW_STATUS.REJECTED,
-    count: rejectedCount.value,
-  },
-]);
-
 // 计算属性
 const adminReviews = computed(() => reviewsStore.adminReviews);
 const adminReviewsTotal = computed(() => reviewsStore.adminReviewsTotal);
@@ -351,23 +335,13 @@ const hasMoreReviews = computed(() => {
   return adminReviews.value.length < adminReviewsTotal.value;
 });
 
-const pendingCount = computed(() => {
-  return adminReviews.value.filter(
-    (review) => review.status === REVIEW_STATUS.PENDING
-  ).length;
-});
-
-const approvedCount = computed(() => {
-  return adminReviews.value.filter(
-    (review) => review.status === REVIEW_STATUS.APPROVED
-  ).length;
-});
-
-const rejectedCount = computed(() => {
-  return adminReviews.value.filter(
-    (review) => review.status === REVIEW_STATUS.REJECTED
-  ).length;
-});
+// 状态筛选选项（不显示计数，因为只有当前页数据，计数不准确）
+const statusFilters = computed(() => [
+  { label: "全部", value: null },
+  { label: "待审核", value: REVIEW_STATUS.PENDING },
+  { label: "已通过", value: REVIEW_STATUS.APPROVED },
+  { label: "已拒绝", value: REVIEW_STATUS.REJECTED },
+]);
 
 // 常量已在导入中定义
 
@@ -378,7 +352,9 @@ const getAttitudeText = (attitude) => reviewsStore.getAttitudeText(attitude);
 const getAttitudeClass = (attitude) => reviewsStore.getAttitudeClass(attitude);
 
 const formatDate = (dateStr) => {
+  if (!dateStr) return '';
   const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return '';
   const now = new Date();
   const diff = now - date;
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));

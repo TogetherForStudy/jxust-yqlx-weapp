@@ -113,7 +113,7 @@ const handleWechatLogin = async () => {
 
   } catch (error) {
     console.error('登录失败:', error)
-    
+
     // 登录失败，等待2秒（错误提示消失）后再启用按钮
     setTimeout(() => {
       loginButtonDisabled.value = false

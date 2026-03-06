@@ -1,17 +1,10 @@
 import { defineStore } from 'pinia'
-import {
-  getStudyTasks,
-  getStudyTaskDetail,
-  createStudyTask as apiCreateStudyTask,
-  updateStudyTask as apiUpdateStudyTask,
-  deleteStudyTask as apiDeleteStudyTask,
-  getStudyTaskStats
-} from '../utils/request'
+import { studyTaskAPI } from '../api'
 
 export const useStudyTaskStore = defineStore('studyTask', {
   state: () => ({
     // 学习任务列表（主要是未完成的任务）
-    studyTasks: [],
+    pendingTasks: [],
     // 已完成任务列表
     completedTasks: [],
     isFetchData: false,
@@ -29,8 +22,8 @@ export const useStudyTaskStore = defineStore('studyTask', {
 
   getters: {
     // 待完成的任务（按优先级和截止日期排序）
-    pendingTasks: (state) => {
-      return state.studyTasks
+    sortedPendingTasks: (state) => {
+      return state.pendingTasks
         .filter(task => task.status === 1) // 1=待完成
         .sort((a, b) => {
           // 首先按优先级排序（1=高，2=中，3=低）
@@ -60,8 +53,8 @@ export const useStudyTaskStore = defineStore('studyTask', {
       const now = new Date()
       const threeDaysLater = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000)
 
-      return state.studyTasks.filter(task => {
-        if (task.status !== 1) return false // 只包含待完成的任务
+      return state.pendingTasks.filter(task => {
+        if (task.status !== 1) return false
 
         const dueDate = new Date(task.due_date)
         return dueDate <= threeDaysLater && dueDate >= now
@@ -73,8 +66,8 @@ export const useStudyTaskStore = defineStore('studyTask', {
       const now = new Date()
       now.setHours(0, 0, 0, 0)
 
-      return state.studyTasks.filter(task => {
-        if (task.status !== 1) return false // 只包含待完成的任务
+      return state.pendingTasks.filter(task => {
+        if (task.status !== 1) return false
 
         const dueDate = new Date(task.due_date)
         dueDate.setHours(0, 0, 0, 0)
@@ -93,13 +86,12 @@ export const useStudyTaskStore = defineStore('studyTask', {
       this.error = null
 
       try {
-        const data = await getStudyTasks(params)
+        const data = await studyTaskAPI.getList(params)
 
-        // 如果是追加模式，将新数据添加到现有数据后面
         if (params.append && data?.data) {
-          this.studyTasks = [...this.studyTasks, ...data.data]
+          this.pendingTasks = [...this.pendingTasks, ...data.data]
         } else {
-          this.studyTasks = data?.data || []
+          this.pendingTasks = data?.data || []
         }
         this.isFetchData = true
         return data
@@ -118,12 +110,12 @@ export const useStudyTaskStore = defineStore('studyTask', {
     // 获取学习任务详情
     async fetchStudyTaskDetail(id) {
       try {
-        const data = await getStudyTaskDetail(id)
+        const data = await studyTaskAPI.getDetail(id)
 
         // 更新本地列表中的对应项
-        const index = this.studyTasks.findIndex(item => item.id === id)
+        const index = this.pendingTasks.findIndex(item => item.id === id)
         if (index !== -1) {
-          this.studyTasks[index] = data
+          this.pendingTasks[index] = data
         }
 
         return data
@@ -136,11 +128,11 @@ export const useStudyTaskStore = defineStore('studyTask', {
     // 创建学习任务
     async createStudyTask(taskData) {
       try {
-        const data = await apiCreateStudyTask(taskData)
+        const data = await studyTaskAPI.create(taskData)
 
         // 将新创建的任务添加到列表中
         if (data) {
-          this.studyTasks.push(data)
+          this.pendingTasks.unshift(data)
           this.stats.total_count++
           if (data.status === 1) {
             this.stats.pending_count++
@@ -159,15 +151,15 @@ export const useStudyTaskStore = defineStore('studyTask', {
     // 更新学习任务
     async updateStudyTask(id, taskData) {
       try {
-        const data = await apiUpdateStudyTask(id, taskData)
+        const data = await studyTaskAPI.update(id, taskData)
 
         // 查找任务在未完成任务列表中的位置
-        const pendingIndex = this.studyTasks.findIndex(item => item.id === id)
+        const pendingIndex = this.pendingTasks.findIndex(item => item.id === id)
         // 查找任务在已完成任务列表中的位置
         const completedIndex = this.completedTasks.findIndex(item => item.id === id)
 
-        const newTask = data || { ...(pendingIndex !== -1 ? this.studyTasks[pendingIndex] : completedIndex !== -1 ? this.completedTasks[completedIndex] : {}), ...taskData }
-        const oldTask = pendingIndex !== -1 ? this.studyTasks[pendingIndex] : completedIndex !== -1 ? this.completedTasks[completedIndex] : null
+        const newTask = data || { ...(pendingIndex !== -1 ? this.pendingTasks[pendingIndex] : completedIndex !== -1 ? this.completedTasks[completedIndex] : {}), ...taskData }
+        const oldTask = pendingIndex !== -1 ? this.pendingTasks[pendingIndex] : completedIndex !== -1 ? this.completedTasks[completedIndex] : null
 
         // 如果状态发生变化，更新统计数据并移动任务到正确的列表
         if (oldTask && oldTask.status !== newTask.status) {
@@ -177,15 +169,13 @@ export const useStudyTaskStore = defineStore('studyTask', {
             this.stats.completed_count++
             // 从未完成任务列表中移除
             if (pendingIndex !== -1) {
-              this.studyTasks.splice(pendingIndex, 1)
+              this.pendingTasks.splice(pendingIndex, 1)
             }
-            // 添加到已完成任务列表（如果已完成任务列表已加载）
-            if (this.completedTasks.length > 0 || completedIndex !== -1) {
-              if (completedIndex === -1) {
-                this.completedTasks.unshift(newTask)
-              } else {
-                this.completedTasks[completedIndex] = newTask
-              }
+            // 始终添加到已完成任务列表，无论列表是否已加载
+            if (completedIndex === -1) {
+              this.completedTasks.unshift(newTask)
+            } else {
+              this.completedTasks[completedIndex] = newTask
             }
           } else if (oldTask.status === 2 && newTask.status === 1) {
             // 从已完成变为待完成
@@ -195,17 +185,17 @@ export const useStudyTaskStore = defineStore('studyTask', {
             if (completedIndex !== -1) {
               this.completedTasks.splice(completedIndex, 1)
             }
-            // 添加到未完成任务列表
+            // 添加到未完成任务列表最前面
             if (pendingIndex === -1) {
-              this.studyTasks.push(newTask)
+              this.pendingTasks.unshift(newTask)
             } else {
-              this.studyTasks[pendingIndex] = newTask
+              this.pendingTasks[pendingIndex] = newTask
             }
           }
         } else {
           // 状态没有变化，只更新任务数据
           if (pendingIndex !== -1) {
-            this.studyTasks[pendingIndex] = newTask
+            this.pendingTasks[pendingIndex] = newTask
           } else if (completedIndex !== -1) {
             this.completedTasks[completedIndex] = newTask
           }
@@ -221,13 +211,13 @@ export const useStudyTaskStore = defineStore('studyTask', {
     // 删除学习任务
     async deleteStudyTask(id) {
       try {
-        await apiDeleteStudyTask(id)
+        await studyTaskAPI.delete(id)
 
         // 从未完成任务列表中移除
-        const pendingIndex = this.studyTasks.findIndex(item => item.id === id)
+        const pendingIndex = this.pendingTasks.findIndex(item => item.id === id)
         if (pendingIndex !== -1) {
-          const task = this.studyTasks[pendingIndex]
-          this.studyTasks.splice(pendingIndex, 1)
+          const task = this.pendingTasks[pendingIndex]
+          this.pendingTasks.splice(pendingIndex, 1)
 
           // 更新统计数据
           this.stats.total_count--
@@ -263,7 +253,7 @@ export const useStudyTaskStore = defineStore('studyTask', {
     // 获取学习任务统计
     async fetchStudyTaskStats() {
       try {
-        const data = await getStudyTaskStats()
+        const data = await studyTaskAPI.getStats()
         this.stats = data || {
           total_count: 0,
           pending_count: 0,
@@ -279,8 +269,7 @@ export const useStudyTaskStore = defineStore('studyTask', {
     // 获取已完成任务列表
     async fetchCompletedStudyTasks(params = {}) {
       try {
-        const data = await getStudyTasks(params)
-        // 如果是追加模式，将新数据添加到现有数据后面
+        const data = await studyTaskAPI.getList(params)
         if (params.append && data?.data) {
           this.completedTasks = [...this.completedTasks, ...data.data]
         } else {
@@ -296,7 +285,7 @@ export const useStudyTaskStore = defineStore('studyTask', {
 
     // 清空学习任务列表
     clearStudyTasks() {
-      this.studyTasks = []
+      this.pendingTasks = []
       this.completedTasks = []
       this.stats = {
         total_count: 0,

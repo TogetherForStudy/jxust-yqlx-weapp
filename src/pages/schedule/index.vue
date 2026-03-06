@@ -172,81 +172,80 @@
       ></view>
 
       <!-- 弹窗内容 -->
-      <view class="relative bg-white rounded-lg mx-6 max-w-sm w-full">
+      <view class="relative bg-white rounded-lg mx-4 max-w-sm w-full">
         <!-- 标题 -->
-        <view class="px-6 pt-2 pb-2 border-b border-gray-200">
-          <view class="text-lg font-semibold text-center text-gray-800 mb-1">功能说明</view>
-          <view class="text-sm text-gray-500 text-center">快速掌握课程表操作</view>
+        <view class="px-4 pt-5 pb-3">
+          <view class="text-base font-semibold text-center text-gray-800">功能说明</view>
         </view>
 
-        <!-- 功能说明列表 -->
-        <view class="px-6 py-4 space-y-4">
-          <!-- 离线数据提醒 -->
-          <view class="flex items-start space-x-3 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-            <view class="i-lucide-alert-triangle w-5 h-5 text-yellow-500 mt-0.5"></view>
-            <view class="flex-1">
-              <view class="text-sm font-medium text-yellow-800">数据提醒</view>
-              <view class="text-xs text-yellow-700 mt-1">当前课程表数据为离线数据，可能与实际课程安排存在差异，请务必与教务系统核对后使用，您可自由编辑课程表内容！</view>
-            </view>
+        <!-- 离线数据提醒 -->
+        <view class="mx-4 flex items-center gap-2 px-3 py-2 bg-yellow-50 rounded-lg border border-yellow-200">
+          <view class="i-lucide-alert-triangle w-4 h-4 text-yellow-500 shrink-0"></view>
+          <view class="text-xs text-yellow-700">课表为离线数据，可能与实际有差异，请与教务系统核对后使用，可自由编辑！</view>
+        </view>
+
+        <!-- 功能说明网格 -->
+        <view class="px-4 py-3 grid grid-cols-2 gap-2">
+          <view class="bg-gray-50 rounded-lg px-3 py-2">
+            <view class="i-lucide-user-plus w-4 h-4 text-blue-500 mb-1"></view>
+            <view class="text-xs font-medium text-gray-800">绑定班级</view>
+            <view class="text-xs text-gray-400">点击左上角班级名</view>
           </view>
 
-          <!-- 班级绑定 -->
-          <view class="flex items-start space-x-3">
-            <view class="i-lucide-user-plus w-5 h-5 text-blue-500 mt-0.5"></view>
-            <view class="flex-1">
-              <view class="text-sm font-medium text-gray-800">绑定班级</view>
-              <view class="text-xs text-gray-500 mt-1">点击左上角班级名称重新绑定</view>
-            </view>
+          <view class="bg-gray-50 rounded-lg px-3 py-2">
+            <view class="i-lucide-edit w-4 h-4 text-green-500 mb-1"></view>
+            <view class="text-xs font-medium text-gray-800">编辑课程</view>
+            <view class="text-xs text-gray-400">点击格子新增/编辑</view>
           </view>
 
-          <!-- 课程操作 -->
-          <view class="flex items-start space-x-3">
-            <view class="i-lucide-edit w-5 h-5 text-green-500 mt-0.5"></view>
-            <view class="flex-1">
-              <view class="text-sm font-medium text-gray-800">编辑课程</view>
-              <view class="text-xs text-gray-500 mt-1">点击课程格子新增或编辑课程</view>
-            </view>
+          <view class="bg-gray-50 rounded-lg px-3 py-2">
+            <view class="i-lucide-move-horizontal w-4 h-4 text-purple-500 mb-1"></view>
+            <view class="text-xs font-medium text-gray-800">周切换</view>
+            <view class="text-xs text-gray-400">左右滑动或点箭头</view>
           </view>
 
-          <!-- 周切换 - 手势 -->
-          <view class="flex items-start space-x-3">
-            <view class="i-lucide-move-horizontal w-5 h-5 text-purple-500 mt-0.5"></view>
-            <view class="flex-1">
-              <view class="text-sm font-medium text-gray-800">周切换</view>
-              <view class="text-xs text-gray-500 mt-1">左右滑动或点击箭头切换周</view>
-            </view>
+          <view class="bg-gray-50 rounded-lg px-3 py-2">
+            <view class="i-lucide-calendar-check w-4 h-4 text-red-500 mb-1"></view>
+            <view class="text-xs font-medium text-gray-800">选择周数</view>
+            <view class="text-xs text-gray-400">点击顶部「第X周」</view>
           </view>
 
-          <!-- 快速回到当前周 -->
-          <view class="flex items-start space-x-3">
-            <view class="i-lucide-calendar-days w-5 h-5 text-orange-500 mt-0.5"></view>
-            <view class="flex-1">
-              <view class="text-sm font-medium text-gray-800">回到当前周</view>
-              <view class="text-xs text-gray-500 mt-1">点击星期栏(周一-周五)回到当前周</view>
-            </view>
+          <view class="bg-gray-50 rounded-lg px-3 py-2">
+            <view class="i-lucide-pointer w-4 h-4 text-orange-500 mb-1"></view>
+            <view class="text-xs font-medium text-gray-800">回到本周</view>
+            <view class="text-xs text-gray-400">点击星期栏快速回</view>
           </view>
 
-          <!-- 选择周数 -->
-          <view class="flex items-start space-x-3">
-            <view class="i-lucide-calendar-check w-5 h-5 text-red-500 mt-0.5"></view>
-            <view class="flex-1">
-              <view class="text-sm font-medium text-gray-800">选择周数</view>
-              <view class="text-xs text-gray-500 mt-1">点击顶部第X周弹窗选择任意周</view>
-            </view>
+          <view class="bg-gray-50 rounded-lg px-3 py-2">
+            <view class="i-lucide-calendar-range w-4 h-4 text-indigo-500 mb-1"></view>
+            <view class="text-xs font-medium text-gray-800">切换学期</view>
+            <view class="text-xs text-gray-400">右上角 <view class="i-lucide-calendar-range w-3 h-3 inline-block align-middle"></view> 按钮</view>
+          </view>
+
+          <view class="bg-gray-50 rounded-lg px-3 py-2">
+            <view class="i-lucide-calendar-days w-4 h-4 text-teal-500 mb-1"></view>
+            <view class="text-xs font-medium text-gray-800">显示周末</view>
+            <view class="text-xs text-gray-400">右上角 <view class="i-lucide-calendar-days w-3 h-3 inline-block align-middle"></view> 按钮</view>
+          </view>
+
+          <view class="bg-gray-50 rounded-lg px-3 py-2">
+            <view class="i-lucide-eye w-4 h-4 text-cyan-500 mb-1"></view>
+            <view class="text-xs font-medium text-gray-800">全部课程</view>
+            <view class="text-xs text-gray-400">右上角 <view class="i-lucide-eye w-3 h-3 inline-block align-middle"></view> 显示非本周</view>
           </view>
         </view>
 
         <!-- 底部按钮 -->
-        <view class="px-6 pb-6 flex justify-between gap-3 border-t border-gray-100 pt-4">
+        <view class="px-4 pb-5 pt-3 flex gap-3">
           <view
             @tap="handleHelpModalConfirm(true)"
-            class="bg-blue-500 text-white text-center py-2 px-4 flex-1 rounded-lg font-medium active:bg-blue-600"
+            class="bg-blue-500 text-white text-center py-2 flex-1 rounded-lg text-sm font-medium active:bg-blue-600"
           >
             不再显示
           </view>
           <view
             @tap="handleHelpModalConfirm(false)"
-            class="bg-gray-100 text-gray-700 text-center py-2 px-4 flex-1 rounded-lg font-medium active:bg-gray-200"
+            class="bg-gray-100 text-gray-700 text-center py-2 flex-1 rounded-lg text-sm font-medium active:bg-gray-200"
           >
             我知道了
           </view>
@@ -456,8 +455,9 @@ const handleCloseEdit = () => {
   originalCourse.value = null
 }
 
-// 提交课程数据（添加或编辑）
 const handleSubmitCourse = async (submitData) => {
+  if (!editTimeInfo.value) return
+
   try {
     const { courseData, operationType, originalCourse: originalCourseData } = submitData
     const index = scheduleStore.calculateCourseIndex(editTimeInfo.value.dayIndex, editTimeInfo.value.period)
@@ -532,7 +532,7 @@ const handleSemesterSelect = async (semesterId) => {
     Taro.showLoading({ title: '加载中...', mask: true })
     await scheduleStore.switchSemester(semesterId)
     showSemesterModal.value = false
-    
+
     Taro.showToast({
       title: '切换成功',
       icon: 'success'
@@ -602,7 +602,7 @@ const showHelpGuide = () => {
 const loadCourseData = async () => {
   if (authStore.userClass && !scheduleStore.isLoading) {
     try {
-      if(scheduleStore.courseData.length === 0) {
+      if(Object.keys(scheduleStore.courseData).length === 0) {
         await scheduleStore.initialize()
       }
 
@@ -635,8 +635,7 @@ const handleSemesterChangeConfirm = async () => {
   try {
     Taro.showLoading({ title: '切换中...', mask: true })
     await scheduleStore.switchSemester(newSemesterName.value)
-    scheduleStore.hasChanged = false
-    scheduleStore.newSemester = ''
+    scheduleStore.acknowledgeCurrentSemester()
     Taro.showToast({
       title: '切换成功',
       icon: 'success'
@@ -652,12 +651,17 @@ const handleSemesterChangeConfirm = async () => {
   }
 }
 
+const reloadScheduleHandler = () => {
+  loadCourseData()
+}
+
 // 页面加载时初始化
 onMounted(async () => {
-  // 监听 reloadSchedule 事件，收到后刷新课表
-  Taro.eventCenter.on('reloadSchedule', () => {
-    loadCourseData()
-  })
+  Taro.eventCenter.on('reloadSchedule', reloadScheduleHandler)
+})
+
+Taro.useUnload(() => {
+  Taro.eventCenter.off('reloadSchedule', reloadScheduleHandler)
 })
 
 // 页面显示时检查是否需要重新加载数据

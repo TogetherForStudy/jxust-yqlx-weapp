@@ -658,7 +658,7 @@ Taro.useShareAppMessage((res) => {
     if (res.from === 'button') {
     }
     return {
-      title: notification.value.title,
+      title: notification.value?.title || '信息详情',
       path: '/pages/notifications/detail/index?id='+notificationId.value,
     }
   })
@@ -667,7 +667,7 @@ Taro.useShareTimeline((res) => {
     if (res.from === 'button') {
     }
     return {
-      title: notification.value.title,
+      title: notification.value?.title || '信息详情',
       path: '/pages/notifications/detail/index?id='+notificationId.value,
     }
   })
