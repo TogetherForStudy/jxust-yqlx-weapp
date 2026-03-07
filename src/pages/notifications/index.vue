@@ -45,13 +45,13 @@
     <view v-if="isAdmin || isOperator" class="mx-4 mt-4">
       <view class="grid grid-cols-4 gap-2">
         <!-- 创建通知 -->
-        <view class="bg-gradient-to-br from-blue-300 to-blue-400 rounded-lg p-1 active:scale-95 transition-transform"
+        <!-- <view class="bg-gradient-to-br from-blue-300 to-blue-400 rounded-lg p-1 active:scale-95 transition-transform"
           @tap="goToCreateNotification">
           <view class="flex items-center justify-center">
             <text class="i-lucide-plus text-white w-5 h-5 mr-2"></text>
             <text class="text-white font-medium text-sm">创建</text>
           </view>
-        </view>
+        </view> -->
 
         <!-- 管理通知 -->
         <view
@@ -143,14 +143,14 @@
             </view>
 
             <!-- 创建投稿 -->
-            <view
+            <!-- <view
               class="flex-1 bg-gradient-to-br from-cyan-400 to-cyan-600 rounded-lg p-1 active:scale-95 transition-transform flex items-center justify-center"
               @tap="goToCreateContribution">
               <view class="flex items-center justify-center">
                 <text class="i-lucide-edit text-white w-5 h-5 mr-2"></text>
                 <text class="text-white font-medium text-sm">投稿</text>
               </view>
-            </view>
+            </view> -->
           </view>
         </view>
 
@@ -409,13 +409,13 @@ const goToNotificationDetail = (notification) => {
   });
 };
 
-const goToCreateNotification = () => {
-  if (!authStore.requireAuth()) return;
+// const goToCreateNotification = () => {
+//   if (!authStore.requireAuth()) return;
 
-  Taro.navigateTo({
-    url: "/pages/notifications/create/index",
-  });
-};
+//   Taro.navigateTo({
+//     url: "/pages/notifications/create/index",
+//   });
+// };
 
 const goToManageNotifications = () => {
   if (!authStore.requireAuth()) return;
@@ -441,13 +441,13 @@ const goToManageCategories = () => {
   });
 };
 
-const goToCreateContribution = () => {
-  if (!authStore.requireAuth()) return;
+// const goToCreateContribution = () => {
+//   if (!authStore.requireAuth()) return;
 
-  Taro.navigateTo({
-    url: "/pages/contributions/create/index",
-  });
-};
+//   Taro.navigateTo({
+//     url: "/pages/contributions/create/index",
+//   });
+// };
 
 const goToMyContributions = () => {
   if (!authStore.requireAuth()) return;
