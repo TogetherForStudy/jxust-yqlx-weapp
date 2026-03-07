@@ -428,8 +428,7 @@ const fetchPermissions = async () => {
 const fetchRolePermissions = async () => {
   try {
     const response = await rbacAPI.getRolesPermissions();
-    // 处理不同的响应格式：可能是 response.roles 或 response.data?.roles
-    rolePermissions.value = response?.roles || response?.data?.roles || [];
+    rolePermissions.value = response?.roles || [];
   } catch (error) {
     console.error("获取角色权限关联失败:", error);
     Taro.showToast({

@@ -1,21 +1,15 @@
-import Taro from '@tarojs/taro'
-import { get } from '../utils/request'
+import { get, request } from '../utils/request'
 
 export const systemAPI = {
   healthCheck() {
-    return new Promise((resolve, reject) => {
-      Taro.request({
-        url: 'https://wx.ntrun.com/health',
-        method: 'GET',
-        success: (res) => {
-          if (res.statusCode >= 200 && res.statusCode < 300) {
-            resolve(res.data)
-          } else {
-            reject(new Error(`Health check failed: HTTP ${res.statusCode}`))
-          }
-        },
-        fail: (err) => reject(new Error(err.errMsg || 'Health check failed'))
-      })
+    return request({
+      url: 'https://wx.ntrun.com/health',
+      method: 'GET',
+      data: {},
+      silent: true,
+      skipAuthRefresh: true,
+      retryOnAuthFailure: false,
+      handleAuthFailure: false
     })
   }
 }

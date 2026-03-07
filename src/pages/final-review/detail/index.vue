@@ -817,7 +817,6 @@ const extractQuestionIds = (res) => {
   if (Array.isArray(res.question_ids)) return res.question_ids;
   if (Array.isArray(res.data)) return res.data;
   if (Array.isArray(res.list)) return res.list;
-  if (res.Result && Array.isArray(res.Result.question_ids)) return res.Result.question_ids;
   return [];
 };
 

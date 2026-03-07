@@ -2,12 +2,11 @@ import Taro from '@tarojs/taro'
 import { useAuthStore } from '../stores/auth'
 
 // API基础配置
-const BASE_URL = 'https://wx.ntrun.com' // 请根据实际情况修改
+const BASE_URL = '' // 请根据实际情况修改
 const AUTH_REFRESH_BUFFER_MS = 60 * 1000
 const AUTH_BYPASS_REFRESH_ENDPOINTS = [
   '/api/v0/auth/refresh',
-  '/api/v0/auth/wechat-login',
-  '/api/v0/auth/mock-wechat-login'
+  '/api/v0/auth/wechat-login'
 ]
 
 // 生成UUID v4（使用微信小程序加密随机数生成器）
@@ -144,6 +143,55 @@ const createRequestError = (message, extra = {}) => {
   return Object.assign(new Error(message), extra)
 }
 
+const isStandardResponseEnvelope = (data) => {
+  return Boolean(data) &&
+    typeof data === 'object' &&
+    Object.prototype.hasOwnProperty.call(data, 'StatusCode')
+}
+
+const getHeaderValue = (headers = {}, targetName = '') => {
+  if (!headers || !targetName) {
+    return null
+  }
+
+  const matchedKey = Object.keys(headers).find(key => key.toLowerCase() === targetName.toLowerCase())
+  return matchedKey ? headers[matchedKey] : null
+}
+
+const getResponseRequestId = (response = {}) => {
+  if (response?.data?.RequestId) {
+    return response.data.RequestId
+  }
+
+  return getHeaderValue(response?.header || response?.headers, 'x-request-id')
+}
+
+const getBusinessStatusCode = (data) => {
+  if (!isStandardResponseEnvelope(data)) {
+    return null
+  }
+
+  return data.StatusCode
+}
+
+const createResponseError = (response, fallbackMessage, extra = {}) => {
+  const data = response?.data
+  const httpStatusCode = response?.statusCode ?? null
+  const businessStatusCode = getBusinessStatusCode(data)
+  const requestId = getResponseRequestId(response)
+  const message = (data && typeof data === 'object' && data.StatusMessage) || fallbackMessage || '请求失败'
+
+  return createRequestError(message, {
+    httpStatusCode,
+    businessStatusCode,
+    requestId,
+    statusMessage: message,
+    statusCode: businessStatusCode ?? httpStatusCode,
+    response,
+    ...extra
+  })
+}
+
 const getRequestPath = (url = '') => {
   if (!url) {
     return ''
@@ -211,53 +259,48 @@ const interceptors = {
     delete config.skipAuthRefresh
     delete config.retryOnAuthFailure
     delete config.handleAuthFailure
+    delete config.returnEnvelope
 
     return config
   },
 
-  response(response) {
+  response(response, options = {}) {
     const { statusCode, data } = response
+    const businessStatusCode = getBusinessStatusCode(data)
+    const isAuthError = statusCode === 401 || businessStatusCode === 401
+    const hasStandardEnvelope = isStandardResponseEnvelope(data)
 
     // 处理HTTP状态码
     if (statusCode >= 200 && statusCode < 300) {
-      if (!data || typeof data !== 'object') {
+      if (!hasStandardEnvelope) {
         return data
       }
 
       // 检查业务状态码
       if (data.StatusCode === 0) {
-        return data.Result
-      } else if (data.StatusCode === 401) {
-        return Promise.reject(createRequestError(data.StatusMessage || '登录已过期', {
-          isAuthError: true,
-          statusCode: 401,
-          response
-        }))
-      } else {
-        return Promise.reject(createRequestError(data.StatusMessage || '请求失败', {
-          statusCode: data.StatusCode,
-          response
-        }))
-      }
-    } else {
-      if (statusCode === 401) {
-        return Promise.reject(createRequestError(data?.StatusMessage || '登录已过期', {
-          isAuthError: true,
-          statusCode,
-          response
-        }))
+        return options.returnEnvelope ? data : data.Result
       }
 
-      return Promise.reject(createRequestError(data?.StatusMessage || `HTTP ${statusCode}`, {
-        statusCode,
-        response
-      }))
+      return Promise.reject(createResponseError(
+        response,
+        data.StatusMessage || '请求失败',
+        { isAuthError }
+      ))
     }
+
+    return Promise.reject(createResponseError(
+      response,
+      data?.StatusMessage || `HTTP ${statusCode}`,
+      { isAuthError }
+    ))
   }
 }
 
 const executeRequest = async (options) => {
   let requestOptions = { ...options }
+  const responseOptions = {
+    returnEnvelope: requestOptions.returnEnvelope
+  }
   delete requestOptions.silent
 
   // 添加基础URL
@@ -268,7 +311,7 @@ const executeRequest = async (options) => {
   // 应用请求拦截器
   requestOptions = await interceptors.request(requestOptions)
 
-  return Taro.request(requestOptions).then(interceptors.response)
+  return Taro.request(requestOptions).then(response => interceptors.response(response, responseOptions))
 }
 
 // 通用请求方法
@@ -299,7 +342,13 @@ export const request = async (options) => {
   try {
     return await executeRequest(requestOptions)
   } catch (error) {
-    console.error('Request error:', error)
+    console.error('Request error:', {
+      message: error?.message,
+      httpStatusCode: error?.httpStatusCode,
+      businessStatusCode: error?.businessStatusCode,
+      requestId: error?.requestId,
+      error
+    })
 
     let finalError = error
     if (shouldRetryAfterAuthFailure(error, requestOptions)) {
