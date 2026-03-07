@@ -2,9 +2,33 @@ import { defineStore } from 'pinia'
 import Taro from '@tarojs/taro'
 import { authAPI, userAPI } from '../api'
 
+const STORAGE_KEYS = {
+  token: 'token',
+  refreshToken: 'refreshToken',
+  accessTokenExpiresAt: 'accessTokenExpiresAt',
+  userInfo: 'userInfo'
+}
+
+const normalizeTimestampToMs = (timestamp) => {
+  if (timestamp === null || timestamp === undefined || timestamp === '') {
+    return null
+  }
+
+  const numericTimestamp = Number(timestamp)
+  if (Number.isNaN(numericTimestamp) || numericTimestamp <= 0) {
+    return null
+  }
+
+  return numericTimestamp > 1e12 ? numericTimestamp : numericTimestamp * 1000
+}
+
+let ongoingRefreshPromise = null
+
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     token: null,
+    refreshToken: null,
+    accessTokenExpiresAt: null,
     userInfo: null,
     isLoggedIn: false
   }),
@@ -31,11 +55,15 @@ export const useAuthStore = defineStore('auth', {
     // 初始化认证状态
     initAuth() {
       try {
-        const token = Taro.getStorageSync('token')
-        const userInfo = Taro.getStorageSync('userInfo')
+        const token = Taro.getStorageSync(STORAGE_KEYS.token)
+        const refreshToken = Taro.getStorageSync(STORAGE_KEYS.refreshToken)
+        const accessTokenExpiresAt = Taro.getStorageSync(STORAGE_KEYS.accessTokenExpiresAt)
+        const userInfo = Taro.getStorageSync(STORAGE_KEYS.userInfo)
 
         if (token && userInfo) {
           this.token = token
+          this.refreshToken = refreshToken || null
+          this.accessTokenExpiresAt = accessTokenExpiresAt || null
           this.userInfo = userInfo
           this.isLoggedIn = true
         }
@@ -56,9 +84,14 @@ export const useAuthStore = defineStore('auth', {
 
         // 调用后端登录接口
         const result = await authAPI.wechatLogin(code)
-        if (result.token && result.user_info) {
+        if (result.token && result.refresh_token && result.user_info) {
           // 保存认证信息
-          this.setAuth(result.token, result.user_info)
+          this.setAuth({
+            token: result.token,
+            refreshToken: result.refresh_token,
+            accessTokenExpiresAt: result.access_token_expires_at,
+            userInfo: result.user_info
+          })
           Taro.showToast({
             title: '登录成功',
             icon: 'success'
@@ -80,57 +113,192 @@ export const useAuthStore = defineStore('auth', {
     },
 
     // 设置认证信息
-    setAuth(token, userInfo) {
+    setAuth(authData, userInfo) {
       try {
+        const normalizedAuthData = typeof authData === 'object' && authData !== null
+          ? authData
+          : {
+              token: authData,
+              userInfo
+            }
+
+        const {
+          token,
+          refreshToken = null,
+          accessTokenExpiresAt = null,
+          userInfo: nextUserInfo = null
+        } = normalizedAuthData
+
         this.token = token
-        this.userInfo = userInfo
+        this.refreshToken = refreshToken
+        this.accessTokenExpiresAt = accessTokenExpiresAt || null
+        this.userInfo = nextUserInfo
         this.isLoggedIn = true
 
         // 持久化存储
-        Taro.setStorageSync('token', token)
-        Taro.setStorageSync('userInfo', userInfo)
+        Taro.setStorageSync(STORAGE_KEYS.token, token)
+        Taro.setStorageSync(STORAGE_KEYS.userInfo, nextUserInfo)
+
+        if (refreshToken) {
+          Taro.setStorageSync(STORAGE_KEYS.refreshToken, refreshToken)
+        } else {
+          Taro.removeStorageSync(STORAGE_KEYS.refreshToken)
+        }
+
+        if (accessTokenExpiresAt) {
+          Taro.setStorageSync(STORAGE_KEYS.accessTokenExpiresAt, accessTokenExpiresAt)
+        } else {
+          Taro.removeStorageSync(STORAGE_KEYS.accessTokenExpiresAt)
+        }
       } catch (error) {
         console.error('保存认证信息失败:', error)
       }
     },
 
-    // 退出登录
-    logout() {
+    clearAuthState() {
+      this.token = null
+      this.refreshToken = null
+      this.accessTokenExpiresAt = null
+      this.userInfo = null
+      this.isLoggedIn = false
+    },
+
+    clearAuthStorage() {
+      Taro.removeStorageSync(STORAGE_KEYS.token)
+      Taro.removeStorageSync(STORAGE_KEYS.refreshToken)
+      Taro.removeStorageSync(STORAGE_KEYS.accessTokenExpiresAt)
+      Taro.removeStorageSync(STORAGE_KEYS.userInfo)
+    },
+
+    isAccessTokenExpiringSoon(bufferMs = 60 * 1000) {
+      const expiresAtMs = normalizeTimestampToMs(this.accessTokenExpiresAt)
+      if (!this.token || !this.refreshToken || !expiresAtMs) {
+        return false
+      }
+
+      return expiresAtMs - Date.now() <= bufferMs
+    },
+
+    async refreshAccessToken(options = {}) {
+      const {
+        silent = true,
+        force = false
+      } = options
+
+      if (!this.refreshToken) {
+        throw new Error('缺少刷新令牌，请重新登录')
+      }
+
+      if (!force && this.token && !this.isAccessTokenExpiringSoon()) {
+        return this.token
+      }
+
+      if (ongoingRefreshPromise) {
+        return ongoingRefreshPromise
+      }
+
+      const currentRefreshToken = this.refreshToken
+      ongoingRefreshPromise = (async () => {
+        const result = await authAPI.refresh(currentRefreshToken, { silent })
+        if (!result?.token || !result?.refresh_token || !result?.user_info) {
+          throw new Error('刷新登录态失败')
+        }
+
+        this.setAuth({
+          token: result.token,
+          refreshToken: result.refresh_token,
+          accessTokenExpiresAt: result.access_token_expires_at,
+          userInfo: result.user_info
+        })
+
+        return result.token
+      })()
+
       try {
-        this.token = null
-        this.userInfo = null
-        this.isLoggedIn = false
+        return await ongoingRefreshPromise
+      } catch (error) {
+        console.error('刷新访问令牌失败:', error)
+        throw error
+      } finally {
+        ongoingRefreshPromise = null
+      }
+    },
 
-        // 清除本地存储
-        Taro.removeStorageSync('token')
-        Taro.removeStorageSync('userInfo')
+    async ensureValidAccessToken(bufferMs = 60 * 1000) {
+      if (!this.token || !this.refreshToken) {
+        return this.token
+      }
 
+      if (!this.isAccessTokenExpiringSoon(bufferMs)) {
+        return this.token
+      }
+
+      return this.refreshAccessToken({ silent: true })
+    },
+
+    // 退出登录
+    async logout(options = {}) {
+      const {
+        remote = true,
+        showToast = true
+      } = options
+
+      const accessToken = this.token
+
+      this.clearAuthState()
+      this.clearAuthStorage()
+
+      if (showToast) {
         Taro.showToast({
           title: '已退出登录',
           icon: 'success'
         })
+      }
+
+      try {
+        if (remote && accessToken) {
+          authAPI.logout({
+            authToken: accessToken,
+            silent: true
+          }).catch(error => {
+            console.error('服务端退出登录失败:', error)
+          })
+        }
       } catch (error) {
-        console.error('退出登录失败:', error)
+        console.error('服务端退出登录失败:', error)
       }
     },
 
-    expireToken() {
-      if (!this.isLoggedIn && !this.token) {
+    expireToken(options = {}) {
+      const normalizedOptions = typeof options === 'string'
+        ? { title: options }
+        : options
+
+      const {
+        title = '请重新登录',
+        showToast = true,
+        navigate = true
+      } = normalizedOptions
+
+      if (!this.isLoggedIn && !this.token && !this.refreshToken) {
         return
       }
 
-      this.token = null
-      this.userInfo = null
-      this.isLoggedIn = false
+      this.clearAuthState()
 
       try {
-        Taro.removeStorageSync('token')
-        Taro.removeStorageSync('userInfo')
-        Taro.showToast({
-          title: '请重新登录',
-          icon: 'error'
-        })
-        Taro.navigateTo({ url: '/pages/login/index' })
+        this.clearAuthStorage()
+
+        if (showToast) {
+          Taro.showToast({
+            title,
+            icon: 'error'
+          })
+        }
+
+        if (navigate) {
+          Taro.navigateTo({ url: '/pages/login/index' })
+        }
       } catch (error) {
         console.error('expireToken处理失败:', error)
       }
@@ -144,7 +312,7 @@ export const useAuthStore = defineStore('auth', {
         // 更新本地用户信息
         const updatedUserInfo = { ...this.userInfo, ...data }
         this.userInfo = updatedUserInfo
-        Taro.setStorageSync('userInfo', updatedUserInfo)
+        Taro.setStorageSync(STORAGE_KEYS.userInfo, updatedUserInfo)
 
         Taro.showToast({
           title: '更新成功',
@@ -163,7 +331,7 @@ export const useAuthStore = defineStore('auth', {
       try {
         const userInfo = await userAPI.getProfile()
         this.userInfo = userInfo
-        Taro.setStorageSync('userInfo', userInfo)
+        Taro.setStorageSync(STORAGE_KEYS.userInfo, userInfo)
         return userInfo
       } catch (error) {
         console.error('获取用户信息失败:', error)
