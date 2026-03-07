@@ -416,14 +416,14 @@ const deleteMaterial = () => {
     content: '确定要删除这份资料吗？此操作不可撤销。',
     success: async (res) => {
       if (res.confirm) {
-          const result = await materialAPI.deleteMaterial(md5.value)
-            Taro.showToast({
-              title: result.message,
-              icon: 'success'
-            })
-            setTimeout(() => {
-              Taro.navigateBack()
-            }, 1500)
+        const response = await materialAPI.deleteMaterial(md5.value)
+        Taro.showToast({
+          title: '删除成功',
+          icon: 'success'
+        })
+        setTimeout(() => {
+          Taro.navigateBack()
+        }, 1500)
       }
     }
   })
