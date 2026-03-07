@@ -3,6 +3,12 @@ import { useAuthStore } from '../stores/auth'
 
 // API基础配置
 const BASE_URL = 'https://wx.ntrun.com' // 请根据实际情况修改
+const AUTH_REFRESH_BUFFER_MS = 60 * 1000
+const AUTH_BYPASS_REFRESH_ENDPOINTS = [
+  '/api/v0/auth/refresh',
+  '/api/v0/auth/wechat-login',
+  '/api/v0/auth/mock-wechat-login'
+]
 
 // 生成UUID v4（使用微信小程序加密随机数生成器）
 const generateUUID = () => {
@@ -134,10 +140,47 @@ const startCacheCleanup = () => {
 }
 startCacheCleanup()
 
+const createRequestError = (message, extra = {}) => {
+  return Object.assign(new Error(message), extra)
+}
+
+const getRequestPath = (url = '') => {
+  if (!url) {
+    return ''
+  }
+
+  return url.replace(/^https?:\/\/[^/]+/i, '')
+}
+
+const shouldBypassAuthRefresh = (url = '') => {
+  const requestPath = getRequestPath(url)
+  return AUTH_BYPASS_REFRESH_ENDPOINTS.some(endpoint => requestPath.endsWith(endpoint))
+}
+
+const shouldRetryAfterAuthFailure = (error, options = {}) => {
+  if (!error?.isAuthError || options.retryOnAuthFailure === false) {
+    return false
+  }
+
+  if (options.skipAuthRefresh || shouldBypassAuthRefresh(options.url)) {
+    return false
+  }
+
+  return Boolean(useAuthStore().refreshToken)
+}
+
 // 请求拦截器
 const interceptors = {
   async request(config) {
-    const token = useAuthStore().token
+    const authStore = useAuthStore()
+    const authToken = config.authToken
+    const skipAuthRefresh = config.skipAuthRefresh || shouldBypassAuthRefresh(config.url)
+
+    if (!skipAuthRefresh) {
+      await authStore.ensureValidAccessToken(AUTH_REFRESH_BUFFER_MS)
+    }
+
+    const token = authToken || authStore.token
     if (token) {
       config.header = {
         ...config.header,
@@ -161,8 +204,13 @@ const interceptors = {
         method,
         config.url,
         config.data
-      )
+        )
     }
+
+    delete config.authToken
+    delete config.skipAuthRefresh
+    delete config.retryOnAuthFailure
+    delete config.handleAuthFailure
 
     return config
   },
@@ -180,16 +228,47 @@ const interceptors = {
       if (data.StatusCode === 0) {
         return data.Result
       } else if (data.StatusCode === 401) {
-        // token过期或无效，跳转到登录页
-        useAuthStore().expireToken()
-        return Promise.reject(new Error(data.StatusMessage || '登录已过期'))
+        return Promise.reject(createRequestError(data.StatusMessage || '登录已过期', {
+          isAuthError: true,
+          statusCode: 401,
+          response
+        }))
       } else {
-        return Promise.reject(new Error(data.StatusMessage || '请求失败'))
+        return Promise.reject(createRequestError(data.StatusMessage || '请求失败', {
+          statusCode: data.StatusCode,
+          response
+        }))
       }
     } else {
-      return Promise.reject(new Error(`HTTP ${statusCode}`))
+      if (statusCode === 401) {
+        return Promise.reject(createRequestError(data?.StatusMessage || '登录已过期', {
+          isAuthError: true,
+          statusCode,
+          response
+        }))
+      }
+
+      return Promise.reject(createRequestError(data?.StatusMessage || `HTTP ${statusCode}`, {
+        statusCode,
+        response
+      }))
     }
   }
+}
+
+const executeRequest = async (options) => {
+  let requestOptions = { ...options }
+  delete requestOptions.silent
+
+  // 添加基础URL
+  if (!requestOptions.url.startsWith('http')) {
+    requestOptions.url = BASE_URL + requestOptions.url
+  }
+
+  // 应用请求拦截器
+  requestOptions = await interceptors.request(requestOptions)
+
+  return Taro.request(requestOptions).then(interceptors.response)
 }
 
 // 通用请求方法
@@ -198,49 +277,76 @@ export const request = async (options) => {
     return Promise.reject(new Error('Request URL is required'))
   }
 
-  // 添加基础URL
-  if (!options.url.startsWith('http')) {
-    options.url = BASE_URL + options.url
-  }
-
   // 是否静默（不显示全局错误 Toast），由调用方自行处理错误提示
-  const silent = options.silent
-  delete options.silent
+  const {
+    silent = false,
+    retryOnAuthFailure = true,
+    handleAuthFailure = true
+  } = options
 
   // 保存原始请求信息（用于清除幂等性 Key）
   const originalMethod = options.method
   const originalUrl = options.url
   const originalData = options.data
 
-  // 应用请求拦截器
-  options = await interceptors.request(options)
+  const requestOptions = {
+    ...options,
+    silent,
+    retryOnAuthFailure,
+    handleAuthFailure
+  }
 
-  return Taro.request(options)
-    .then(interceptors.response)
-    .catch(error => {
-      console.error('Request error:', error)
+  try {
+    return await executeRequest(requestOptions)
+  } catch (error) {
+    console.error('Request error:', error)
 
-      if (!silent) {
-        Taro.showToast({
-          title: error.message || error.errMsg || '网络错误',
-          icon: 'error',
-          duration: 2000
+    let finalError = error
+    if (shouldRetryAfterAuthFailure(error, requestOptions)) {
+      try {
+        await useAuthStore().refreshAccessToken({
+          silent: true,
+          force: true
         })
-      }
 
-      return Promise.reject(error)
-    }).finally(() => {
-      const method = originalMethod?.toUpperCase()
-      if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(method)) {
-        clearIdempotencyKey(method, originalUrl, originalData)
+        return await request({
+          ...options,
+          retryOnAuthFailure: false
+        })
+      } catch (refreshError) {
+        console.error('Retry after token refresh failed:', refreshError)
+        finalError = refreshError
       }
-    })
+    }
+
+    if (finalError?.isAuthError && handleAuthFailure) {
+      useAuthStore().expireToken(finalError.message || '请重新登录')
+    } else if (!silent) {
+      Taro.showToast({
+        title: finalError.message || finalError.errMsg || '网络错误',
+        icon: 'error',
+        duration: 2000
+      })
+    }
+
+    return Promise.reject(finalError)
+  } finally {
+    const method = originalMethod?.toUpperCase()
+    if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(method)) {
+      clearIdempotencyKey(method, originalUrl, originalData)
+    }
+  }
 }
 
 // GET请求
-export const get = (url, data) => {
+export const get = (url, data, options = {}) => {
   if (!data) {
-    return request({ url, method: 'GET', data: {} })
+    return request({
+      url,
+      method: 'GET',
+      data: {},
+      ...options
+    })
   }
 
   // 处理数组参数（如categories），转换为多个同名参数
@@ -269,34 +375,38 @@ export const get = (url, data) => {
   return request({
     url,
     method: 'GET',
-    data: {} // 传空对象，参数已经在URL中
+    data: {}, // 传空对象，参数已经在URL中
+    ...options
   })
 }
 
 // POST请求
-export const post = (url, data) => {
+export const post = (url, data, options = {}) => {
   return request({
     url,
     method: 'POST',
-    data
+    data,
+    ...options
   })
 }
 
 // PUT请求
-export const put = (url, data) => {
+export const put = (url, data, options = {}) => {
   return request({
     url,
     method: 'PUT',
-    data
+    data,
+    ...options
   })
 }
 
 // DELETE请求
-export const del = (url, data) => {
+export const del = (url, data, options = {}) => {
   return request({
     url,
     method: 'DELETE',
-    data
+    data,
+    ...options
   })
 }
 
