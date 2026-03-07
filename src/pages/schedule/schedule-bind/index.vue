@@ -4,17 +4,11 @@
     <view class="bg-white rounded-lg shadow-sm mb-4">
       <view class="flex items-center gap-2">
         <view class="flex-1">
-          <input
-            v-model="searchKeyword"
-            placeholder="请输入班级名称进行搜索"
+          <input v-model="searchKeyword" placeholder="请输入班级名称进行搜索"
             class="w-full px-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-            @input="handleSearch"
-          />
+            @input="handleSearch" />
         </view>
-        <view
-          @tap="search"
-          class="bg-blue-500 text-white px-4 py-2 rounded-lg"
-        >
+        <view @tap="search" class="bg-blue-500 text-white px-4 py-2 rounded-lg">
           搜索
         </view>
       </view>
@@ -27,12 +21,8 @@
       </view>
 
       <view class="divide-y divide-gray-100">
-        <view
-          v-for="classItem in searchResults"
-          :key="classItem.class_id"
-          class="p-4 flex items-center justify-between"
-          @tap="selectClass(classItem)"
-        >
+        <view v-for="classItem in searchResults" :key="classItem.class_id" class="p-4 flex items-center justify-between"
+          @tap="selectClass(classItem)">
           <view class="flex-1">
             <view class="font-medium text-gray-900">{{ classItem.class_id }}</view>
             <view v-if="classItem.semester" class="text-sm text-gray-500 mt-1">{{ classItem.semester }}</view>
@@ -44,23 +34,16 @@
       <!-- 分页控制 -->
       <view v-if="totalPages > 1" class="p-4 border-t border-gray-100 flex justify-center">
         <view class="flex items-center space-x-2">
-          <view
-            @tap="previousPage"
-            :disabled="currentPage <= 1"
-            class="px-3 py-1 text-sm bg-blue-400 text-white rounded"
-            :class="{ 'opacity-50':currentPage <= 1 }"
-          >
+          <view @tap="previousPage" :disabled="currentPage <= 1"
+            class="px-3 py-1 text-sm bg-blue-400 text-white rounded" :class="{ 'opacity-50': currentPage <= 1 }">
             上一页
           </view>
           <view class="text-sm text-gray-500 px-2">
             {{ currentPage }} / {{ totalPages }}
           </view>
-          <view
-            @tap="nextPage"
-            :disabled="currentPage >= totalPages"
+          <view @tap="nextPage" :disabled="currentPage >= totalPages"
             class="px-3 py-1 text-sm bg-blue-400 text-white rounded"
-            :class="{ 'opacity-50':currentPage >= totalPages }"
-          >
+            :class="{ 'opacity-50': currentPage >= totalPages }">
             下一页
           </view>
         </view>
@@ -68,7 +51,8 @@
     </view>
 
     <!-- 空状态 -->
-    <view v-if="hasSearched && searchResults.length === 0 && !isLoading" class="bg-white rounded-lg shadow-sm p-8 text-center">
+    <view v-if="hasSearched && searchResults.length === 0 && !isLoading"
+      class="bg-white rounded-lg shadow-sm p-8 text-center">
       <view class="i-lucide-search text-4xl mb-4"></view>
       <view class="text-gray-500">没有找到相关班级</view>
       <view class="text-sm text-gray-400 mt-2">请检查班级名称是否正确</view>
@@ -76,9 +60,15 @@
 
     <!-- 搜索提示 -->
     <view v-if="!hasSearched && !isLoading" class="bg-white rounded-lg shadow-sm p-8 text-center">
-      <view v-if="isOnlyUserBasic" class="text-gray-500">仅有 2 次绑定机会</view>
+      <view v-if="isOnlyUserBasic && bindCountLoaded" class="text-sm text-gray-400 mb-2">已绑定 {{ bindCount }}/2 次</view>
       <view class="text-gray-500">请输入班级名称进行搜索</view>
       <view class="text-sm text-gray-400 mt-2">如：25软件1班</view>
+
+      <!-- 重置个人课表 -->
+      <view v-if="authStore.userInfo?.class_id" @tap="handleResetSchedule"
+        class="mt-6 mx-auto bg-red-50 text-red-500 border border-red-200 rounded-lg px-4 py-2 text-sm inline-block">
+        重置课表数据
+      </view>
     </view>
 
     <!-- 确认绑定弹窗 -->
@@ -90,17 +80,11 @@
         </view>
 
         <view class="flex space-x-3">
-          <view
-            @tap="cancelSelect"
-            class="flex-1 px-4 py-2 bg-gray-300 text-white rounded-lg font-medium text-center"
-          >
+          <view @tap="cancelSelect" class="flex-1 px-4 py-2 bg-gray-300 text-white rounded-lg font-medium text-center">
             取消
           </view>
-          <view
-            @tap="confirmBind"
-            :disabled="isBinding"
-            class="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg font-medium text-center"
-          >
+          <view @tap="confirmBind" :disabled="isBinding"
+            class="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg font-medium text-center">
             {{ isBinding ? '绑定中...' : '确认绑定' }}
           </view>
         </view>
@@ -114,6 +98,7 @@ import { ref, computed, onBeforeUnmount } from 'vue'
 import Taro from '@tarojs/taro'
 import { useScheduleStore } from '../../../stores/schedule'
 import { useAuthStore } from '../../../stores/auth'
+import { courseTableAPI } from '../../../api/index'
 
 defineOptions({
   name: 'ScheduleBindPage'
@@ -121,6 +106,22 @@ defineOptions({
 
 const scheduleStore = useScheduleStore()
 const authStore = useAuthStore()
+
+// 绑定次数
+const bindCount = ref(0)
+const bindCountLoaded = ref(false)
+
+const fetchBindCount = async () => {
+  try {
+    const res = await courseTableAPI.getBindCount()
+    bindCount.value = res.bind_count || 0
+    bindCountLoaded.value = true
+  } catch (error) {
+    console.error('获取绑定次数失败:', error)
+  }
+}
+
+fetchBindCount()
 
 // 计算属性：判断用户是否只有 user_basic 角色标签
 const isOnlyUserBasic = computed(() => {
@@ -278,6 +279,43 @@ const confirmBind = async () => {
     isBinding.value = false
     selectedClass.value = null
   }
+}
+
+// 重置个人课表
+const handleResetSchedule = () => {
+  const currentSemester = scheduleStore.semester
+
+  if (!currentSemester) {
+    Taro.showToast({ title: '无学期信息', icon: 'error' })
+    return
+  }
+
+  Taro.showModal({
+    title: '重置个人课表',
+    content: `确定要重置「${currentSemester}」的课表数据吗？重置后课表将恢复为班级初始数据。`,
+    confirmColor: '#ef4444',
+    success: async (res) => {
+      if (res.confirm) {
+        try {
+          await courseTableAPI.deleteSchedule(currentSemester)
+          scheduleStore.fetchCourseTable(currentSemester, true)
+          Taro.showToast({ title: '重置成功', icon: 'success' })
+          setTimeout(() => {
+            // 传递消息通知课表页刷新
+            Taro.eventCenter.trigger('reloadSchedule')
+            Taro.navigateBack()
+          }, 1000)
+
+        } catch (error) {
+          Taro.showModal({
+            title: '重置失败',
+            content: error.message || '请稍后重试',
+            showCancel: false
+          })
+        }
+      }
+    }
+  })
 }
 </script>
 
