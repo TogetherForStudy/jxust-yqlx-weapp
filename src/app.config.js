@@ -29,11 +29,9 @@ export default {
     // 通知公告相关页面
     'pages/notifications/index',
     'pages/notifications/detail/index',
-    'pages/notifications/create/index',
     'pages/notifications/manage/index',
     'pages/notifications/categories/index',
     // 用户投稿相关页面
-    'pages/contributions/create/index',
     'pages/contributions/mine/index',
     'pages/contributions/detail/index',
     'pages/contributions/review/index',
