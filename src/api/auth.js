@@ -49,5 +49,9 @@ export const userAPI = {
 
   updateProfile(data) {
     return put('/api/v0/user/profile', data)
+  },
+
+  getLoginDays() {
+    return get('/api/v0/user/login-days')
   }
 }
