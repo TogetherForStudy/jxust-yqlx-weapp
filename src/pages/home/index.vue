@@ -176,6 +176,7 @@ import TodayCourse from './components/TodayCourse.vue'
 import CountdownCard from './components/CountdownCard.vue'
 import StudyTaskCard from './components/StudyTaskCard.vue'
 import NotificationCard from './components/NotificationCard.vue'
+import PomodoroCard from './components/PomodoroCard.vue'
 import { useAuthStore } from '../../stores/auth'
 import { useShareAppMessage, useShareTimeline } from '@tarojs/taro'
 import { dictionaryAPI } from '../../api'
@@ -193,6 +194,7 @@ const defaultCards = [
   { name: 'TodayCourse', label: '今日课程', iconClass: 'i-lucide-book-open text-blue-500', component: TodayCourse },
   { name: 'NotificationCard', label: '通知公告', iconClass: 'i-lucide-bell text-orange-500', component: NotificationCard },
   { name: 'StudyTaskCard', label: '学习任务', iconClass: 'i-lucide-clipboard-check text-green-500', component: StudyTaskCard },
+  { name: 'PomodoroCard', label: '番茄钟', iconClass: 'i-lucide-timer-reset text-red-500', component: PomodoroCard },
   { name: 'CountdownCard', label: '倒数日', iconClass: 'i-lucide-timer text-purple-500', component: CountdownCard }
 ]
 
@@ -208,15 +210,27 @@ const orderedCards = computed(() => {
   ).filter(Boolean)
 })
 
+const normalizeCardOrder = (savedOrder) => {
+  if (!Array.isArray(savedOrder) || savedOrder.length === 0) {
+    return defaultCards.map(card => card.name)
+  }
+
+  const validCardNames = new Set(defaultCards.map(card => card.name))
+  const normalizedOrder = savedOrder.filter(name => validCardNames.has(name))
+  const missingCards = defaultCards
+    .map(card => card.name)
+    .filter(name => !normalizedOrder.includes(name))
+
+  return [...normalizedOrder, ...missingCards]
+}
+
 // 初始化卡片顺序
 const initCardOrder = () => {
   try {
     const savedOrder = Taro.getStorageSync('homeCardOrder')
-    if (savedOrder && Array.isArray(savedOrder) && savedOrder.length === defaultCards.length) {
-      cardOrder.value = savedOrder
-    } else {
-      cardOrder.value = defaultCards.map(card => card.name)
-    }
+    const normalizedOrder = normalizeCardOrder(savedOrder)
+    cardOrder.value = normalizedOrder
+    Taro.setStorageSync('homeCardOrder', normalizedOrder)
   } catch (error) {
     console.error('加载卡片顺序失败:', error)
     cardOrder.value = defaultCards.map(card => card.name)

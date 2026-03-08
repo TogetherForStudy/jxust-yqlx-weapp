@@ -143,6 +143,50 @@ const createRequestError = (message, extra = {}) => {
   return Object.assign(new Error(message), extra)
 }
 
+let isRequestErrorModalVisible = false
+let queuedRequestErrorMessage = null
+
+const buildRequestErrorContent = (error) => {
+  const message = error?.message || error?.errMsg || '网络错误'
+  const requestId = error?.requestId
+
+  if (!requestId) {
+    return message
+  }
+
+  return `${message}\n\n请求ID: ${requestId}`
+}
+
+const showRequestErrorModal = async (error) => {
+  const content = buildRequestErrorContent(error)
+
+  if (isRequestErrorModalVisible) {
+    queuedRequestErrorMessage = content
+    return
+  }
+
+  isRequestErrorModalVisible = true
+
+  try {
+    await Taro.showModal({
+      title: '请求失败',
+      content,
+      showCancel: false,
+      confirmText: '知道了'
+    })
+  } finally {
+    isRequestErrorModalVisible = false
+
+    if (queuedRequestErrorMessage && queuedRequestErrorMessage !== content) {
+      const nextMessage = queuedRequestErrorMessage
+      queuedRequestErrorMessage = null
+      await showRequestErrorModal({ message: nextMessage })
+    } else {
+      queuedRequestErrorMessage = null
+    }
+  }
+}
+
 const isStandardResponseEnvelope = (data) => {
   return Boolean(data) &&
     typeof data === 'object' &&
@@ -371,11 +415,7 @@ export const request = async (options) => {
     if (finalError?.isAuthError && handleAuthFailure) {
       useAuthStore().expireToken(finalError.message || '请重新登录')
     } else if (!silent) {
-      Taro.showToast({
-        title: finalError.message || finalError.errMsg || '网络错误',
-        icon: 'error',
-        duration: 2000
-      })
+      await showRequestErrorModal(finalError)
     }
 
     return Promise.reject(finalError)
