@@ -361,9 +361,7 @@ const goToTermsOfService = () => {
 // 显示登录活跃度进度
 const showLoginDaysProgress = async () => {
   try {
-    Taro.showLoading({ title: '加载中...', mask: true })
     const res = await userAPI.getLoginDays()
-    Taro.hideLoading()
 
     loginDaysData.value = {
       loginDays: res.login_days || 0,
@@ -371,7 +369,7 @@ const showLoginDaysProgress = async () => {
     }
     loginDaysModal.value = true
   } catch (error) {
-    Taro.hideLoading()
+
   }
 };
 
