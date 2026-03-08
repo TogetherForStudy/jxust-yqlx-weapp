@@ -270,7 +270,6 @@ const loadMaterialDetail = async () => {
     userRating.value = res?.user_rating || 0
   } catch (error) {
     console.error('加载资料详情失败:', error)
-    Taro.showToast({ title: '加载失败', icon: 'error' })
   } finally {
     loading.value = false
   }
@@ -325,11 +324,6 @@ const rateMaterial = async (rating) => {
   } catch (error) {
     // 评分失败，恢复之前的评分
     userRating.value = oldRating
-
-    Taro.showToast({
-      title: '评分失败',
-      icon: 'none'
-    })
     console.error('评分失败:', error)
   }
 }
@@ -352,10 +346,6 @@ const handleDownload = async () => {
       }
     })
   } catch (error) {
-    Taro.showToast({
-      title: '操作失败',
-      icon: 'none'
-    })
     console.error('下载记录失败:', error)
   }
 }
@@ -401,10 +391,6 @@ const submitEdit = async () => {
     // 重新获取数据，只更新编辑的字段
     refreshMaterialData(['tags', 'description', 'external_link', 'is_recommended'])
   } catch (error) {
-    Taro.showToast({
-      title: '更新失败',
-      icon: 'none'
-    })
     console.error('更新失败:', error)
   }
 }

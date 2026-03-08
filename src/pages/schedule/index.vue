@@ -439,10 +439,6 @@ const handleDeleteCourse = async (data) => {
     })
   } catch (error) {
     console.error('删除课程失败:', error)
-    Taro.showToast({
-      title: '删除失败',
-      icon: 'error'
-    })
   }
 }
 
@@ -475,10 +471,7 @@ const handleSubmitCourse = async (submitData) => {
       icon: 'success'
     })
   } catch (error) {
-    Taro.showToast({
-      title: '保存失败',
-      icon: 'error'
-    })
+
   }
 }
 
@@ -620,11 +613,6 @@ const loadCourseData = async () => {
       if (error.message && error.message.includes('未设置班级')) {
         return
       }
-
-      Taro.showToast({
-        title: '获取课程表失败',
-        icon: 'error'
-      })
     }
   }
 }

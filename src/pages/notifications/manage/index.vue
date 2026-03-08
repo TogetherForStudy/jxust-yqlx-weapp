@@ -430,18 +430,6 @@ onMounted(async () => {
   if (!authStore.requireAuth()) {
     return
   }
-
-  if (!isAdmin.value && !isOperator.value) {
-    Taro.showToast({
-      title: '权限不足',
-      icon: 'error'
-    })
-    setTimeout(() => {
-      Taro.navigateBack()
-    }, 1500)
-    return
-  }
-
   await initPage()
   isFirstLoad.value = false // 标记首次加载完成
 })
@@ -468,10 +456,6 @@ const initPage = async () => {
     ])
   } catch (error) {
     console.error('初始化页面失败:', error)
-    Taro.showToast({
-      title: '加载失败',
-      icon: 'error'
-    })
   }
 }
 
@@ -661,10 +645,6 @@ const publishNotification = async (id) => {
       await refreshData()
     } catch (error) {
       console.error('发布信息失败:', error)
-      Taro.showToast({
-        title: '发布失败',
-        icon: 'error'
-      })
     }
   }
 }
@@ -688,10 +668,6 @@ const publishAdminNotification = async (id) => {
       await refreshData()
     } catch (error) {
       console.error('直通失败:', error)
-      Taro.showToast({
-        title: '发布失败',
-        icon: 'error'
-      })
     }
   }
 }
@@ -715,10 +691,6 @@ const deleteNotification = async (id) => {
       await refreshData()
     } catch (error) {
       console.error('删除信息失败:', error)
-      Taro.showToast({
-        title: '删除失败',
-        icon: 'error'
-      })
     }
   }
 }
@@ -756,10 +728,7 @@ const submitApproval = async () => {
     await refreshData()
   } catch (error) {
     console.error('审核信息失败:', error)
-    Taro.showToast({
-      title: '操作失败',
-      icon: 'error'
-    })
+
   }
 }
 
@@ -789,10 +758,6 @@ const togglePin = async (notification) => {
       await refreshData()
     } catch (error) {
       console.error(`${actionText}信息失败:`, error)
-      Taro.showToast({
-        title: `${actionText}失败`,
-        icon: 'error'
-      })
     }
   }
 }

@@ -381,10 +381,7 @@ const onSearchInput = (e) => {
       await loadReviews(true, 1);
     } catch (error) {
       console.error("搜索失败:", error);
-      Taro.showToast({
-        title: "搜索失败",
-        icon: "error",
-      });
+
     }
   }, 300);
 };
@@ -410,10 +407,6 @@ const selectStatusFilter = async (status) => {
     await loadReviews(true, 1);
   } catch (error) {
     console.error("筛选失败:", error);
-    Taro.showToast({
-      title: "筛选失败",
-      icon: "error",
-    });
   }
 };
 
@@ -425,10 +418,6 @@ const refreshData = async () => {
       icon: "success",
     });
   } catch (error) {
-    Taro.showToast({
-      title: "刷新失败",
-      icon: "error",
-    });
   }
 };
 
@@ -466,10 +455,6 @@ const loadMoreReviews = async () => {
     await loadReviews(false, currentPage);
   } catch (error) {
     console.error("加载更多评价失败:", error);
-    Taro.showToast({
-      title: "加载失败",
-      icon: "error",
-    });
   }
 };
 
@@ -511,10 +496,7 @@ const confirmApprove = async () => {
 
     hideApproveModal();
   } catch (error) {
-    Taro.showToast({
-      title: error.message || "审核失败",
-      icon: "error",
-    });
+
   } finally {
     approving.value = false;
   }
@@ -548,10 +530,7 @@ const confirmReject = async () => {
 
     hideRejectModal();
   } catch (error) {
-    Taro.showToast({
-      title: error.message || "操作失败",
-      icon: "error",
-    });
+    console.error("审核拒绝失败:", error);
   } finally {
     rejecting.value = false;
   }
@@ -582,10 +561,7 @@ const confirmDelete = async () => {
 
     hideDeleteConfirm();
   } catch (error) {
-    Taro.showToast({
-      title: error.message || "删除失败",
-      icon: "error",
-    });
+    console.error("删除评价失败:", error);
   } finally {
     deleting.value = false;
   }
@@ -593,16 +569,6 @@ const confirmDelete = async () => {
 
 // 生命周期
 onMounted(async () => {
-  // 检查管理员权限
-  if (!authStore.isAdmin) {
-    Taro.showToast({
-      title: "权限不足",
-      icon: "error",
-    });
-    Taro.navigateBack();
-    return;
-  }
-
   await loadReviews();
 });
 

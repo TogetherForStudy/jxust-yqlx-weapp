@@ -273,10 +273,6 @@ const initPage = async () => {
     ]);
   } catch (error) {
     console.error("初始化页面失败:", error);
-    Taro.showToast({
-      title: "加载失败",
-      icon: "error",
-    });
   }
 };
 
@@ -352,12 +348,6 @@ const applyFilters = async () => {
     onBefore: () => {
       isSearchPending.value = false;
     },
-    onError: () => {
-      Taro.showToast({
-        title: "搜索失败",
-        icon: "error",
-      });
-    },
   });
 };
 
@@ -410,12 +400,6 @@ const loadMore = async () => {
     await fetchNotificationPage(searchList, {
       page: searchList.currentPage.value + 1,
       extraParams: getSearchParams(),
-      onError: () => {
-        Taro.showToast({
-          title: "搜索失败",
-          icon: "error",
-        });
-      },
     });
     return;
   }
@@ -424,12 +408,6 @@ const loadMore = async () => {
 
   await fetchNotificationPage(defaultList, {
     page: defaultList.currentPage.value + 1,
-    onError: () => {
-      Taro.showToast({
-        title: "加载失败",
-        icon: "error",
-      });
-    },
   });
 };
 

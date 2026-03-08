@@ -473,10 +473,7 @@ const submitCountdown = async () => {
 
     hideAddModal()
   } catch (error) {
-    Taro.showToast({
-      title: error.message || '添加失败',
-      icon: 'error'
-    })
+
   } finally {
     submitting.value = false
   }
@@ -497,10 +494,7 @@ const updateCountdown = async () => {
 
     hideEditModal()
   } catch (error) {
-    Taro.showToast({
-      title: error.message || '更新失败',
-      icon: 'error'
-    })
+
   } finally {
     submitting.value = false
   }
@@ -528,10 +522,7 @@ const deleteCountdown = async () => {
 
       hideEditModal()
     } catch (error) {
-      Taro.showToast({
-        title: error.message || '删除失败',
-        icon: 'error'
-      })
+
     }
   }
 }

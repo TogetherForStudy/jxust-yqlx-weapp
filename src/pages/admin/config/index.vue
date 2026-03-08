@@ -442,10 +442,6 @@ const fetchAllConfigs = async (page = 1, keyword = '') => {
     }
   } catch (error) {
     console.error("获取配置失败:", error);
-    Taro.showToast({
-      title: error.message || "获取数据失败",
-      icon: "error",
-    });
   } finally {
     loading.value = false;
   }
@@ -664,10 +660,6 @@ const confirmSave = async () => {
 
     hideFormModal();
   } catch (error) {
-    Taro.showToast({
-      title: error.message || "保存失败",
-      icon: "error",
-    });
   } finally {
     saving.value = false;
   }
@@ -755,10 +747,7 @@ const confirmDelete = async () => {
 
     hideDeleteConfirm();
   } catch (error) {
-    Taro.showToast({
-      title: error.message || "删除失败",
-      icon: "error",
-    });
+
   } finally {
     deleting.value = false;
   }
@@ -766,16 +755,6 @@ const confirmDelete = async () => {
 
 // 生命周期
 onMounted(async () => {
-  // 检查管理员权限
-  if (!authStore.isAdmin) {
-    Taro.showToast({
-      title: "权限不足",
-      icon: "error",
-    });
-    Taro.navigateBack();
-    return;
-  }
-
   await fetchAllConfigs(1, '');
 });
 

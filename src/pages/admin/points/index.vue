@@ -308,14 +308,10 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from "vue";
+import { ref, computed, watch } from "vue";
 import Taro from "@tarojs/taro";
-import { useAuthStore } from "../../../stores/auth";
 import { pointsAPI } from "../../../api/index";
 import { formatDateTime } from "../../../utils/time";
-
-// Store
-const authStore = useAuthStore();
 
 // Tab 配置
 const tabs = [
@@ -396,10 +392,6 @@ const loadUserData = async () => {
     }
   } catch (error) {
     console.error("加载数据失败:", error);
-    Taro.showToast({
-      title: error.message || "加载数据失败",
-      icon: "error",
-    });
   } finally {
     loading.value = false;
   }
@@ -519,10 +511,7 @@ const confirmGrantPoints = async () => {
       await loadUserData();
     }
   } catch (error) {
-    Taro.showToast({
-      title: error.message || "操作失败",
-      icon: "error",
-    });
+
   } finally {
     granting.value = false;
   }
@@ -589,18 +578,6 @@ const getSourceName = (source) => {
   return sourceNames[source] || source;
 };
 
-// 生命周期
-onMounted(async () => {
-  // 检查管理员权限
-  if (!authStore.isAdmin) {
-    Taro.showToast({
-      title: "权限不足",
-      icon: "error",
-    });
-    Taro.navigateBack();
-    return;
-  }
-});
 </script>
 
 <style scoped>

@@ -805,7 +805,6 @@ const loadQuestionIds = async () => {
     }
   } catch (error) {
     console.error("loadQuestionIds error", error);
-    Taro.showToast({ title: "题目加载失败", icon: "none" });
   } finally {
     loadingList.value = false;
   }
@@ -852,7 +851,6 @@ const loadQuestionDetail = async (index, shouldScroll = false) => {
     }
   } catch (error) {
     console.error("loadQuestionDetail error", error);
-    Taro.showToast({ title: "题目加载失败", icon: "none" });
   } finally {
     loadingQuestion.value = false;
   }
@@ -1365,7 +1363,6 @@ const clearWrongBook = async () => {
     }
   } catch (error) {
     console.error("clear wrong book failed", error);
-    Taro.showToast({ title: "清空失败", icon: "none" });
   }
 };
 
@@ -1620,7 +1617,6 @@ const deleteProgress = (type, isOldVersion = false) => {
             Taro.showToast({ title: "已删除", icon: "success", duration: 1000 });
           } catch (error) {
             console.error("delete old progress failed", error);
-            Taro.showToast({ title: "删除失败", icon: "none" });
           }
         } else {
           clearProgress(type);

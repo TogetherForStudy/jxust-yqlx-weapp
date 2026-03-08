@@ -187,10 +187,6 @@ const search = async () => {
 
   } catch (error) {
     console.error('搜索班级失败:', error)
-    Taro.showToast({
-      title: '搜索失败',
-      icon: 'error'
-    })
   } finally {
     isLoading.value = false
   }
@@ -223,10 +219,6 @@ const loadPage = async () => {
 
   } catch (error) {
     console.error('加载页面失败:', error)
-    Taro.showToast({
-      title: '加载失败，请重试',
-      icon: 'error'
-    })
   } finally {
     isLoading.value = false
   }
@@ -271,10 +263,6 @@ const confirmBind = async () => {
 
   } catch (error) {
     console.error('绑定班级失败:', error)
-    Taro.showToast({
-      title: '请联系客服',
-      icon: 'error'
-    })
   } finally {
     isBinding.value = false
     selectedClass.value = null
