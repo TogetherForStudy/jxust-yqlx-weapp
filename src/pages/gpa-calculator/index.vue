@@ -672,14 +672,14 @@ const calculateReverse = () => {
 
   // 获取当前已选课程的数据
   const selectedCourses = courses.value.filter(course => course.selected !== false)
-  
+
   let currentTotalCredits = 0
   let currentWeightedScore = 0
-  
+
   selectedCourses.forEach(course => {
     const credits = parseFloat(course.credits) || 0
     const score = parseFloat(course.score) || 0
-    
+
     if (credits > 0 && score >= 0 && score <= 100) {
       currentTotalCredits += credits
       currentWeightedScore += score * credits
@@ -689,11 +689,11 @@ const calculateReverse = () => {
   const targetScore = parseFloat(reverseCalc.value.targetGPA)
   const remainingCredits = parseFloat(reverseCalc.value.remainingCredits)
   const totalFutureCredits = currentTotalCredits + remainingCredits
-  
+
   // 计算公式（百分制）：(当前加权分数 + 剩余学分 * 所需分数) / 总学分 = 目标分数
   // 所需分数 = (目标分数 * 总学分 - 当前加权分数) / 剩余学分
   const requiredScore = (targetScore * totalFutureCredits - currentWeightedScore) / remainingCredits
-  
+
   if (requiredScore > 100) {
     Taro.showToast({
       title: '目标过高无法达到',
@@ -702,7 +702,7 @@ const calculateReverse = () => {
     })
     return
   }
-  
+
   if (requiredScore < 0) {
     Taro.showToast({
       title: '当前成绩已超过目标',
@@ -715,7 +715,7 @@ const calculateReverse = () => {
     }
     return
   }
-  
+
   reverseCalcResult.value = {
     requiredScore: Math.round(requiredScore),
     requiredGPA: requiredScore.toFixed(1)
@@ -835,11 +835,6 @@ const loadGraduateData = async () => {
     }
   } catch (error) {
     console.error('加载保研专业数据失败:', error)
-    Taro.showToast({
-      title: '加载数据失败',
-      icon: 'error',
-      duration: 1500
-    })
   }
 }
 

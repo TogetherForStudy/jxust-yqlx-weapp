@@ -413,10 +413,7 @@ const fetchNotificationDetail = async () => {
     preloadData.value = null
   } catch (error) {
     console.error('获取信息详情失败:', error)
-    Taro.showToast({
-      title: '加载失败',
-      icon: 'error'
-    })
+
   } finally {
     isLoading.value = false
   }
@@ -615,10 +612,7 @@ const convertToSchedule = async () => {
     await fetchNotificationDetail()
   } catch (error) {
     console.error('转换为日程失败:', error)
-    Taro.showToast({
-      title: '添加失败',
-      icon: 'error'
-    })
+
   }
 }
 

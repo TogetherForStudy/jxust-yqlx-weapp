@@ -372,7 +372,6 @@ const showLoginDaysProgress = async () => {
     loginDaysModal.value = true
   } catch (error) {
     Taro.hideLoading()
-    Taro.showToast({ title: '获取失败', icon: 'error' })
   }
 };
 

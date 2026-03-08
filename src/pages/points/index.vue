@@ -252,10 +252,6 @@ const initPage = async () => {
     pointsStats.value = statsRes
   } catch (error) {
     console.error('初始化页面失败:', error)
-    Taro.showToast({
-      title: '加载失败',
-      icon: 'error'
-    })
   } finally {
     isLoading.value = false
   }

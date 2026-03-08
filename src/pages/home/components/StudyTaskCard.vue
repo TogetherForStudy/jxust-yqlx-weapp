@@ -41,40 +41,40 @@
       <view v-else class="p-3">
         <!-- Tab 切换（按钮组样式） -->
         <view class="flex gap-0 mb-3 p-1 bg-gray-100 rounded-lg">
-          <view 
-            @tap="switchToCompletedTab" 
+          <view
+            @tap="switchToCompletedTab"
             class="flex-1 text-center py-1 text-sm font-medium rounded-md transition-all"
-            :class="activeTab === 'completed' 
-              ? 'bg-white text-green-600 shadow-sm' 
+            :class="activeTab === 'completed'
+              ? 'bg-white text-green-600 shadow-sm'
               : 'text-gray-600'"
           >
             已完成({{ stats.completed_count }})
           </view>
-          <view 
-            @tap="switchToPendingTab" 
+          <view
+            @tap="switchToPendingTab"
             class="flex-1 text-center py-1 text-sm font-medium rounded-md transition-all"
-            :class="activeTab === 'pending' 
-              ? 'bg-white text-green-600 shadow-sm' 
+            :class="activeTab === 'pending'
+              ? 'bg-white text-green-600 shadow-sm'
               : 'text-gray-600'"
           >
             待完成({{ stats.pending_count }})
           </view>
-          
+
         </view>
 
           <!-- 待完成任务列表 -->
-          <scroll-view 
-            v-show="activeTab === 'pending'" 
-            :scroll-y="true" 
-          class="max-h-72" 
-            @scrolltolower="loadMorePendingTasks" 
+          <scroll-view
+            v-show="activeTab === 'pending'"
+            :scroll-y="true"
+          class="max-h-72"
+            @scrolltolower="loadMorePendingTasks"
             :lower-threshold="100"
           >
             <view v-if="pendingTasks.length === 0" class="flex flex-col items-center justify-center py-8">
               <view class="i-lucide-clipboard text-2xl text-gray-400 mb-2"></view>
               <text class="text-gray-500 text-sm">劳逸结合 · 爱自己</text>
             </view>
-            
+
             <view v-else class="space-y-2">
               <view v-for="task in pendingTasks" :key="`pending-${task.id}`"
                 class="relative p-3 border rounded-lg" :class="getTaskBorderClass(task)"
@@ -126,18 +126,18 @@
           </scroll-view>
 
           <!-- 已完成任务列表 -->
-          <scroll-view 
-            v-show="activeTab === 'completed'" 
-            :scroll-y="true" 
-          class="max-h-72" 
-            @scrolltolower="loadMoreCompletedTasks" 
+          <scroll-view
+            v-show="activeTab === 'completed'"
+            :scroll-y="true"
+          class="max-h-72"
+            @scrolltolower="loadMoreCompletedTasks"
             :lower-threshold="100"
           >
             <view v-if="completedTasks.length === 0" class="flex flex-col items-center justify-center py-8">
               <view class="i-lucide-check-circle text-2xl text-gray-400 mb-2"></view>
               <text class="text-gray-500 text-sm">还没有完成的任务</text>
             </view>
-            
+
             <view v-else class="space-y-2">
               <view v-for="task in completedTasks" :key="`completed-${task.id}`"
                 class="relative p-3 border border-green-200 rounded-lg bg-green-50" @tap="showEditTaskModal(task)">
@@ -728,10 +728,7 @@ const submitTask = async () => {
 
     hideAddModal();
   } catch (error) {
-    Taro.showToast({
-      title: error.message || "添加失败",
-      icon: "error",
-    });
+
   } finally {
     submitting.value = false;
   }
@@ -768,10 +765,7 @@ const updateTask = async () => {
 
     hideEditModal();
   } catch (error) {
-    Taro.showToast({
-      title: error.message || "更新失败",
-      icon: "error",
-    });
+
   } finally {
     submitting.value = false;
   }
@@ -799,10 +793,7 @@ const deleteTask = async () => {
 
       hideEditModal();
     } catch (error) {
-      Taro.showToast({
-        title: error.message || "删除失败",
-        icon: "error",
-      });
+
     }
   }
 };
@@ -833,10 +824,7 @@ const toggleTaskStatus = async (taskId) => {
       duration: 1000,
     });
   } catch (error) {
-    Taro.showToast({
-      title: error.message || "更新失败",
-      icon: "error",
-    });
+
   }
 };
 

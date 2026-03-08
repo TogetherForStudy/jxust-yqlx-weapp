@@ -33,11 +33,11 @@
             {{ filter.label }}
           </view>
         </view>
-        
+
         <!-- 分页控件 -->
         <view v-if="total > 0" class="flex items-center space-x-1 shrink-0">
           <!-- 首页 -->
-          <view 
+          <view
             @tap="goToFirstPage"
             :class="[
               'p-1.5 rounded flex items-center justify-center',
@@ -46,9 +46,9 @@
           >
             <text class="i-lucide-chevrons-left w-4 h-4"></text>
           </view>
-          
+
           <!-- 上一页 -->
-          <view 
+          <view
             @tap="goToPrevPage"
             :class="[
               'p-1.5 rounded flex items-center justify-center',
@@ -57,14 +57,14 @@
           >
             <text class="i-lucide-chevron-left w-4 h-4"></text>
           </view>
-          
+
           <!-- 页码 -->
           <view class="px-2 py-1 text-sm text-gray-600 flex items-center">
             {{ currentPage }}/{{ totalPages }}
           </view>
-          
+
           <!-- 下一页 -->
-          <view 
+          <view
             @tap="goToNextPage"
             :class="[
               'p-1.5 rounded flex items-center justify-center',
@@ -73,9 +73,9 @@
           >
             <text class="i-lucide-chevron-right w-4 h-4"></text>
           </view>
-          
+
           <!-- 末页 -->
-          <view 
+          <view
             @tap="goToLastPage"
             :class="[
               'p-1.5 rounded flex items-center justify-center',
@@ -404,10 +404,6 @@ const fetchHeroes = async (keyword = '', isShow = null, page = 1, size = 20) => 
     }
   } catch (error) {
     console.error("获取英雄榜失败:", error);
-    Taro.showToast({
-      title: error.message || "获取数据失败",
-      icon: "error",
-    });
   } finally {
     loading.value = false;
   }
@@ -575,10 +571,7 @@ const confirmSave = async () => {
 
     hideFormModal();
   } catch (error) {
-    Taro.showToast({
-      title: error.message || "保存失败",
-      icon: "error",
-    });
+
   } finally {
     saving.value = false;
   }
@@ -605,10 +598,7 @@ const toggleHeroStatus = async (hero) => {
       icon: "success",
     });
   } catch (error) {
-    Taro.showToast({
-      title: error.message || "操作失败",
-      icon: "error",
-    });
+
   }
 };
 
@@ -640,10 +630,7 @@ const confirmDelete = async () => {
 
     hideDeleteConfirm();
   } catch (error) {
-    Taro.showToast({
-      title: error.message || "删除失败",
-      icon: "error",
-    });
+
   } finally {
     deleting.value = false;
   }
@@ -651,16 +638,6 @@ const confirmDelete = async () => {
 
 // 生命周期
 onMounted(async () => {
-  // 检查管理员权限
-  if (!authStore.isAdmin) {
-    Taro.showToast({
-      title: "权限不足",
-      icon: "error",
-    });
-    Taro.navigateBack();
-    return;
-  }
-
   await fetchHeroes('', null, 1);
 });
 

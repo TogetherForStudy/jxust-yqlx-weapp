@@ -405,10 +405,6 @@ const fetchRoles = async () => {
     }).filter(r => r.id != null);
   } catch (error) {
     console.error("获取角色列表失败:", error);
-    Taro.showToast({
-      title: error.message || "获取角色列表失败",
-      icon: "error",
-    });
   }
 };
 
@@ -418,10 +414,6 @@ const fetchPermissions = async () => {
     permissions.value = response || [];
   } catch (error) {
     console.error("获取权限列表失败:", error);
-    Taro.showToast({
-      title: error.message || "获取权限列表失败",
-      icon: "error",
-    });
   }
 };
 
@@ -431,10 +423,6 @@ const fetchRolePermissions = async () => {
     rolePermissions.value = response?.roles || [];
   } catch (error) {
     console.error("获取角色权限关联失败:", error);
-    Taro.showToast({
-      title: error.message || "获取角色权限关联失败",
-      icon: "error",
-    });
   }
 };
 
@@ -519,10 +507,7 @@ const confirmUpdateUserRoles = async () => {
 
     hideUpdateUserRolesModal();
   } catch (error) {
-    Taro.showToast({
-      title: error.message || "更新失败",
-      icon: "error",
-    });
+
   } finally {
     updating.value = false;
   }
@@ -541,16 +526,6 @@ const hideUserIdsModal = () => {
 
 // 生命周期
 onMounted(async () => {
-  // 检查管理员权限
-  if (!authStore.isAdmin) {
-    Taro.showToast({
-      title: "权限不足",
-      icon: "error",
-    });
-    Taro.navigateBack();
-    return;
-  }
-
   loading.value = true;
   try {
     await Promise.all([fetchRoles(), fetchPermissions(), fetchRolePermissions()]);

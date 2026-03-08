@@ -261,17 +261,6 @@ onMounted(async () => {
     return
   }
 
-  if (!isAdmin.value) {
-    Taro.showToast({
-      title: '权限不足',
-      icon: 'error'
-    })
-    setTimeout(() => {
-      Taro.navigateBack()
-    }, 1500)
-    return
-  }
-
   await initPage()
 })
 
@@ -281,10 +270,6 @@ const initPage = async () => {
     await notificationStore.fetchCategories()
   } catch (error) {
     console.error('初始化页面失败:', error)
-    Taro.showToast({
-      title: '加载失败',
-      icon: 'error'
-    })
   }
 }
 
@@ -298,10 +283,6 @@ const refreshData = async () => {
     })
   } catch (error) {
     console.error('刷新数据失败:', error)
-    Taro.showToast({
-      title: '刷新失败',
-      icon: 'error'
-    })
   }
 }
 
@@ -408,10 +389,6 @@ const submitCategory = async () => {
 
   } catch (error) {
     console.error('提交分类失败:', error)
-    Taro.showToast({
-      title: error.message || '操作失败',
-      icon: 'error'
-    })
   } finally {
     isSubmitting.value = false
   }
@@ -436,10 +413,6 @@ const toggleCategoryStatus = async (category) => {
     await refreshData()
   } catch (error) {
     console.error('切换状态失败:', error)
-    Taro.showToast({
-      title: '操作失败',
-      icon: 'error'
-    })
   }
 }
 
@@ -452,26 +425,13 @@ const deleteCategory = async (id) => {
 
   if (result.confirm) {
     try {
-      // 注意：API中没有删除分类的接口，这里需要根据实际API调整
-      // await notificationStore.deleteCategory(id)
-
       Taro.showToast({
         title: '删除功能暂未开放',
         icon: 'error'
       })
 
-      // Taro.showToast({
-      //   title: '删除成功',
-      //   icon: 'success'
-      // })
-
-      // await refreshData()
     } catch (error) {
       console.error('删除分类失败:', error)
-      Taro.showToast({
-        title: '删除失败',
-        icon: 'error'
-      })
     }
   }
 }

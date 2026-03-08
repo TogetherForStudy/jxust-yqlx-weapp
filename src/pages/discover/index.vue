@@ -674,13 +674,6 @@ const goToGroupChat = () => {
   Taro.navigateTo({ url: "/pages/groupchat/index" });
 };
 
-const goToNoticeToZLK = () => {
-  Taro.showToast({
-    title: "请在资料库查找",
-    icon: "success",
-  });
-};
-
 const goToJw = () => {
   if (!authStore.requireAuth()) return;
   Taro.navigateTo({ url: "/pages/gotojw/index" });
