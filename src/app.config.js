@@ -31,10 +31,6 @@ export default {
     'pages/notifications/detail/index',
     'pages/notifications/manage/index',
     'pages/notifications/categories/index',
-    // 用户投稿相关页面
-    'pages/contributions/mine/index',
-    'pages/contributions/detail/index',
-    'pages/contributions/review/index',
     // 资料库相关页面
     'pages/materials/index',
     'pages/materials/detail/index',

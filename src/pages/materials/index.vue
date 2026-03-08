@@ -88,7 +88,7 @@
       </view>
 
       <!-- 资料热榜（带Tab切换） -->
-      <view v-if="hotRankMaterials.length" class="bg-white mb-2">
+      <view class="bg-white mb-2">
         <!-- Tab切换 -->
         <view class="flex">
           <view
@@ -116,42 +116,47 @@
         </view>
 
         <!-- 榜单列表 -->
-        <view
-          v-for="(item, index) in hotRankMaterials"
-          :key="item.md5"
-          class="px-4 py-3 border-b border-gray-100 active:bg-gray-50"
-          @tap="enterMaterial(item)"
-        >
-          <view class="flex items-start">
-            <view
-              :class="[
-                'w-6 h-6 flex items-center justify-center text-xs font-bold mr-3 flex-shrink-0',
-                index < 3 ? 'bg-red-500 text-white rounded' : 'text-gray-400',
-              ]"
-            >
-              {{ index + 1 }}
-            </view>
-            <view class="flex-1 min-w-0">
-              <text class="text-gray-800 font-medium text-sm break-all">{{
-                item.file_name
-              }}</text>
-              <view class="flex items-center mt-1 text-xs text-gray-400">
-                <text class="i-lucide-trending-up w-3 h-3 mr-1"></text>
-                <text>热度 {{ hotRankType === 0 ? item.total_hotness : item.period_hotness || 0 }}</text>
-                <text class="mx-2">·</text>
-                <text>{{ item.download_count || 0 }} 下载</text>
+        <view v-if="hotRankMaterials.length">
+          <view
+            v-for="(item, index) in hotRankMaterials"
+            :key="item.md5"
+            class="px-4 py-3 border-b border-gray-100 active:bg-gray-50"
+            @tap="enterMaterial(item)"
+          >
+            <view class="flex items-start">
+              <view
+                :class="[
+                  'w-6 h-6 flex items-center justify-center text-xs font-bold mr-3 flex-shrink-0',
+                  index < 3 ? 'bg-red-500 text-white rounded' : 'text-gray-400',
+                ]"
+              >
+                {{ index + 1 }}
               </view>
-              <view v-if="item.tags" class="flex flex-wrap gap-1 mt-1">
-                <text
-                  v-for="tag in item.tags.split(',').slice(0, 3)"
-                  :key="tag"
-                  class="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded"
-                >
-                  {{ tag.trim() }}
-                </text>
+              <view class="flex-1 min-w-0">
+                <text class="text-gray-800 font-medium text-sm break-all">{{
+                  item.file_name
+                }}</text>
+                <view class="flex items-center mt-1 text-xs text-gray-400">
+                  <text class="i-lucide-trending-up w-3 h-3 mr-1"></text>
+                  <text>热度 {{ hotRankType === 0 ? item.total_hotness : item.period_hotness || 0 }}</text>
+                  <text class="mx-2">·</text>
+                  <text>{{ item.download_count || 0 }} 下载</text>
+                </view>
+                <view v-if="item.tags" class="flex flex-wrap gap-1 mt-1">
+                  <text
+                    v-for="tag in item.tags.split(',').slice(0, 3)"
+                    :key="tag"
+                    class="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded"
+                  >
+                    {{ tag.trim() }}
+                  </text>
+                </view>
               </view>
             </view>
           </view>
+        </view>
+        <view v-else class="text-center py-10">
+          <text class="text-gray-400 text-sm">暂无热榜数据</text>
         </view>
       </view>
     </scroll-view>

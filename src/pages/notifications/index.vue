@@ -44,15 +44,6 @@
     <!-- 管理员功能区 -->
     <view v-if="isAdmin || isOperator" class="mx-4 mt-4">
       <view class="grid grid-cols-4 gap-2">
-        <!-- 创建通知 -->
-        <!-- <view class="bg-gradient-to-br from-blue-300 to-blue-400 rounded-lg p-1 active:scale-95 transition-transform"
-          @tap="goToCreateNotification">
-          <view class="flex items-center justify-center">
-            <text class="i-lucide-plus text-white w-5 h-5 mr-2"></text>
-            <text class="text-white font-medium text-sm">创建</text>
-          </view>
-        </view> -->
-
         <!-- 管理通知 -->
         <view
           class="bg-gradient-to-br from-purple-300 to-purple-400 rounded-lg p-1 active:scale-95 transition-transform"
@@ -60,21 +51,6 @@
           <view class="flex items-center justify-center">
             <text class="i-lucide-settings text-white w-5 h-5 mr-2"></text>
             <text class="text-white font-medium text-sm">管理</text>
-          </view>
-        </view>
-
-        <!-- 审核投稿 -->
-        <view v-if="isAdmin || isOperator"
-          class="relative bg-gradient-to-br from-green-300 to-green-400 rounded-lg p-1 active:scale-95 transition-transform"
-          @tap="goToReviewContributions">
-          <view class="flex items-center justify-center">
-            <text class="i-lucide-check-circle text-white w-5 h-5 mr-2"></text>
-            <text class="text-white font-medium text-sm">审核</text>
-          </view>
-          <view v-if="pendingContributionsCount > 0" class="absolute -top-1 -right-1">
-            <view class="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-              {{ pendingContributionsCount }}
-            </view>
           </view>
         </view>
 
@@ -93,7 +69,7 @@
     <!-- 通知列表 -->
     <view class="p-4 flex-1 h-[1px]">
       <!-- 加载状态 -->
-      <view v-if="notificationStore.isLoading && notifications.length === 0">
+      <view v-if="isListLoading && displayedNotifications.length === 0">
         <view class="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
           <view class="flex items-center justify-center">
             <text class="text-gray-500 text-sm">加载中...</text>
@@ -102,7 +78,7 @@
       </view>
 
       <!-- 空状态 -->
-      <view v-else-if="notifications.length === 0">
+      <view v-else-if="displayedNotifications.length === 0">
         <view class="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
           <view class="flex flex-col items-center justify-center">
             <text class="i-lucide-bell-off text-gray-300 text-4xl mb-2"></text>
@@ -113,49 +89,8 @@
 
       <!-- 通知卡片列表 -->
       <scroll-view v-else :scroll-y="true" class="h-full" @scrolltolower="loadMore" :lower-threshold="100">
-        <!-- 用户投稿区 -->
-        <view v-if="authStore.isLoggedIn && authStore.userInfo?.role === 0" class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 mb-4">
-          <view class="flex justify-between items-center mb-3">
-            <text class="text-gray-800 font-medium">贡献信息差</text>
-            <text class="text-blue-500 text-sm" @tap="goToMyContributions">
-              查看全部
-            </text>
-          </view>
-
-          <view class="flex space-x-3">
-            <!-- 投稿统计 -->
-            <view class="flex-1 bg-gray-50 rounded-lg p-1">
-              <view class="text-center">
-                <text class="text-lg font-bold text-gray-800">{{
-                  contributionStats.total_count
-                  }}</text>
-                <text class="text-xs text-gray-500 block">总投稿数</text>
-              </view>
-            </view>
-
-            <view class="flex-1 bg-gray-50 rounded-lg p-1">
-              <view class="text-center">
-                <text class="text-lg font-bold text-green-600">{{
-                  contributionStats.approved_count
-                  }}</text>
-                <text class="text-xs text-gray-500 block">已采纳</text>
-              </view>
-            </view>
-
-            <!-- 创建投稿 -->
-            <!-- <view
-              class="flex-1 bg-gradient-to-br from-cyan-400 to-cyan-600 rounded-lg p-1 active:scale-95 transition-transform flex items-center justify-center"
-              @tap="goToCreateContribution">
-              <view class="flex items-center justify-center">
-                <text class="i-lucide-edit text-white w-5 h-5 mr-2"></text>
-                <text class="text-white font-medium text-sm">投稿</text>
-              </view>
-            </view> -->
-          </view>
-        </view>
-
         <view class="space-y-3">
-          <view v-for="notification in notifications" :key="notification.id"
+          <view v-for="notification in displayedNotifications" :key="notification.id"
             class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 active:scale-98 transition-transform"
             @tap="goToNotificationDetail(notification)">
             <!-- 通知头部 -->
@@ -213,9 +148,9 @@
         </view>
 
         <!-- 加载更多指示器 -->
-        <view v-if="notificationStore.isLoading || notificationStore.hasMore" class="text-center py-4">
-          <text v-if="notificationStore.isLoading" class="text-gray-500 text-sm">加载中...</text>
-          <text v-else-if="!notificationStore.hasMore && notifications.length > 0"
+        <view v-if="isListLoading || hasMoreNotifications || displayedNotifications.length > 0" class="text-center py-4">
+          <text v-if="isListLoading" class="text-gray-500 text-sm">加载中...</text>
+          <text v-else-if="!hasMoreNotifications && displayedNotifications.length > 0"
             class="text-gray-400 text-sm">已加载全部</text>
         </view>
       </scroll-view>
@@ -224,14 +159,16 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, watch } from "vue";
-import Taro, { useDidShow } from "@tarojs/taro";
+import { ref, computed, onMounted, onBeforeUnmount } from "vue";
+import Taro, { useDidShow, useDidHide } from "@tarojs/taro";
 import { useNotificationStore } from "../../stores/notifications";
 import { useAuthStore } from "../../stores/auth";
+import { notificationAPI } from "../../api/notification";
 import { formatDateTime } from "../../utils/time";
 
 const notificationStore = useNotificationStore();
 const authStore = useAuthStore();
+const PAGE_SIZE = 10;
 
 // 响应式数据
 const showSearchBar = ref(false);
@@ -239,16 +176,42 @@ const searchKeyword = ref("");
 const selectedCategories = ref([]);
 const searchTimer = ref(null);
 const isFirstLoad = ref(true); // 标志位，用于控制首次加载
+const isSearchPending = ref(false);
+
+const createPagedListState = () => ({
+  items: ref([]),
+  currentPage: ref(1),
+  totalPages: ref(1),
+  isLoading: ref(false),
+  requestId: 0,
+});
+
+const defaultList = createPagedListState();
+const searchList = createPagedListState();
 
 // 计算属性
-const notifications = computed(() => notificationStore.notifications);
 const categories = computed(() => notificationStore.categories);
-const contributionStats = computed(() => notificationStore.contributionStats);
 const isAdmin = computed(() => authStore.isAdmin);
 const isOperator = computed(() => authStore.userInfo?.role === 3); // 假设运营角色为3
-const pendingContributionsCount = computed(() => {
-  return notificationStore.contributions.filter((item) => item.status === 1)
-    .length;
+const isSearchMode = computed(() => {
+  return (
+    selectedCategories.value.length > 0 || !!searchKeyword.value.trim()
+  );
+});
+const activeList = computed(() => {
+  return isSearchMode.value ? searchList : defaultList;
+});
+const displayedNotifications = computed(() => {
+  return activeList.value.items.value;
+});
+const isListLoading = computed(() => {
+  return isSearchMode.value
+    ? isSearchPending.value || searchList.isLoading.value
+    : defaultList.isLoading.value;
+});
+const hasMoreNotifications = computed(() => {
+  const list = activeList.value;
+  return list.currentPage.value < list.totalPages.value;
 });
 
 // 页面初始化
@@ -257,43 +220,57 @@ onMounted(async () => {
   isFirstLoad.value = false; // 标记首次加载完成
 });
 
-onBeforeUnmount(() => {
+const clearSearchTimer = () => {
   if (searchTimer.value) {
     clearTimeout(searchTimer.value);
     searchTimer.value = null;
   }
+};
+
+const resetPagedList = (list) => {
+  list.requestId += 1;
+  list.items.value = [];
+  list.currentPage.value = 1;
+  list.totalPages.value = 1;
+  list.isLoading.value = false;
+};
+
+const resetSearchState = () => {
+  clearSearchTimer();
+  showSearchBar.value = false;
+  searchKeyword.value = "";
+  selectedCategories.value = [];
+  isSearchPending.value = false;
+  resetPagedList(searchList);
+};
+
+onBeforeUnmount(() => {
+  resetSearchState();
 });
 
 // 页面显示时刷新数据
 useDidShow(async () => {
   // 只在非首次加载时刷新数据，避免与 onMounted 冲突
   if (!isFirstLoad.value) {
+    if (isSearchMode.value) {
+      return;
+    }
+
     await refreshPageData();
   }
+});
+
+useDidHide(() => {
+  clearSearchTimer();
 });
 
 // 初始化页面数据
 const initPage = async () => {
   try {
-    // 获取通知分类
-    await notificationStore.fetchCategories();
-
-    // 获取通知列表
-    await notificationStore.fetchNotifications({ page: 1 });
-
-    // 如果用户已登录，获取投稿统计
-    if (authStore.isLoggedIn) {
-      await notificationStore.fetchContributionStats();
-    }
-
-    // 如果是管理员，获取待审核投稿数量
-    if (isAdmin.value) {
-      await notificationStore.fetchContributions({
-        status: 1,
-        page: 1,
-        size: 100,
-      });
-    }
+    await Promise.all([
+      notificationStore.fetchCategories(),
+      fetchNotificationPage(defaultList, { page: 1 }),
+    ]);
   } catch (error) {
     console.error("初始化页面失败:", error);
     Taro.showToast({
@@ -306,29 +283,7 @@ const initPage = async () => {
 // 刷新页面数据（用于页面显示时自动刷新）
 const refreshPageData = async () => {
   try {
-    // 应用当前的筛选条件重新获取通知列表
-    const filters = {
-      categories: selectedCategories.value,
-      keyword: searchKeyword.value.trim(),
-    };
-
-    // 设置筛选条件并获取通知列表
-    notificationStore.setFilters(filters);
-    await notificationStore.fetchNotifications({ page: 1 });
-
-    // 如果用户已登录，刷新投稿统计
-    if (authStore.isLoggedIn) {
-      await notificationStore.fetchContributionStats();
-    }
-
-    // 如果是管理员，刷新待审核投稿数量
-    if (isAdmin.value) {
-      await notificationStore.fetchContributions({
-        status: 1,
-        page: 1,
-        size: 100,
-      });
-    }
+    await fetchNotificationPage(defaultList, { page: 1 });
   } catch (error) {
     console.error("刷新页面数据失败:", error);
     // 静默失败，不显示错误提示，避免影响用户体验
@@ -352,9 +307,24 @@ const clearCategoryFilter = () => {
   applyFilters();
 };
 
-// 搜索
+const getSearchParams = () => {
+  const params = {};
+  const keyword = searchKeyword.value.trim();
+
+  if (keyword) {
+    params.keyword = keyword;
+  }
+
+  if (selectedCategories.value.length > 0) {
+    params.categories = [...selectedCategories.value];
+  }
+
+  return params;
+};
+
 const onSearchInput = () => {
-  clearTimeout(searchTimer.value);
+  isSearchPending.value = true;
+  clearSearchTimer();
   searchTimer.value = setTimeout(() => {
     applyFilters();
   }, 500);
@@ -368,21 +338,98 @@ const clearSearch = () => {
 
 // 应用筛选条件
 const applyFilters = async () => {
-  const filters = {
-    categories: selectedCategories.value,
-    keyword: searchKeyword.value.trim(),
-  };
+  if (!isSearchMode.value) {
+    isSearchPending.value = false;
+    resetPagedList(searchList);
+    await fetchNotificationPage(defaultList, { page: 1 });
+    return;
+  }
 
-  notificationStore.setFilters(filters);
-  await notificationStore.fetchNotifications({ page: 1 });
+  isSearchPending.value = true;
+  await fetchNotificationPage(searchList, {
+    page: 1,
+    extraParams: getSearchParams(),
+    onBefore: () => {
+      isSearchPending.value = false;
+    },
+    onError: () => {
+      Taro.showToast({
+        title: "搜索失败",
+        icon: "error",
+      });
+    },
+  });
+};
+
+const fetchNotificationPage = async (
+  list,
+  { page = 1, extraParams = {}, onBefore, onError } = {}
+) => {
+  const requestId = ++list.requestId;
+
+  onBefore?.();
+  list.isLoading.value = true;
+
+  try {
+    const result = await notificationAPI.getNotifications({
+      page,
+      size: PAGE_SIZE,
+      status: 3,
+      ...extraParams,
+    });
+
+    if (requestId !== list.requestId) return;
+
+    const items = result.data || [];
+    if (page === 1) {
+      list.items.value = items;
+    } else {
+      list.items.value.push(...items);
+    }
+
+    const total = result.total || 0;
+    list.totalPages.value = Math.max(1, Math.ceil(total / PAGE_SIZE));
+    list.currentPage.value = page;
+  } catch (error) {
+    if (requestId !== list.requestId) return;
+
+    console.error("获取信息列表失败:", error);
+    onError?.(error);
+  } finally {
+    if (requestId === list.requestId) {
+      list.isLoading.value = false;
+    }
+  }
 };
 
 // 加载更多
 const loadMore = async () => {
-  if (notificationStore.isLoading || !notificationStore.hasMore) return;
+  if (isSearchMode.value) {
+    if (searchList.isLoading.value || !hasMoreNotifications.value) return;
 
-  await notificationStore.fetchNotifications({
-    page: notificationStore.notificationCurrentPage + 1,
+    await fetchNotificationPage(searchList, {
+      page: searchList.currentPage.value + 1,
+      extraParams: getSearchParams(),
+      onError: () => {
+        Taro.showToast({
+          title: "搜索失败",
+          icon: "error",
+        });
+      },
+    });
+    return;
+  }
+
+  if (defaultList.isLoading.value || !hasMoreNotifications.value) return;
+
+  await fetchNotificationPage(defaultList, {
+    page: defaultList.currentPage.value + 1,
+    onError: () => {
+      Taro.showToast({
+        title: "加载失败",
+        icon: "error",
+      });
+    },
   });
 };
 
@@ -409,27 +456,11 @@ const goToNotificationDetail = (notification) => {
   });
 };
 
-// const goToCreateNotification = () => {
-//   if (!authStore.requireAuth()) return;
-
-//   Taro.navigateTo({
-//     url: "/pages/notifications/create/index",
-//   });
-// };
-
 const goToManageNotifications = () => {
   if (!authStore.requireAuth()) return;
 
   Taro.navigateTo({
     url: "/pages/notifications/manage/index",
-  });
-};
-
-const goToReviewContributions = () => {
-  if (!authStore.requireAuth()) return;
-
-  Taro.navigateTo({
-    url: "/pages/contributions/review/index",
   });
 };
 
@@ -439,53 +470,6 @@ const goToManageCategories = () => {
   Taro.navigateTo({
     url: "/pages/notifications/categories/index",
   });
-};
-
-// const goToCreateContribution = () => {
-//   if (!authStore.requireAuth()) return;
-
-//   Taro.navigateTo({
-//     url: "/pages/contributions/create/index",
-//   });
-// };
-
-const goToMyContributions = () => {
-  if (!authStore.requireAuth()) return;
-
-  Taro.navigateTo({
-    url: "/pages/contributions/mine/index",
-  });
-};
-
-// 工具函数
-const getStatusClass = (status) => {
-  switch (status) {
-    case 1:
-      return "bg-gray-100 text-gray-600"; // 草稿
-    case 2:
-      return "bg-yellow-100 text-yellow-700"; // 待审核
-    case 3:
-      return "bg-green-100 text-green-700"; // 已发布
-    case 4:
-      return "bg-red-100 text-red-700"; // 已删除
-    default:
-      return "bg-gray-100 text-gray-600";
-  }
-};
-
-const getStatusText = (status) => {
-  switch (status) {
-    case 1:
-      return "草稿";
-    case 2:
-      return "待审核";
-    case 3:
-      return "已发布";
-    case 4:
-      return "已删除";
-    default:
-      return "未知";
-  }
 };
 
 const formatDate = (dateString) => {
@@ -511,15 +495,6 @@ const formatDate = (dateString) => {
     return formatDateTime(date, "yyyy-MM-dd HH:mm");
   }
 };
-
-// 监听筛选条件变化
-watch(
-  [selectedCategories, searchKeyword],
-  () => {
-    // 这里可以添加防抖逻辑
-  },
-  { deep: true }
-);
 
 // 判断通知是否有日程数据
 const hasScheduleData = (notification) => {
