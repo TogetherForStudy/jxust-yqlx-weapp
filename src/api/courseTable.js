@@ -1,4 +1,4 @@
-import { get, put, post, del } from '../utils/request'
+import { get, put, del } from '../utils/request'
 
 export const courseTableAPI = {
   getCourseTable(params) {
@@ -19,11 +19,6 @@ export const courseTableAPI = {
 
   editCourseCell(data) {
     return put('/api/v0/coursetable', data)
-  },
-
-  resetBindCount(userId) {
-    if (!userId) return Promise.reject(new Error('userId is required'))
-    return post(`/api/v0/coursetable/reset/${userId}`)
   },
 
   deleteSchedule(semester) {

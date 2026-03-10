@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/multi-word-component-names -->
 <template>
   <view class="h-screen bg-gray-50 flex flex-col">
     <!-- 头部筛选栏 -->
@@ -37,31 +38,6 @@
             class="w-full px-3 h-10 pr-8 bg-gray-50 rounded-lg text-sm box-border" @input="onSearchInput" />
           <text class="absolute right-2 top-1/2 transform -translate-y-1/2 i-lucide-x text-gray-400 w-4 h-4"
             @tap="clearSearch"></text>
-        </view>
-      </view>
-    </view>
-
-    <!-- 管理员功能区 -->
-    <view v-if="isAdmin || isOperator" class="mx-4 mt-4">
-      <view class="grid grid-cols-4 gap-2">
-        <!-- 管理通知 -->
-        <view
-          class="bg-gradient-to-br from-purple-300 to-purple-400 rounded-lg p-1 active:scale-95 transition-transform"
-          @tap="goToManageNotifications">
-          <view class="flex items-center justify-center">
-            <text class="i-lucide-settings text-white w-5 h-5 mr-2"></text>
-            <text class="text-white font-medium text-sm">管理</text>
-          </view>
-        </view>
-
-        <!-- 分类管理 -->
-        <view v-if="isAdmin"
-          class="bg-gradient-to-br from-orange-300 to-orange-400 rounded-lg p-1 active:scale-95 transition-transform"
-          @tap="goToManageCategories">
-          <view class="flex items-center justify-center">
-            <text class="i-lucide-tag text-white w-5 h-5 mr-2"></text>
-            <text class="text-white font-medium text-sm">分类</text>
-          </view>
         </view>
       </view>
     </view>
@@ -162,12 +138,10 @@
 import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import Taro, { useDidShow, useDidHide } from "@tarojs/taro";
 import { useNotificationStore } from "../../stores/notifications";
-import { useAuthStore } from "../../stores/auth";
 import { notificationAPI } from "../../api/notification";
 import { formatDateTime } from "../../utils/time";
 
 const notificationStore = useNotificationStore();
-const authStore = useAuthStore();
 const PAGE_SIZE = 10;
 
 // 响应式数据
@@ -191,8 +165,6 @@ const searchList = createPagedListState();
 
 // 计算属性
 const categories = computed(() => notificationStore.categories);
-const isAdmin = computed(() => authStore.isAdmin);
-const isOperator = computed(() => authStore.userInfo?.role === 3); // 假设运营角色为3
 const isSearchMode = computed(() => {
   return (
     selectedCategories.value.length > 0 || !!searchKeyword.value.trim()
@@ -431,22 +403,6 @@ const goToNotificationDetail = (notification) => {
 
   Taro.navigateTo({
     url: `/pages/notifications/detail/index?id=${notification.id}&preloadData=${encodedData}`,
-  });
-};
-
-const goToManageNotifications = () => {
-  if (!authStore.requireAuth()) return;
-
-  Taro.navigateTo({
-    url: "/pages/notifications/manage/index",
-  });
-};
-
-const goToManageCategories = () => {
-  if (!authStore.requireAuth()) return;
-
-  Taro.navigateTo({
-    url: "/pages/notifications/categories/index",
   });
 };
 

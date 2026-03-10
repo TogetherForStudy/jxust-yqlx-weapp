@@ -131,25 +131,6 @@
           </text>
         </view>
       </view>
-
-      <!-- 管理员操作 -->
-      <view v-if="authStore.isAdmin" class="bg-white p-4 mb-2">
-        <text class="text-gray-800 font-medium text-sm mb-3 block">管理员操作</text>
-        <view class="flex space-x-2">
-          <view
-            class="bg-blue-500 text-white text-center py-2 rounded-lg w-full"
-            @tap="editMaterial"
-          >
-            编辑资料描述
-          </view>
-          <view
-            class="bg-red-500 text-white text-center py-2 rounded-lg w-full"
-            @tap="deleteMaterial"
-          >
-            删除资料
-          </view>
-        </view>
-      </view>
     </view>
 
     <!-- 底部下载按钮 -->
@@ -160,65 +141,6 @@
       >
         <text class="i-lucide-download w-5 h-5 mr-2"></text>
         下载资料
-      </view>
-    </view>
-
-    <!-- 编辑对话框 -->
-    <view v-if="showEditDialog" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" @tap="showEditDialog = false">
-      <view class="bg-white rounded-xl p-4 m-4 w-full max-w-lg" @tap.stop>
-        <text class="text-gray-800 font-bold text-lg mb-4 block">编辑资料描述</text>
-
-        <view class="mb-3">
-          <text class="text-gray-600 text-sm mb-1 block">标签（逗号分隔）</text>
-          <input
-            v-model="editForm.tags"
-            class="border-solid border-[1px] border-gray-400 rounded-lg p-2"
-          />
-        </view>
-
-        <view class="mb-3">
-          <text class="text-gray-600 text-sm mb-1 block">资料描述</text>
-          <textarea
-            v-model="editForm.description"
-            class="border-solid border-[1px] border-gray-400 rounded-lg p-2 box-border w-full"
-            :maxlength="1000"
-            placeholder="请输入资料描述..."
-          />
-        </view>
-
-        <view class="mb-3">
-          <text class="text-gray-600 text-sm mb-1 block">外部链接</text>
-          <input
-            v-model="editForm.external_link"
-            class="border-solid border-[1px] border-gray-400 rounded-lg p-2"
-          />
-        </view>
-
-        <view class="mb-4">
-          <label class="flex items-center">
-            <switch
-              :checked="editForm.is_recommended"
-              @change="e => editForm.is_recommended = e.detail.value"
-              class="mr-2"
-            />
-            <text class="text-gray-600 text-sm">设为推荐</text>
-          </label>
-        </view>
-
-        <view class="flex space-x-2">
-          <view
-            class="flex-1 bg-gray-200 text-gray-800 text-center py-2 rounded-lg"
-            @tap="showEditDialog = false"
-          >
-            取消
-          </view>
-          <view
-            class="flex-1 bg-blue-500 text-white text-center py-2 rounded-lg"
-            @tap="submitEdit"
-          >
-            保存
-          </view>
-        </view>
       </view>
     </view>
   </view>
@@ -361,56 +283,6 @@ const openExternalLink = () => {
         title: '请到浏览器粘贴使用',
         icon: 'success'
       })
-    }
-  })
-}
-
-// 编辑资料
-const editMaterial = () => {
-  editForm.value = {
-    tags: material.value.tags || '',
-    description: material.value.description || '',
-    external_link: material.value.external_link || '',
-    is_recommended: material.value.is_recommended || false
-  }
-  showEditDialog.value = true
-}
-
-// 提交编辑
-const submitEdit = async () => {
-  try {
-    await materialAPI.updateMaterialDesc(md5.value, editForm.value)
-
-    Taro.showToast({
-      title: '更新成功',
-      icon: 'success'
-    })
-
-    showEditDialog.value = false
-
-    // 重新获取数据，只更新编辑的字段
-    refreshMaterialData(['tags', 'description', 'external_link', 'is_recommended'])
-  } catch (error) {
-    console.error('更新失败:', error)
-  }
-}
-
-// 删除资料
-const deleteMaterial = () => {
-  Taro.showModal({
-    title: '确认删除',
-    content: '确定要删除这份资料吗？此操作不可撤销。',
-    success: async (res) => {
-      if (res.confirm) {
-        const response = await materialAPI.deleteMaterial(md5.value)
-        Taro.showToast({
-          title: '删除成功',
-          icon: 'success'
-        })
-        setTimeout(() => {
-          Taro.navigateBack()
-        }, 1500)
-      }
     }
   })
 }

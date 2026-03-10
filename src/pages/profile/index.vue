@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/multi-word-component-names -->
 <template>
   <view class="min-h-screen bg-gray-50 flex flex-col justify-between">
     <!-- 主要内容区域 -->
@@ -76,63 +77,6 @@
             <text class="text-gray-800">使用条款</text>
           </view>
           <text class="i-lucide-chevron-right text-gray-400"></text>
-        </view>
-      </view>
-
-      <!-- 管理员功能 -->
-      <view
-        v-if="authStore.isAdmin"
-        class="bg-white rounded-xl mb-4 overflow-hidden"
-      >
-        <view class="grid grid-cols-4 divide-x divide-gray-100">
-          <view
-            class="px-4 py-3 text-base flex flex-col items-center justify-center active:bg-gray-50"
-            @tap="goToReviewManagement"
-          >
-            <text class="i-lucide-star mb-1"></text>
-            <text class="text-xs text-gray-800 text-center">评价管理</text>
-          </view>
-
-          <view
-            class="px-4 py-3 text-base flex flex-col items-center justify-center active:bg-gray-50"
-            @tap="goToHeroManagement"
-          >
-            <text class="i-lucide-trophy mb-1"></text>
-            <text class="text-xs text-gray-800 text-center">英雄管理</text>
-          </view>
-
-          <view
-            class="px-4 py-3 text-base flex flex-col items-center justify-center active:bg-gray-50"
-            @tap="goToConfigManagement"
-          >
-            <text class="i-lucide-settings mb-1"></text>
-            <text class="text-xs text-gray-800 text-center">配置管理</text>
-          </view>
-
-          <view
-            class="px-4 py-3 text-base flex flex-col items-center justify-center active:bg-gray-50"
-            @tap="goToRbacManagement"
-          >
-            <text class="i-lucide-shield mb-1"></text>
-            <text class="text-xs text-gray-800 text-center">权限管理</text>
-          </view>
-        </view>
-        <view class="grid grid-cols-4 divide-x divide-gray-100 border-t border-gray-100">
-          <view
-            class="px-4 py-3 text-base flex flex-col items-center justify-center active:bg-gray-50"
-            @tap="goToResetBindCount"
-          >
-            <text class="i-lucide-refresh-ccw mb-1"></text>
-            <text class="text-xs text-gray-800 text-center">重置绑定</text>
-          </view>
-
-          <view
-            class="px-4 py-3 text-base flex flex-col items-center justify-center active:bg-gray-50"
-            @tap="goToPointsManagement"
-          >
-            <text class="i-lucide-coins mb-1"></text>
-            <text class="text-xs text-gray-800 text-center">积分管理</text>
-          </view>
         </view>
       </view>
 
@@ -278,68 +222,6 @@ const goToLogin = () => {
 
 const goToMyPoints = () => {
   Taro.navigateTo({ url: "/pages/points/index" });
-};
-
-const goToReviewManagement = () => {
-  Taro.navigateTo({ url: "/pages/admin/teacher-reviews/index" });
-};
-
-const goToHeroManagement = () => {
-  Taro.navigateTo({ url: "/pages/admin/heroes/index" });
-};
-
-const goToConfigManagement = () => {
-  Taro.navigateTo({ url: "/pages/admin/config/index" });
-};
-
-const goToRbacManagement = () => {
-  Taro.navigateTo({ url: "/pages/admin/rbac/index" });
-};
-
-const goToPointsManagement = () => {
-  Taro.navigateTo({ url: "/pages/admin/points/index" });
-};
-
-const goToResetBindCount = () => {
-  Taro.showModal({
-    title: "重置绑定",
-    editable: true,
-    placeholderText: "用户ID",
-    success: (res) => {
-      if (res.confirm && res.content && res.content.trim() !== "") {
-        const userId = res.content.trim();
-        // 延迟执行，避免与modal关闭冲突
-        setTimeout(async () => {
-          // 显示加载中
-          Taro.showLoading({
-            title: "处理中...",
-            mask: true
-          });
-
-          try {
-            await courseTableAPI.resetBindCount(userId);
-            Taro.hideLoading();
-            // 使用modal显示结果，避免toast冲突
-            Taro.showModal({
-              title: "操作成功",
-              content: "重置绑定成功！",
-              showCancel: false,
-              confirmText: "确定"
-            });
-          } catch (error) {
-            Taro.hideLoading();
-            // 使用modal显示错误，避免toast冲突
-            Taro.showModal({
-              title: "操作失败",
-              content: error.message || "重置绑定失败，请重试",
-              showCancel: false,
-              confirmText: "确定"
-            });
-          }
-        }, 300);
-      }
-    },
-  });
 };
 
 const handleLogout = () => {

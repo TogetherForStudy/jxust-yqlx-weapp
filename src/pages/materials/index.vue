@@ -69,23 +69,6 @@
         </view>
       </view>
 
-      <!-- 热搜词 -->
-      <view v-if="hotWords.length && authStore.isAdmin" class="bg-white p-4 mb-2">
-        <view class="flex items-center justify-between mb-3">
-          <text class="text-gray-800 font-medium">一起来学热搜</text>
-          <text class="text-xs text-gray-400">热门搜索</text>
-        </view>
-        <view class="flex flex-wrap gap-2">
-          <text
-            v-for="word in hotWords"
-            :key="word.keywords"
-            class="text-sm px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full active:bg-gray-200"
-            @tap="quickSearch(word.keywords)"
-          >
-            {{ word.keywords }}
-          </text>
-        </view>
-      </view>
 
       <!-- 资料热榜（带Tab切换） -->
       <view class="bg-white mb-2">

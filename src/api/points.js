@@ -12,8 +12,4 @@ export const pointsAPI = {
   getStats(params) {
     return get('/api/v0/points/stats', params)
   },
-
-  grantPoints(data) {
-    return post('/api/v0/points/grant', data)
-  }
 }
