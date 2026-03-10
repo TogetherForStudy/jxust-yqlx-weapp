@@ -140,7 +140,7 @@
 
             <view v-else class="space-y-2">
               <view v-for="task in completedTasks" :key="`completed-${task.id}`"
-                class="relative p-3 border border-green-200 rounded-lg bg-green-50" @tap="showEditTaskModal(task)">
+                class="relative p-3 border border-gray-200 rounded-lg bg-white" @tap="showEditTaskModal(task)">
                 <!-- 任务内容 -->
                 <view class="flex items-start gap-3">
                   <!-- 完成指示器 -->
@@ -162,8 +162,8 @@
 
                     <!-- 完成时间 -->
                     <view class="flex items-center gap-1 mt-1">
-                      <text class="i-lucide-check-circle w-3 h-3 text-green-500"></text>
-                      <text class="text-xs text-green-600">
+                      <text class="i-lucide-check-circle w-3 h-3 text-gray-500"></text>
+                      <text class="text-xs text-gray-500">
                         {{
                           formatCompletedTime(
                             task.completed_at || task.updated_at
@@ -500,12 +500,6 @@ const getPriorityColorClass = (priority) => {
 };
 
 const getTaskBorderClass = (task) => {
-  const daysLeft = studyTaskStore.calculateDaysLeft(task.due_date);
-
-  if (task.status === 2) return "border-green-200";
-  if (daysLeft < 0) return "border-red-200"; // 过期
-  if (daysLeft === 0) return "border-orange-300"; // 今天
-  if (daysLeft <= 3) return "border-amber-200"; // 紧急
   return "border-gray-200";
 };
 

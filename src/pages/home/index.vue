@@ -1,6 +1,9 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
-  <view class="min-h-screen bg-gray-50 flex flex-col">
+  <view
+    class="min-h-screen bg-gray-50 flex flex-col"
+    :class="{ 'h-screen overflow-hidden': isWordDetailVisible }"
+  >
     <!-- 顶部栏 -->
     <view v-if="authStore.isLoggedIn" class="flex items-center justify-between px-4 py-1 bg-white border-b border-gray-100">
       <view class="flex items-center gap-1.5 flex-1 min-w-0" @tap="showWordDetail">
@@ -27,10 +30,11 @@
 
     <!-- 每日一词详情弹窗 -->
     <view v-if="isWordDetailVisible" class="fixed inset-0 z-50 flex items-center justify-center" @tap.self="hideWordDetail">
-      <view class="absolute inset-0 bg-black opacity-50"></view>
+      <view class="absolute inset-0 bg-black opacity-50" @tap="hideWordDetail"></view>
       <view
         class="relative bg-white rounded-xl w-11/12 max-w-md max-h-[80vh] overflow-y-auto p-5 shadow-xl"
         @touchstart="handleWordTouchStart"
+        @touchmove.stop="handleWordTouchMove"
         @touchend="handleWordTouchEnd"
       >
         <view class="flex items-center justify-between mb-4">
@@ -415,6 +419,8 @@ const handleWordTouchStart = (e) => {
     startTime: Date.now()
   }
 }
+
+const handleWordTouchMove = () => {}
 
 const handleWordTouchEnd = async (e) => {
   if (!isWordDetailVisible.value || isRefreshingWord.value) {

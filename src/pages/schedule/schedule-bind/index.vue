@@ -295,11 +295,6 @@ const handleResetSchedule = () => {
           }, 1000)
 
         } catch (error) {
-          Taro.showModal({
-            title: '重置失败',
-            content: error.message || '请稍后重试',
-            showCancel: false
-          })
         }
       }
     }

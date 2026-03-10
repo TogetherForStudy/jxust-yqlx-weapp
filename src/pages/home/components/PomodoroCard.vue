@@ -91,10 +91,17 @@
 
     <view
       v-if="showRankingModal"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 px-5"
-      @tap="showRankingModal = false"
+      class="fixed inset-0 z-50 flex items-center justify-center px-5"
+      :catch-move="true"
+      @touchmove.stop.prevent="handleRankingModalTouchMove"
     >
-      <view class="bg-white rounded-2xl w-full max-w-md max-h-[70vh] overflow-hidden shadow-2xl" @tap.stop="">
+      <view class="absolute inset-0 bg-black bg-opacity-40" @tap="showRankingModal = false"></view>
+      <view
+        class="relative bg-white rounded-2xl w-full max-w-md max-h-[70vh] overflow-hidden shadow-2xl"
+        :catch-move="true"
+        @tap.stop=""
+        @touchmove.stop="handleRankingModalTouchMove"
+      >
         <view class="px-4 py-2 border-b border-gray-100 flex items-center justify-between">
           <text class="text-base font-semibold text-gray-800">专注排行榜</text>
           <view class="w-7 h-7 flex items-center justify-center" @tap="showRankingModal = false">
@@ -517,6 +524,8 @@ const openRankingModal = async () => {
     loadRankingData()
   ])
 }
+
+const handleRankingModalTouchMove = () => {}
 
 const switchMode = async (nextMode) => {
   if (!modePresetMap[nextMode] || mode.value === nextMode) {

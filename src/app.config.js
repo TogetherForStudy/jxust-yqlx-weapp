@@ -12,11 +12,6 @@ export default {
     'pages/graduation/index',
     'pages/map/index',
     'pages/teacher-reviews/index',
-    'pages/admin/teacher-reviews/index',
-    'pages/admin/heroes/index',
-    'pages/admin/config/index',
-    'pages/admin/rbac/index',
-    'pages/admin/points/index',
     'pages/terms-of-service/index',
     'pages/webview/index',
     'pages/hero/index',
@@ -29,8 +24,6 @@ export default {
     // 通知公告相关页面
     'pages/notifications/index',
     'pages/notifications/detail/index',
-    'pages/notifications/manage/index',
-    'pages/notifications/categories/index',
     // 资料库相关页面
     'pages/materials/index',
     'pages/materials/detail/index',
