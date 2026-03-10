@@ -142,7 +142,7 @@
           <view class="divide-y divide-gray-100">
             <view
               v-for="(item, index) in ranking"
-              :key="`${item.id || item.name || 'rank'}-${index}`"
+              :key="`${item.nickname || 'rank'}-${index}`"
               class="px-4 py-2 grid grid-cols-[44px_1fr_84px] gap-3 items-center"
               :class="getRankingRowClass(index)"
             >
@@ -155,9 +155,9 @@
                 </view>
               </view>
               <view class="min-w-0">
-                <text class="block text-sm font-medium text-gray-800 truncate">{{ item.name }}</text>
+                <text class="block text-sm font-medium text-gray-800 truncate">番茄{{ item.nickname }}</text>
               </view>
-              <text class="text-sm font-semibold text-gray-700 text-right tabular-nums">{{ item.count }}</text>
+              <text class="text-sm font-semibold text-gray-700 text-right tabular-nums">{{ item.pomodoro_count }}</text>
             </view>
           </view>
         </scroll-view>
@@ -304,92 +304,26 @@ const formatSeconds = (seconds) => {
   return `${String(minutes).padStart(2, '0')}:${String(remain).padStart(2, '0')}`
 }
 
-const getNumericValue = (value) => {
-  const numericValue = Number(value)
-  return Number.isFinite(numericValue) ? numericValue : null
+const normalizePomodoroCount = (payload) => {
+  const count = Number(payload?.pomodoro_count)
+  return Number.isFinite(count) ? count : 0
 }
 
-const getValueByPath = (target, path) => {
-  return path.split('.').reduce((current, key) => current?.[key], target)
-}
-
-const pickFirstDefined = (target, paths) => {
-  for (const path of paths) {
-    const value = getValueByPath(target, path)
-    if (value !== undefined && value !== null && value !== '') {
-      return value
-    }
-  }
-
-  return null
-}
-
-const normalizeCount = (payload) => {
-  if (Array.isArray(payload)) {
-    return 0
-  }
-
-  const directValue = getNumericValue(payload)
-  if (directValue !== null) {
-    return directValue
-  }
-
-  if (!payload || typeof payload !== 'object') {
-    return 0
-  }
-
-  const candidate = pickFirstDefined(payload, [
-    'count',
-    'total',
-    'value',
-    'pomodoro_count',
-    'completed_count',
-    'focus_count',
-    'data.count',
-    'stats.count'
-  ])
-
-  return getNumericValue(candidate) ?? 0
-}
-
-const normalizeRanking = (payload) => {
-  let source = payload
-
-  if (!Array.isArray(source)) {
-    source = pickFirstDefined(payload, [
-      'list',
-      'items',
-      'ranking',
-      'rankings',
-      'records',
-      'users',
-      'data',
-      'result'
-    ])
-  }
-
-  if (!Array.isArray(source)) {
+const normalizePomodoroRanking = (payload) => {
+  if (!Array.isArray(payload)) {
     return []
   }
 
-  return source
+  return payload
     .map((item, index) => {
-      const name = pickFirstDefined(item, [
-        'nickname',
-        'name',
-        'username',
-        'user_name',
-        'user.nickname',
-        'user.name'
-      ]) || `番茄${index + 1}`
+      const count = Number(item?.pomodoro_count)
 
       return {
-        id: pickFirstDefined(item, ['id', 'user_id', 'user.id']) || `${name}-${index}`,
-        name,
-        count: normalizeCount(item)
+        nickname: String(item?.nickname ?? `${index + 1}`),
+        pomodoro_count: Number.isFinite(count) ? count : 0
       }
     })
-    .sort((left, right) => right.count - left.count)
+    .sort((left, right) => right.pomodoro_count - left.pomodoro_count)
 }
 
 const persistState = () => {
@@ -448,21 +382,22 @@ const restoreState = () => {
     mode.value = nextMode
 
     const presetDuration = modePresetMap[nextMode].duration
-    const storedRemaining = getNumericValue(savedState.remainingSeconds)
-    remainingSeconds.value = storedRemaining === null
-      ? presetDuration
-      : Math.min(presetDuration, Math.max(0, storedRemaining))
-    const storedCompletedFocusSessions = getNumericValue(savedState.completedFocusSessions)
-    completedFocusSessions.value = storedCompletedFocusSessions === null
-      ? 0
-      : Math.max(0, storedCompletedFocusSessions)
+    const storedRemaining = Number(savedState.remainingSeconds)
+    remainingSeconds.value = Number.isFinite(storedRemaining)
+      ? Math.min(presetDuration, Math.max(0, storedRemaining))
+      : presetDuration
+    const storedCompletedFocusSessions = Number(savedState.completedFocusSessions)
+    completedFocusSessions.value = Number.isFinite(storedCompletedFocusSessions)
+      ? Math.max(0, storedCompletedFocusSessions)
+      : 0
     cycleDate.value = typeof savedState.cycleDate === 'string' && savedState.cycleDate
       ? savedState.cycleDate
       : getTodayKey()
     ensureDailyCycleState()
 
     isRunning.value = Boolean(savedState.isRunning)
-    endTimestamp.value = getNumericValue(savedState.endTimestamp)
+    const storedEndTimestamp = Number(savedState.endTimestamp)
+    endTimestamp.value = Number.isFinite(storedEndTimestamp) ? storedEndTimestamp : null
 
     if (isRunning.value && endTimestamp.value) {
       const nextRemaining = syncRemainingFromTimestamp()
@@ -492,7 +427,7 @@ const loadCountData = async () => {
 
   try {
     const countData = await pomodoroAPI.getCount()
-    completedCount.value = normalizeCount(countData)
+    completedCount.value = normalizePomodoroCount(countData)
   } catch (error) {
     console.error('加载专注次数失败:', error)
   } finally {
@@ -509,7 +444,7 @@ const loadRankingData = async () => {
 
   try {
     const rankingData = await pomodoroAPI.getRanking()
-    ranking.value = normalizeRanking(rankingData)
+    ranking.value = normalizePomodoroRanking(rankingData)
   } catch (error) {
     console.error('加载排行榜失败:', error)
   } finally {
