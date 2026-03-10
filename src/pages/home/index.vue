@@ -28,13 +28,22 @@
     <!-- 每日一词详情弹窗 -->
     <view v-if="isWordDetailVisible" class="fixed inset-0 z-50 flex items-center justify-center" @tap.self="hideWordDetail">
       <view class="absolute inset-0 bg-black opacity-50"></view>
-      <view class="relative bg-white rounded-xl w-11/12 max-w-md max-h-[80vh] overflow-y-auto p-5 shadow-xl">
+      <view
+        class="relative bg-white rounded-xl w-11/12 max-w-md max-h-[80vh] overflow-y-auto p-5 shadow-xl"
+        @touchstart="handleWordTouchStart"
+        @touchend="handleWordTouchEnd"
+      >
         <view class="flex items-center justify-between mb-4">
           <view class="flex items-center gap-2">
             <text class="i-lucide-book w-5 h-5 text-blue-500"></text>
             <text class="text-lg font-semibold text-gray-800">{{ dailyWord.word }}</text>
           </view>
           <text @tap="hideWordDetail" class="i-lucide-x w-5 h-5 text-gray-400"></text>
+        </view>
+
+        <view class="flex items-center justify-between mb-4 text-xs text-gray-400">
+          <text>左右滑动切换单词</text>
+          <text>{{ isRefreshingWord ? '加载新词中...' : '' }}</text>
         </view>
 
         <view v-if="dailyWord" class="space-y-4">
@@ -186,8 +195,19 @@ const authStore = useAuthStore()
 const updateManager = Taro.getUpdateManager()
 
 // 每日一词
-const dailyWord = ref(null)
+const WORD_BUFFER_SIZE = 5
+const wordBuffer = ref([])
+const currentWordIndex = ref(-1)
+const dailyWord = computed(() => {
+  return wordBuffer.value[currentWordIndex.value] || null
+})
 const isWordDetailVisible = ref(false)
+const isRefreshingWord = ref(false)
+const wordTouchState = ref({
+  startX: 0,
+  startY: 0,
+  startTime: 0
+})
 
 // 默认卡片配置
 const defaultCards = [
@@ -305,18 +325,32 @@ const resetOrder = () => {
 }
 
 // 获取每日一词
-const fetchDailyWord = async () => {
+const fetchDailyWord = async (force = false) => {
   // 只在登录状态下请求每日一词
   if (!authStore.isLoggedIn) {
     return
   }
-  if(dailyWord.value) {
+  if (!force && dailyWord.value) {
     return
   }
+  if (isRefreshingWord.value) {
+    return
+  }
+
+  isRefreshingWord.value = true
   try {
-    dailyWord.value = await dictionaryAPI.getRandomWord()
+    const nextWord = await dictionaryAPI.getRandomWord()
+    pushWordToBuffer(nextWord)
   } catch (error) {
     console.error('获取每日一词失败:', error)
+    if (force) {
+      Taro.showToast({
+        title: '刷新失败',
+        icon: 'error'
+      })
+    }
+  } finally {
+    isRefreshingWord.value = false
   }
 }
 
@@ -330,6 +364,88 @@ const showWordDetail = () => {
 // 隐藏单词详情
 const hideWordDetail = () => {
   isWordDetailVisible.value = false
+  resetWordTouchState()
+}
+
+const resetWordTouchState = () => {
+  wordTouchState.value = {
+    startX: 0,
+    startY: 0,
+    startTime: 0
+  }
+}
+
+const pushWordToBuffer = (word) => {
+  if (!word) return
+
+  const nextBuffer = [...wordBuffer.value, word]
+  if (nextBuffer.length > WORD_BUFFER_SIZE) {
+    nextBuffer.shift()
+  }
+
+  wordBuffer.value = nextBuffer
+  currentWordIndex.value = nextBuffer.length - 1
+}
+
+const showPreviousWord = () => {
+  if (currentWordIndex.value <= 0) {
+    return false
+  }
+
+  currentWordIndex.value -= 1
+  return true
+}
+
+const showNextWord = async () => {
+  if (currentWordIndex.value < wordBuffer.value.length - 1) {
+    currentWordIndex.value += 1
+    return
+  }
+
+  await fetchDailyWord(true)
+}
+
+const handleWordTouchStart = (e) => {
+  const touch = e.touches?.[0]
+  if (!touch) return
+
+  wordTouchState.value = {
+    startX: touch.clientX,
+    startY: touch.clientY,
+    startTime: Date.now()
+  }
+}
+
+const handleWordTouchEnd = async (e) => {
+  if (!isWordDetailVisible.value || isRefreshingWord.value) {
+    resetWordTouchState()
+    return
+  }
+
+  const touch = e.changedTouches?.[0]
+  if (!touch) {
+    resetWordTouchState()
+    return
+  }
+
+  const deltaX = touch.clientX - wordTouchState.value.startX
+  const deltaY = touch.clientY - wordTouchState.value.startY
+  const deltaTime = Date.now() - wordTouchState.value.startTime
+  const isHorizontalSwipe = Math.abs(deltaX) > 50 &&
+    Math.abs(deltaX) > Math.abs(deltaY) &&
+    deltaTime < 500
+  const isValidLeftSwipe = deltaX < -50 &&
+    isHorizontalSwipe
+  const isValidRightSwipe = deltaX > 50 &&
+    isHorizontalSwipe
+
+  if (isValidLeftSwipe) {
+    await showNextWord()
+  } else if (isValidRightSwipe) {
+    showPreviousWord()
+  }
+
+  resetWordTouchState()
 }
 
 onMounted(() => {

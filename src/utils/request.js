@@ -2,7 +2,7 @@ import Taro from '@tarojs/taro'
 import { useAuthStore } from '../stores/auth'
 
 // API基础配置
-const BASE_URL = '' // 请根据实际情况修改
+const BASE_URL = 'https://wx.ntrun.com' // 请根据实际情况修改
 const AUTH_REFRESH_BUFFER_MS = 60 * 1000
 const AUTH_BYPASS_REFRESH_ENDPOINTS = [
   '/api/v0/auth/refresh',
