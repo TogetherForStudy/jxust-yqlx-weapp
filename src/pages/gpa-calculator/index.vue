@@ -39,7 +39,7 @@
       </view>
 
       <!-- 功能按钮区域 -->
-      <view class="mb-4 grid grid-cols-3 gap-3">
+      <view class="mb-3 grid grid-cols-4 gap-3">
         <!-- 反向计算 -->
         <view
           @tap="openReverseCalcModal"
@@ -72,6 +72,35 @@
             <text class="text-white text-xs font-medium">添加课程</text>
           </view>
         </view>
+
+        <!-- 备份恢复 -->
+        <view
+          @tap="openBackupModal"
+          class="bg-blue-400 rounded-xl p-2 active:opacity-90 transition-opacity"
+        >
+          <view class="flex flex-col items-center justify-center">
+            <text class="i-lucide-database w-5 h-5 text-white mb-1"></text>
+            <text class="text-white text-xs font-medium">备份恢复</text>
+          </view>
+        </view>
+      </view>
+
+      <view
+        v-if="!isLocalDataView"
+        class="mb-4 bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 flex items-center justify-between"
+      >
+        <view class="pr-3">
+          <text class="text-amber-700 text-sm font-medium block">
+            {{ activeBackupTitle || `云端存档 ${activeBackupId}` }}
+          </text>
+          <text class="text-amber-600 text-xs block mt-1">当前操作不会影响本地数据</text>
+        </view>
+        <view
+          @tap="switchToLocalData"
+          class="shrink-0 bg-white text-amber-700 text-xs px-3 py-2 rounded-lg border border-amber-200 active:bg-amber-100"
+        >
+          <text>切回本地</text>
+        </view>
       </view>
     </view>
 
@@ -79,7 +108,14 @@
     <view class="px-4 flex-1 h-[1px] flex flex-col">
       <view v-if="courses.length > 0" class="bg-white rounded-xl shadow-sm overflow-hidden flex-1 flex flex-col h-full">
         <view class="px-4 py-3 border-b border-gray-100 flex-shrink-0 flex items-center justify-between">
-            <text class="text-gray-700 font-medium text-sm">已添加课程</text>
+          <view>
+            <text class="text-gray-700 font-medium text-sm block">
+              {{ isLocalDataView ? '已添加课程' : '备份预览课程' }}
+            </text>
+            <text v-if="!isLocalDataView && activeBackupUpdatedAt" class="text-gray-400 text-xs block mt-1">
+              更新时间：{{ activeBackupUpdatedAt }}
+            </text>
+          </view>
           <view class="flex items-center flex-shrink-0">
             <view
               @tap="selectAll"
@@ -99,7 +135,7 @@
           <view class="divide-y divide-gray-100">
             <view
               v-for="(course, index) in courses"
-              :key="index"
+              :key="`${course.courseName}-${index}`"
               class="px-4 py-3 flex items-center"
             >
               <!-- 左侧勾选框 -->
@@ -132,13 +168,19 @@
               <view class="flex items-center flex-shrink-0">
                 <view
                   @tap.stop="editCourse(index)"
-                  class="ml-3 p-2 active:bg-gray-100 rounded"
+                  :class="[
+                    'ml-3 p-2 rounded',
+                    isLocalDataView ? 'active:bg-gray-100' : 'opacity-40'
+                  ]"
                 >
                   <text class="i-lucide-edit text-blue-500 w-5 h-5"></text>
                 </view>
                 <view
                   @tap.stop="removeCourse(index)"
-                  class="ml-2 p-2 active:bg-gray-100 rounded"
+                  :class="[
+                    'ml-2 p-2 rounded',
+                    isLocalDataView ? 'active:bg-gray-100' : 'opacity-40'
+                  ]"
                 >
                   <text class="i-lucide-trash-2 text-red-500 w-5 h-5"></text>
                 </view>
@@ -153,7 +195,9 @@
         <view class="text-center">
           <text class="i-lucide-book-open w-12 h-12 text-gray-300 block mx-auto mb-3"></text>
           <text class="text-gray-500 text-sm block">暂无课程数据</text>
-          <text class="text-gray-400 text-xs mt-1 block">请在上方添加课程信息</text>
+          <text class="text-gray-400 text-xs mt-1 block">
+            {{ isLocalDataView ? '请在上方添加课程信息' : '当前备份中没有可恢复的课程' }}
+          </text>
         </view>
       </view>
     </view>
@@ -161,7 +205,7 @@
     <!-- 底部提示 -->
     <view class="p-4 flex-shrink-0">
       <text class="text-gray-400 text-xs text-center block">
-        您的数据不会被上传
+        默认仅保存在本地，点击“备份恢复”后才会上传到服务器
       </text>
     </view>
 
@@ -341,6 +385,109 @@
       </view>
     </view>
 
+    <!-- 备份恢复弹窗 -->
+    <view v-if="showBackupModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" @tap="closeBackupModal">
+      <view class="bg-white rounded-xl p-6 w-full max-w-sm mx-4" @tap.stop>
+        <view class="flex items-center justify-between mb-3">
+          <view>
+            <text class="text-gray-800 font-medium text-lg block">备份恢复</text>
+            <text class="text-gray-400 text-xs block mt-1">最多可上传 6 份数据</text>
+          </view>
+          <view
+            @tap="loadBackupList"
+            class="text-blue-500 text-xs px-2 py-1 rounded active:bg-blue-50"
+          >
+            <text>刷新</text>
+          </view>
+        </view>
+
+        <view class="grid grid-cols-2 gap-3 mb-4">
+          <view
+            @tap="uploadCurrentLocalBackup"
+            :class="[
+              'rounded-xl px-3 py-3 text-center transition-colors border',
+              canUploadLocalBackup ? 'bg-blue-500 text-white border-blue-500 active:bg-blue-600' : 'bg-gray-100 text-gray-400 border-gray-100'
+            ]"
+          >
+            <text class="text-sm font-medium block">上传本地数据</text>
+            <text class="text-xs opacity-90 block mt-1">当前 {{ localCoursesSnapshot.length }} 门课程</text>
+          </view>
+
+          <view
+            @tap="switchToLocalData"
+            :class="[
+              'rounded-xl px-3 py-3 text-center transition-colors border',
+              isLocalDataView
+                ? 'bg-gray-100 text-gray-400 border-gray-100'
+                : 'bg-white text-amber-700 border-amber-200 active:bg-amber-50'
+            ]"
+          >
+            <text class="text-sm font-medium block">切回本地</text>
+            <text class="text-xs block mt-1">恢复本地展示</text>
+          </view>
+        </view>
+
+        <view class="mb-2 flex items-center justify-between">
+          <text class="text-gray-700 text-sm font-medium">云端备份列表</text>
+          <text v-if="isBackupLoading" class="text-gray-400 text-xs">加载中...</text>
+        </view>
+
+        <scroll-view :scroll-y="true" class="mb-4" style="max-height: 320px;">
+          <view v-if="displayedBackupList.length > 0" class="space-y-3">
+            <view
+              v-for="backup in displayedBackupList"
+              :key="backup.id"
+              class="border rounded-xl px-4 py-3"
+              :class="isActiveBackup(backup.id) ? 'border-blue-200 bg-blue-50' : 'border-gray-100 bg-gray-50'"
+            >
+              <view class="flex items-start justify-between gap-3">
+                <view class="flex-1 min-w-0">
+                  <text class="text-gray-800 text-sm font-medium block">
+                    {{ backup.title || `云端存档 ${backup.id}` }}
+                  </text>
+                  <text class="text-gray-500 text-xs block mt-1">
+                    更新时间：{{ formatBackupTime(backup.updated_at || backup.created_at) }}
+                  </text>
+                  <text class="text-gray-400 text-xs block mt-1">
+                    课程数：{{ getBackupCourseCount(backup) }}
+                  </text>
+                </view>
+                <view class="shrink-0 flex flex-col gap-2">
+                  <view
+                    @tap="handleRestoreBackup(backup.id)"
+                    class="w-8 h-8 rounded-lg flex items-center justify-center"
+                    :class="isActiveBackup(backup.id) ? 'bg-white text-blue-600 border border-blue-200' : 'bg-blue-500 text-white active:bg-blue-600'"
+                  >
+                    <text class="i-lucide-rotate-ccw w-3.5 h-3.5"></text>
+                  </view>
+                  <view
+                    @tap="deleteBackupItem(backup.id)"
+                    class="w-8 h-8 rounded-lg flex items-center justify-center bg-white text-red-500 border border-red-100 active:bg-red-50"
+                  >
+                    <text class="i-lucide-trash-2 w-3.5 h-3.5"></text>
+                  </view>
+                </view>
+              </view>
+            </view>
+          </view>
+
+          <view v-else class="bg-gray-50 rounded-xl px-4 py-6 text-center">
+            <text class="text-gray-500 text-sm block">
+              {{ isBackupListLoadFailed ? '备份加载失败' : '暂无云端备份' }}
+            </text>
+            <text v-if="isBackupListLoadFailed" class="text-gray-400 text-xs block mt-1">请点击右上角刷新重试</text>
+          </view>
+        </scroll-view>
+
+        <view
+          @tap="closeBackupModal"
+          class="w-full bg-gray-100 text-gray-600 text-center py-3 rounded-lg active:bg-gray-200 transition-colors"
+        >
+          <text class="text-sm">关闭</text>
+        </view>
+      </view>
+    </view>
+
     <!-- 编辑弹窗 -->
     <view v-if="showEditModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" @tap="closeEditModal">
       <view class="bg-white rounded-xl p-6 w-full max-w-sm mx-4" @tap.stop>
@@ -410,19 +557,82 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import Taro from '@tarojs/taro'
-import { configAPI } from '../../api'
+import { configAPI, gpaAPI } from '../../api'
 
-// 当前输入的课程信息
+const STORAGE_KEY = 'gpa_calculator_courses'
+const BACKUP_LIMIT = 6
+
+const normalizeCourse = (course = {}) => {
+  const credits = parseFloat(course.credits)
+  const score = parseFloat(course.score)
+
+  return {
+    courseName: String(course.courseName ?? course.name ?? '').trim(),
+    credits: Number.isFinite(credits) ? credits : '',
+    score: Number.isFinite(score) ? score : '',
+    selected: course.selected !== undefined ? Boolean(course.selected) : true
+  }
+}
+
+const cloneCourseList = (list = []) => {
+  if (!Array.isArray(list)) {
+    return []
+  }
+
+  return list.map(item => normalizeCourse(item))
+}
+
+const extractCoursesFromBackupData = (data) => {
+  if (Array.isArray(data)) {
+    return cloneCourseList(data)
+  }
+
+  if (!data || typeof data !== 'object') {
+    return []
+  }
+
+  if (Array.isArray(data.courses)) {
+    return cloneCourseList(data.courses)
+  }
+
+  if (Array.isArray(data.list)) {
+    return cloneCourseList(data.list)
+  }
+
+  if (Array.isArray(data.data)) {
+    return cloneCourseList(data.data)
+  }
+
+  if (data.data && Array.isArray(data.data.courses)) {
+    return cloneCourseList(data.data.courses)
+  }
+
+  return []
+}
+
+const formatBackupTime = (value) => {
+  if (!value) {
+    return '--'
+  }
+
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) {
+    return value
+  }
+
+  const pad = num => String(num).padStart(2, '0')
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`
+}
+
 const currentCourse = ref({
   courseName: '',
   credits: '',
   score: ''
 })
 
-// 课程列表
 const courses = ref([])
+const localCoursesSnapshot = ref([])
 
-// 编辑相关
 const showEditModal = ref(false)
 const editCourseIndex = ref(-1)
 const editCourseData = ref({
@@ -431,10 +641,8 @@ const editCourseData = ref({
   score: ''
 })
 
-// 添加弹窗相关
 const showAddModal = ref(false)
 
-// 反向计算弹窗相关
 const showReverseCalcModal = ref(false)
 const reverseCalc = ref({
   targetGPA: '',
@@ -442,16 +650,32 @@ const reverseCalc = ref({
 })
 const reverseCalcResult = ref(null)
 
-// 保研均分查询弹窗相关
 const showGraduateModal = ref(false)
-
-// 保研年份
 const graduateYear = ref(2026)
-
-// 保研专业数据
 const graduateMajorData = ref([])
 
-// 是否可以添加
+const showBackupModal = ref(false)
+const backupList = ref([])
+const isBackupLoading = ref(false)
+const isBackupListLoadFailed = ref(false)
+const isBackupSubmitting = ref(false)
+const activeDataSource = ref('local')
+const activeBackupId = ref(null)
+const activeBackupTitle = ref('')
+const activeBackupUpdatedAt = ref('')
+
+const isLocalDataView = computed(() => activeDataSource.value === 'local')
+
+const displayedBackupList = computed(() => {
+  return [...backupList.value]
+    .sort((a, b) => new Date(b.updated_at || b.created_at).getTime() - new Date(a.updated_at || a.created_at).getTime())
+    .slice(0, BACKUP_LIMIT)
+})
+
+const canUploadLocalBackup = computed(() => {
+  return !isBackupSubmitting.value && localCoursesSnapshot.value.length > 0
+})
+
 const canAdd = computed(() => {
   return (
     currentCourse.value.courseName.trim() &&
@@ -463,7 +687,6 @@ const canAdd = computed(() => {
   )
 })
 
-// 是否可以保存编辑
 const canSaveEdit = computed(() => {
   return (
     editCourseData.value.courseName.trim() &&
@@ -475,7 +698,6 @@ const canSaveEdit = computed(() => {
   )
 })
 
-// 是否可以进行反向计算
 const canReverseCalc = computed(() => {
   return (
     reverseCalc.value.targetGPA &&
@@ -486,7 +708,6 @@ const canReverseCalc = computed(() => {
   )
 })
 
-// 绩点计算结果（只计算选中的课程）
 const gpaResults = computed(() => {
   const selectedCourses = courses.value.filter(course => course.selected !== false)
 
@@ -498,7 +719,7 @@ const gpaResults = computed(() => {
     }
   }
 
-  let totalCredits = 0
+  let totalCreditsValue = 0
   let totalScoreWeighted = 0
   let totalFivePointWeighted = 0
   let totalFourPointWeighted = 0
@@ -508,20 +729,14 @@ const gpaResults = computed(() => {
     const score = parseFloat(course.score) || 0
 
     if (credits > 0 && score >= 0 && score <= 100) {
-      totalCredits += credits
+      totalCreditsValue += credits
       totalScoreWeighted += score * credits
-
-      // 五分制转换
-      const fivePoint = convertToFivePoint(score)
-      totalFivePointWeighted += fivePoint * credits
-
-      // 四分制转换
-      const fourPoint = convertToFourPoint(score)
-      totalFourPointWeighted += fourPoint * credits
+      totalFivePointWeighted += convertToFivePoint(score) * credits
+      totalFourPointWeighted += convertToFourPoint(score) * credits
     }
   })
 
-  if (totalCredits === 0) {
+  if (totalCreditsValue === 0) {
     return {
       percentage: 0,
       fivePoint: 0,
@@ -530,13 +745,12 @@ const gpaResults = computed(() => {
   }
 
   return {
-    percentage: totalScoreWeighted / totalCredits,
-    fivePoint: totalFivePointWeighted / totalCredits,
-    fourPoint: totalFourPointWeighted / totalCredits
+    percentage: totalScoreWeighted / totalCreditsValue,
+    fivePoint: totalFivePointWeighted / totalCreditsValue,
+    fourPoint: totalFourPointWeighted / totalCreditsValue
   }
 })
 
-// 总学分（所有课程）
 const totalCredits = computed(() => {
   return courses.value.reduce((sum, course) => {
     const credits = parseFloat(course.credits) || 0
@@ -544,7 +758,6 @@ const totalCredits = computed(() => {
   }, 0)
 })
 
-// 已选择的总学分
 const totalSelectedCredits = computed(() => {
   return courses.value
     .filter(course => course.selected !== false)
@@ -554,16 +767,11 @@ const totalSelectedCredits = computed(() => {
     }, 0)
 })
 
-// 百分制转五分制（线性换算）
 const convertToFivePoint = (score) => {
-  // 线性换算公式：GPA = (分数 - 50) / 10
-  // 100分=5.0, 90分=4.0, 80分=3.0, 70分=2.0, 60分=1.0, 50分=0.0
   const gpa = (score - 50) / 10
-  // 限制在 0-5 范围内
   return Math.max(0, Math.min(5, gpa))
 }
 
-// 百分制转四分制
 const convertToFourPoint = (score) => {
   if (score >= 90) return 4.0
   if (score >= 85) return 3.7
@@ -577,7 +785,110 @@ const convertToFourPoint = (score) => {
   return 0
 }
 
-// 切换课程选中状态
+const calculatePercentageFromCourses = (courseList = []) => {
+  let totalCreditsValue = 0
+  let totalScoreWeighted = 0
+
+  courseList.forEach(course => {
+    const credits = parseFloat(course.credits) || 0
+    const score = parseFloat(course.score) || 0
+
+    if (credits > 0 && score >= 0 && score <= 100) {
+      totalCreditsValue += credits
+      totalScoreWeighted += score * credits
+    }
+  })
+
+  if (totalCreditsValue <= 0) {
+    return 0
+  }
+
+  return totalScoreWeighted / totalCreditsValue
+}
+
+const buildBackupTitle = () => {
+  const courseList = cloneCourseList(localCoursesSnapshot.value)
+  const percentage = calculatePercentageFromCourses(courseList).toFixed(2)
+  const courseCount = courseList.length
+  const totalCreditsValue = courseList.reduce((sum, course) => {
+    const credits = parseFloat(course.credits) || 0
+    return sum + credits
+  }, 0)
+
+  return `${percentage}-${courseCount}门-${totalCreditsValue.toFixed(1)}学分`
+}
+
+const buildBackupPayload = () => {
+  return {
+    title: buildBackupTitle(),
+    data: {
+      courses: cloneCourseList(localCoursesSnapshot.value),
+      exported_at: new Date().toISOString(),
+      source: 'weapp'
+    }
+  }
+}
+
+const isActiveBackup = (backupId) => {
+  return !isLocalDataView.value && activeBackupId.value === backupId
+}
+
+const getBackupCourseCount = (backup) => {
+  return extractCoursesFromBackupData(backup?.data).length
+}
+
+const persistLocalCourseList = (courseList) => {
+  const normalizedCourses = cloneCourseList(courseList)
+  Taro.setStorageSync(STORAGE_KEY, normalizedCourses)
+  localCoursesSnapshot.value = cloneCourseList(normalizedCourses)
+  return normalizedCourses
+}
+
+const saveToLocalStorage = () => {
+  if (!isLocalDataView.value) {
+    return
+  }
+
+  try {
+    persistLocalCourseList(courses.value)
+  } catch (error) {
+    console.error('保存数据失败:', error)
+  }
+}
+
+const loadFromLocalStorage = () => {
+  try {
+    const saved = Taro.getStorageSync(STORAGE_KEY)
+    const normalizedCourses = cloneCourseList(saved)
+    localCoursesSnapshot.value = cloneCourseList(normalizedCourses)
+    courses.value = cloneCourseList(normalizedCourses)
+    activeDataSource.value = 'local'
+    activeBackupId.value = null
+    activeBackupTitle.value = ''
+    activeBackupUpdatedAt.value = ''
+  } catch (error) {
+    console.error('加载数据失败:', error)
+  }
+}
+
+const switchToLocalData = () => {
+  if (isLocalDataView.value) {
+    return
+  }
+
+  courses.value = cloneCourseList(localCoursesSnapshot.value)
+  activeDataSource.value = 'local'
+  activeBackupId.value = null
+  activeBackupTitle.value = ''
+  activeBackupUpdatedAt.value = ''
+  closeBackupModal()
+
+  Taro.showToast({
+    title: '已切回本地数据',
+    icon: 'success'
+  })
+}
+
 const toggleCourseSelection = (index) => {
   if (courses.value[index]) {
     courses.value[index].selected = !courses.value[index].selected
@@ -585,7 +896,6 @@ const toggleCourseSelection = (index) => {
   }
 }
 
-// 全选
 const selectAll = () => {
   courses.value.forEach(course => {
     course.selected = true
@@ -593,7 +903,6 @@ const selectAll = () => {
   saveToLocalStorage()
 }
 
-// 反选
 const toggleAll = () => {
   courses.value.forEach(course => {
     course.selected = !course.selected
@@ -601,15 +910,12 @@ const toggleAll = () => {
   saveToLocalStorage()
 }
 
-// 打开添加弹窗
 const openAddModal = () => {
   showAddModal.value = true
 }
 
-// 关闭添加弹窗
 const closeAddModal = () => {
   showAddModal.value = false
-  // 清空输入
   currentCourse.value = {
     courseName: '',
     credits: '',
@@ -617,7 +923,6 @@ const closeAddModal = () => {
   }
 }
 
-// 添加课程
 const addCourse = () => {
   if (!canAdd.value) {
     Taro.showToast({
@@ -627,30 +932,22 @@ const addCourse = () => {
     return
   }
 
-  const newCourse = {
-    courseName: currentCourse.value.courseName.trim(),
-    credits: parseFloat(currentCourse.value.credits),
-    score: parseFloat(currentCourse.value.score),
-    selected: true // 默认选中
-  }
+  courses.value.unshift(normalizeCourse({
+    courseName: currentCourse.value.courseName,
+    credits: currentCourse.value.credits,
+    score: currentCourse.value.score,
+    selected: true
+  }))
 
-  // 使用unshift确保新课程添加到数组开头（显示在顶部）
-  courses.value.unshift(newCourse)
-
-  // 保存到本地存储
   saveToLocalStorage()
-
-  // 关闭弹窗
   closeAddModal()
 }
 
-// 打开反向计算弹窗
 const openReverseCalcModal = () => {
   showReverseCalcModal.value = true
   reverseCalcResult.value = null
 }
 
-// 关闭反向计算弹窗
 const closeReverseCalcModal = () => {
   showReverseCalcModal.value = false
   reverseCalc.value = {
@@ -660,7 +957,6 @@ const closeReverseCalcModal = () => {
   reverseCalcResult.value = null
 }
 
-// 反向计算
 const calculateReverse = () => {
   if (!canReverseCalc.value) {
     Taro.showToast({
@@ -670,9 +966,7 @@ const calculateReverse = () => {
     return
   }
 
-  // 获取当前已选课程的数据
   const selectedCourses = courses.value.filter(course => course.selected !== false)
-
   let currentTotalCredits = 0
   let currentWeightedScore = 0
 
@@ -689,9 +983,6 @@ const calculateReverse = () => {
   const targetScore = parseFloat(reverseCalc.value.targetGPA)
   const remainingCredits = parseFloat(reverseCalc.value.remainingCredits)
   const totalFutureCredits = currentTotalCredits + remainingCredits
-
-  // 计算公式（百分制）：(当前加权分数 + 剩余学分 * 所需分数) / 总学分 = 目标分数
-  // 所需分数 = (目标分数 * 总学分 - 当前加权分数) / 剩余学分
   const requiredScore = (targetScore * totalFutureCredits - currentWeightedScore) / remainingCredits
 
   if (requiredScore > 100) {
@@ -722,18 +1013,200 @@ const calculateReverse = () => {
   }
 }
 
-// 打开保研均分弹窗
 const openGraduateModal = () => {
   showGraduateModal.value = true
 }
 
-// 关闭保研均分弹窗
 const closeGraduateModal = () => {
   showGraduateModal.value = false
 }
 
-// 编辑课程
+const openBackupModal = async () => {
+  showBackupModal.value = true
+  await loadBackupList()
+}
+
+const closeBackupModal = () => {
+  showBackupModal.value = false
+}
+
+const loadBackupList = async () => {
+  if (isBackupLoading.value) {
+    return
+  }
+
+  isBackupLoading.value = true
+  isBackupListLoadFailed.value = false
+  try {
+    const response = await gpaAPI.getBackupList()
+    backupList.value = Array.isArray(response) ? response : []
+
+    if (!isLocalDataView.value && activeBackupId.value) {
+      const activeBackup = backupList.value.find(item => item.id === activeBackupId.value)
+      activeBackupTitle.value = activeBackup?.title || activeBackupTitle.value || `云端存档 ${activeBackupId.value}`
+    }
+  } catch (error) {
+    console.error('加载绩点备份失败:', error)
+    backupList.value = []
+    isBackupListLoadFailed.value = true
+  } finally {
+    isBackupLoading.value = false
+  }
+}
+
+const uploadCurrentLocalBackup = async () => {
+  if (!canUploadLocalBackup.value) {
+    Taro.showToast({
+      title: '本地暂无可上传数据',
+      icon: 'none'
+    })
+    return
+  }
+
+  isBackupSubmitting.value = true
+  Taro.showLoading({
+    title: '上传中...',
+    mask: true
+  })
+
+  try {
+    await gpaAPI.createBackup(buildBackupPayload())
+    await loadBackupList()
+    Taro.showToast({
+      title: '备份上传成功',
+      icon: 'success'
+    })
+  } catch (error) {
+    console.error('上传绩点备份失败:', error)
+  } finally {
+    isBackupSubmitting.value = false
+    Taro.hideLoading()
+  }
+}
+
+const handleRestoreBackup = async (backupId) => {
+  if (!backupId) {
+    return
+  }
+
+  try {
+    const { tapIndex } = await Taro.showActionSheet({
+      itemList: ['仅查看，不覆盖本地', '恢复并覆盖本地']
+    })
+
+    await restoreBackupItem(backupId, {
+      overwriteLocal: tapIndex === 1
+    })
+  } catch (error) {
+    if (error?.errMsg && error.errMsg.includes('cancel')) {
+      return
+    }
+    console.error('选择恢复方式失败:', error)
+  }
+}
+
+const deleteBackupItem = async (backupId) => {
+  if (!backupId || isBackupLoading.value) {
+    return
+  }
+
+  try {
+    const { confirm } = await Taro.showModal({
+      title: '删除备份',
+      content: '删除后不可恢复，确定删除这份备份吗？',
+      confirmText: '删除',
+      confirmColor: '#ef4444'
+    })
+
+    if (!confirm) {
+      return
+    }
+  } catch (error) {
+    console.error('确认删除备份失败:', error)
+    return
+  }
+
+  isBackupLoading.value = true
+  Taro.showLoading({
+    title: '删除中...',
+    mask: true
+  })
+
+  try {
+    await gpaAPI.deleteBackup(backupId)
+    backupList.value = backupList.value.filter(item => item.id !== backupId)
+
+    if (!isLocalDataView.value && activeBackupId.value === backupId) {
+      courses.value = cloneCourseList(localCoursesSnapshot.value)
+      activeDataSource.value = 'local'
+      activeBackupId.value = null
+      activeBackupTitle.value = ''
+      activeBackupUpdatedAt.value = ''
+    }
+
+    Taro.showToast({
+      title: '备份已删除',
+      icon: 'success'
+    })
+  } catch (error) {
+    console.error('删除绩点备份失败:', error)
+  } finally {
+    isBackupLoading.value = false
+    Taro.hideLoading()
+  }
+}
+
+const restoreBackupItem = async (backupId, { overwriteLocal = false } = {}) => {
+  if (!backupId || isBackupLoading.value) {
+    return
+  }
+
+  isBackupLoading.value = true
+  Taro.showLoading({
+    title: '恢复中...',
+    mask: true
+  })
+
+  try {
+    const backup = await gpaAPI.getBackupDetail(backupId)
+    const backupCourses = extractCoursesFromBackupData(backup?.data)
+    const backupUpdatedAt = formatBackupTime(backup?.updated_at || backup?.created_at)
+    const backupTitle = backup?.title || backupList.value.find(item => item.id === backupId)?.title || `云端存档 ${backupId}`
+
+    if (overwriteLocal) {
+      const normalizedCourses = persistLocalCourseList(backupCourses)
+      courses.value = cloneCourseList(normalizedCourses)
+      activeDataSource.value = 'local'
+      activeBackupId.value = null
+      activeBackupTitle.value = ''
+      activeBackupUpdatedAt.value = ''
+    } else {
+      courses.value = backupCourses
+      activeDataSource.value = 'backup'
+      activeBackupId.value = backup?.id ?? backupId
+      activeBackupTitle.value = backupTitle
+      activeBackupUpdatedAt.value = backupUpdatedAt
+    }
+
+    closeBackupModal()
+
+    Taro.showToast({
+      title: overwriteLocal ? '已覆盖本地数据' : '已切换到备份',
+      icon: 'success'
+    })
+  } catch (error) {
+    console.error('恢复绩点备份失败:', error)
+  } finally {
+    isBackupLoading.value = false
+    Taro.hideLoading()
+  }
+}
+
 const editCourse = (index) => {
+  if (!isLocalDataView.value) {
+    return
+  }
+
   editCourseIndex.value = index
   editCourseData.value = {
     courseName: courses.value[index].courseName,
@@ -743,7 +1216,6 @@ const editCourse = (index) => {
   showEditModal.value = true
 }
 
-// 保存编辑
 const saveEditCourse = () => {
   if (!canSaveEdit.value) {
     Taro.showToast({
@@ -753,23 +1225,21 @@ const saveEditCourse = () => {
     return
   }
 
-  // 保留原有的 selected 状态
   const originalSelected = courses.value[editCourseIndex.value]?.selected !== undefined
     ? courses.value[editCourseIndex.value].selected
     : true
 
-  courses.value[editCourseIndex.value] = {
-    courseName: editCourseData.value.courseName.trim(),
-    credits: parseFloat(editCourseData.value.credits),
-    score: parseFloat(editCourseData.value.score),
-    selected: originalSelected // 保留原有的选中状态
-  }
+  courses.value[editCourseIndex.value] = normalizeCourse({
+    courseName: editCourseData.value.courseName,
+    credits: editCourseData.value.credits,
+    score: editCourseData.value.score,
+    selected: originalSelected
+  })
 
   saveToLocalStorage()
   closeEditModal()
 }
 
-// 关闭编辑弹窗
 const closeEditModal = () => {
   showEditModal.value = false
   editCourseIndex.value = -1
@@ -780,8 +1250,11 @@ const closeEditModal = () => {
   }
 }
 
-// 删除课程
 const removeCourse = (index) => {
+  if (!isLocalDataView.value) {
+    return
+  }
+
   Taro.showModal({
     title: '提示',
     content: '确定要删除这条课程记录吗？',
@@ -794,37 +1267,10 @@ const removeCourse = (index) => {
   })
 }
 
-// 保存到本地存储
-const saveToLocalStorage = () => {
-  try {
-    Taro.setStorageSync('gpa_calculator_courses', courses.value)
-  } catch (error) {
-    console.error('保存数据失败:', error)
-  }
-}
-
-// 从本地存储加载
-const loadFromLocalStorage = () => {
-  try {
-    const saved = Taro.getStorageSync('gpa_calculator_courses')
-    if (saved && Array.isArray(saved)) {
-      // 确保每个课程都有selected属性，默认为true
-      courses.value = saved.map(course => ({
-        ...course,
-        selected: course.selected !== undefined ? course.selected : true
-      }))
-    }
-  } catch (error) {
-    console.error('加载数据失败:', error)
-  }
-}
-
-// 加载保研专业数据
 const loadGraduateData = async () => {
   try {
     const response = await configAPI.getConfig('bygpa')
     if (response && response.value) {
-      // 解析 value 字段中的 JSON 字符串
       const configData = JSON.parse(response.value)
       if (configData.year) {
         graduateYear.value = configData.year
@@ -838,7 +1284,6 @@ const loadGraduateData = async () => {
   }
 }
 
-// 页面加载时恢复数据
 onMounted(() => {
   loadFromLocalStorage()
   loadGraduateData()
@@ -864,4 +1309,3 @@ Taro.useShareTimeline((res) => {
 </script>
 
 <style scoped></style>
-
