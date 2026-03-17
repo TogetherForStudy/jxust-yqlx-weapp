@@ -54,7 +54,7 @@
             :class="itemIndex > 0 ? 'border-t border-slate-100' : ''"
           >
             <view class="min-w-0 flex-1">
-              <text class="block text-sm leading-6 text-slate-800">{{ item.name }}</text>
+              <text class="block text-sm leading-6 text-slate-800" :user-select="true">{{ item.name }}</text>
             </view>
             <view
               @tap.stop="copyCompetitionLink(item)"
@@ -63,7 +63,7 @@
                 item.url ? 'bg-orange-50 text-orange-600' : 'bg-slate-100 text-slate-400'
               ]"
             >
-              <text class="i-lucide-external-link h-4 w-4"></text>
+              <text class="i-lucide-external-link h-4 w-4" :user-select="true"></text>
             </view>
           </view>
         </view>
@@ -95,7 +95,7 @@
                 :class="itemIndex > 0 ? 'border-t border-slate-100' : ''"
               >
                 <view class="min-w-0 flex-1">
-                  <text class="block text-sm leading-6 text-slate-800">{{ item.name }}</text>
+                  <text class="block text-sm leading-6 text-slate-800" :user-select="true">{{ item.name }}</text>
                 </view>
                 <view
                   @tap.stop="copyCompetitionLink(item)"
@@ -104,7 +104,7 @@
                     item.url ? 'bg-orange-50 text-orange-600' : 'bg-slate-100 text-slate-400'
                   ]"
                 >
-                  <text class="i-lucide-external-link h-4 w-4"></text>
+                  <text class="i-lucide-external-link h-4 w-4" :user-select="true"></text>
                 </view>
               </view>
             </view>
