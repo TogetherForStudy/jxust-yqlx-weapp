@@ -264,16 +264,16 @@
       </view>
       <view class="grid grid-cols-4 gap-2">
         <view
-          @tap="goToCoding"
-          class="bg-white rounded-xl p-3 shadow-sm opacity-60"
+          @tap="goToExchange"
+          class="bg-white rounded-xl p-3 shadow-sm active:scale-95 transition-transform duration-200"
         >
           <view class="flex flex-col items-center text-center">
             <view
-              class="w-8 h-8 bg-gradient-to-br from-blue-200 to-blue-400 rounded-full flex items-center justify-center mb-2"
+              class="w-8 h-8 bg-gradient-to-br from-pink-200 to-pink-400 rounded-full flex items-center justify-center mb-2"
             >
-              <text class="i-lucide-rocket text-white w-4 h-4"></text>
+              <text class="i-lucide-globe text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">大学生涯</text>
+            <text class="text-gray-800 font-medium text-sm">交换生</text>
           </view>
         </view>
         <view
@@ -321,11 +321,11 @@
         >
           <view class="flex flex-col items-center text-center">
             <view
-              class="w-8 h-8 bg-gradient-to-br from-pink-200 to-pink-400 rounded-full flex items-center justify-center mb-2"
+              class="w-8 h-8 bg-gradient-to-br from-blue-200 to-blue-400 rounded-full flex items-center justify-center mb-2"
             >
-              <text class="i-lucide-globe text-white w-4 h-4"></text>
+              <text class="i-lucide-rocket text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">交换生</text>
+            <text class="text-gray-800 font-medium text-sm">大学生涯</text>
           </view>
         </view>
         <view
@@ -651,6 +651,10 @@ const goToCompetition = () => {
 
 const goToQualification = () => {
   Taro.navigateTo({ url: "/pages/qualification/index" });
+};
+
+const goToExchange = () => {
+  Taro.navigateTo({ url: "/pages/exchange/index" });
 };
 
 const goToHero = () => {
