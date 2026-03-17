@@ -26,8 +26,8 @@
         <view class="border-b border-slate-200 pb-3">
           <view class="flex items-start justify-between gap-3">
             <view>
-              <text class="text-base font-semibold text-slate-900">{{ activeTitle }}</text>
-              <text v-if="activeDescription" class="mt-1 block text-xs leading-5 text-slate-500">{{ activeDescription }}</text>
+              <text class="text-base font-semibold text-slate-900" :user-select="true">{{ activeTitle }}</text>
+              <text v-if="activeDescription" class="mt-1 block text-xs leading-5 text-slate-500" :user-select="true">{{ activeDescription }}</text>
             </view>
             <text class="flex-shrink-0 text-xs text-orange-600">{{ activeCount }} 项</text>
           </view>
@@ -53,16 +53,17 @@
             :class="index > 0 ? 'border-t border-slate-100' : ''"
           >
             <view class="flex items-start justify-between gap-3">
-              <text class="block min-w-0 flex-1 text-sm font-semibold leading-6 text-slate-800">{{ item.name }}</text>
+              <text class="block min-w-0 flex-1 text-sm font-semibold leading-6 text-slate-800" :user-select="true">{{ item.name }}</text>
             </view>
 
             <text
               v-if="item.displayDate"
               class="mt-1 block text-xs font-medium leading-5 text-orange-600"
+              :user-select="true"
             >
               {{ item.displayDate }}
             </text>
-            <text class="mt-2 block text-sm leading-6 text-slate-600">{{ item.intro || '暂无介绍' }}</text>
+            <text class="mt-2 block text-sm leading-6 text-slate-600" :user-select="true">{{ item.intro || '暂无介绍' }}</text>
           </view>
         </template>
 
@@ -74,8 +75,8 @@
             :class="index > 0 ? 'border-t border-slate-100' : ''"
           >
             <view class="min-w-0">
-              <text class="block text-sm font-semibold leading-6 text-slate-800">{{ item.name }}</text>
-              <text class="mt-1 block text-xs leading-5 text-slate-400">{{ item.displayDate || '时间待更新' }}</text>
+              <text class="block text-sm font-semibold leading-6 text-slate-800" :user-select="true">{{ item.name }}</text>
+              <text class="mt-1 block text-xs leading-5 text-slate-400" :user-select="true">{{ item.displayDate || '时间待更新' }}</text>
             </view>
 
             <view v-if="item.children.length > 0" class="mt-3 rounded-xl bg-slate-50 px-3 py-2.5">
@@ -86,14 +87,14 @@
                 :class="childIndex > 0 ? 'border-t border-slate-200' : ''"
               >
                 <view class="flex items-start justify-between gap-3">
-                  <text class="min-w-0 flex-1 text-xs font-medium leading-5 text-slate-700">{{ child.name }}</text>
-                  <text class="flex-shrink-0 text-xs leading-5 text-slate-400">{{ child.displayDate || '时间待更新' }}</text>
+                  <text class="min-w-0 flex-1 text-xs font-medium leading-5 text-slate-700" :user-select="true">{{ child.name }}</text>
+                  <text class="flex-shrink-0 text-xs leading-5 text-slate-400" :user-select="true">{{ child.displayDate || '时间待更新' }}</text>
                 </view>
               </view>
             </view>
 
             <view class="mt-3 flex justify-end">
-              <text class="text-xs text-sky-600">{{ item.category || '职业资格' }}</text>
+              <text class="text-xs text-sky-600" :user-select="true">{{ item.category || '职业资格' }}</text>
             </view>
           </view>
         </template>

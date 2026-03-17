@@ -52,8 +52,8 @@
           <view v-else>
             <view v-for="season in currentNoticeSeasons" :key="season.key" class="border-b border-slate-200">
               <view class="flex items-center justify-between py-3">
-                <text class="text-sm font-semibold text-slate-800">{{ season.label }}</text>
-                <text class="text-xs text-slate-400">{{ season.items.length }} 条</text>
+                <text class="text-sm font-semibold text-slate-800" :user-select="true">{{ season.label }}</text>
+                <text class="text-xs text-slate-400" :user-select="true">{{ season.items.length }} 条</text>
               </view>
 
               <view class="border-t border-slate-100">
@@ -68,21 +68,22 @@
                     class="border-t border-slate-100"
                   >
                     <view class="flex items-start gap-3 py-3" @tap="toggleNotice(`${noticeYearTab}-${season.key}-${noticeIndex}`)">
-                      <text class="i-lucide-file-text mt-0.5 h-4 w-4 flex-shrink-0 text-orange-500"></text>
+                      <text class="i-lucide-file-text mt-0.5 h-4 w-4 flex-shrink-0 text-orange-500" :user-select="true"></text>
                       <view class="min-w-0 flex-1">
                         <view class="flex items-center justify-between gap-3">
-                          <text class="block min-w-0 flex-1 truncate text-sm leading-6 text-slate-800">{{ notice.name || '未命名通知' }}</text>
-                          <text :class="Number(notice.status) === 1 ? 'flex-shrink-0 text-xs text-emerald-600' : 'flex-shrink-0 text-xs text-slate-400'">
+                          <text class="block min-w-0 flex-1 truncate text-sm leading-6 text-slate-800" :user-select="true">{{ notice.name || '未命名通知' }}</text>
+                          <text :class="Number(notice.status) === 1 ? 'flex-shrink-0 text-xs text-emerald-600' : 'flex-shrink-0 text-xs text-slate-400'" :user-select="true">
                             {{ Number(notice.status) === 1 ? '已发布' : '未发布' }}
                           </text>
                         </view>
                         <view class="mt-1 flex items-center justify-between text-xs text-slate-400">
-                          <text>{{ notice.publishDate || '发布时间待定' }}</text>
+                          <text :user-select="true">{{ notice.publishDate || '发布时间待定' }}</text>
                           <text
                             :class="[
                               'i-lucide-chevron-down h-4 w-4 transform transition-transform duration-200',
                               isNoticeExpanded(`${noticeYearTab}-${season.key}-${noticeIndex}`) ? 'rotate-180 text-orange-500' : 'rotate-0'
                             ]"
+                            :user-select="true"
                           ></text>
                         </view>
                       </view>
@@ -98,15 +99,16 @@
                           :key="`${noticeYearTab}-${season.key}-${noticeIndex}-${attachmentIndex}`"
                           class="flex items-center gap-2 text-sm text-slate-600"
                         >
-                          <text class="i-lucide-paperclip h-3.5 w-3.5 flex-shrink-0 text-slate-400"></text>
-                          <text class="min-w-0 flex-1 truncate">{{ attachment.name }}</text>
+                          <text class="i-lucide-paperclip h-3.5 w-3.5 flex-shrink-0 text-slate-400" :user-select="true"></text>
+                          <text class="min-w-0 flex-1 truncate" :user-select="true">{{ attachment.name }}</text>
                         </view>
                       </view>
                       <view class="mt-2 flex items-center justify-between text-sm">
-                        <text class="text-slate-500">附件 {{ getNoticeAttachmentCount(notice.attachments) }} 个</text>
+                        <text class="text-slate-500" :user-select="true">附件 {{ getNoticeAttachmentCount(notice.attachments) }} 个</text>
                         <text
                           :class="Number(notice.status) === 1 ? 'text-orange-600' : 'text-slate-400'"
                           @tap.stop="handleAttachmentTap(notice)"
+                          :user-select="true"
                         >
                           {{ Number(notice.status) === 1 ? '复制下载链接' : '暂未发布' }}
                         </text>
@@ -156,17 +158,17 @@
                     class="border-t border-slate-100 py-3 first:border-t-0 first:pt-0"
                   >
                     <view class="flex items-center justify-between gap-3">
-                      <text class="text-sm font-semibold text-slate-800">{{ chance.name || `机会 ${index + 1}` }}</text>
-                      <text class="text-xs text-orange-600">常规批次</text>
+                      <text class="text-sm font-semibold text-slate-800" :user-select="true">{{ chance.name || `机会 ${index + 1}` }}</text>
+                      <text class="text-xs text-orange-600" :user-select="true">常规批次</text>
                     </view>
                     <view class="mt-2 grid grid-cols-2 gap-x-4 gap-y-2 text-xs leading-5 text-slate-600">
-                      <text>咨询时间：{{ chance.consultTime || '未说明' }}</text>
-                      <text>申请时间：{{ chance.applyTime || '未说明' }}</text>
-                      <text>考核时间：{{ chance.assessmentTime || '未说明' }}</text>
-                      <text>转入时间：{{ chance.transferTime || '未说明' }}</text>
-                      <text v-if="chance.approvalTime" class="col-span-2">审批时间：{{ chance.approvalTime }}</text>
+                      <text :user-select="true">咨询时间：{{ chance.consultTime || '未说明' }}</text>
+                      <text :user-select="true">申请时间：{{ chance.applyTime || '未说明' }}</text>
+                      <text :user-select="true">考核时间：{{ chance.assessmentTime || '未说明' }}</text>
+                      <text :user-select="true">转入时间：{{ chance.transferTime || '未说明' }}</text>
+                      <text v-if="chance.approvalTime" class="col-span-2" :user-select="true">审批时间：{{ chance.approvalTime }}</text>
                     </view>
-                    <text class="mt-2 block text-xs leading-6 text-slate-500">{{ chance.principle || '暂无原则说明' }}</text>
+                    <text class="mt-2 block text-xs leading-6 text-slate-500" :user-select="true">{{ chance.principle || '暂无原则说明' }}</text>
                   </view>
                 </view>
               </view>
@@ -174,7 +176,7 @@
               <view v-else-if="explainTab === 'special'" class="border-b border-slate-200 py-3">
                 <view class="mb-2 flex items-center gap-2">
                   <view class="h-2 w-2 rounded-full bg-sky-400"></view>
-                  <text class="text-sm font-semibold text-slate-800">特殊情况</text>
+                  <text class="text-sm font-semibold text-slate-800" :user-select="true">特殊情况</text>
                 </view>
                 <view v-if="majorExplain.specialCases.length === 0" class="py-2 text-sm text-slate-400">暂无特殊情况说明</view>
                 <view v-else>
@@ -183,8 +185,8 @@
                     :key="`${item.title}-${index}`"
                     class="border-t border-slate-100 py-3 first:border-t-0 first:pt-0"
                   >
-                    <text class="text-sm font-semibold text-slate-800">{{ item.title || `特殊情况 ${index + 1}` }}</text>
-                    <text class="mt-1 block text-sm leading-6 text-slate-600">{{ item.content || '暂无说明' }}</text>
+                      <text class="text-sm font-semibold text-slate-800" :user-select="true">{{ item.title || `特殊情况 ${index + 1}` }}</text>
+                      <text class="mt-1 block text-sm leading-6 text-slate-600" :user-select="true">{{ item.content || '暂无说明' }}</text>
                   </view>
                 </view>
               </view>
@@ -192,7 +194,7 @@
               <view v-else class="border-b border-slate-200 py-3">
                 <view class="mb-2 flex items-center gap-2">
                   <view class="h-2 w-2 rounded-full bg-rose-400"></view>
-                  <text class="text-sm font-semibold text-slate-800">禁止转专业情形</text>
+                    <text class="text-sm font-semibold text-slate-800" :user-select="true">禁止转专业情形</text>
                 </view>
                 <view v-if="majorExplain.prohibited.length === 0" class="py-2 text-sm text-slate-400">暂无限制说明</view>
                 <view v-else>
@@ -202,7 +204,7 @@
                     class="flex items-start gap-2 border-t border-slate-100 py-2.5 first:border-t-0 first:pt-0"
                   >
                     <view class="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-rose-400"></view>
-                    <text class="text-sm leading-6 text-slate-700">{{ item }}</text>
+                      <text class="text-sm leading-6 text-slate-700" :user-select="true">{{ item }}</text>
                   </view>
                 </view>
               </view>
@@ -212,8 +214,8 @@
 
         <view v-else-if="activeSection === 'major'" class="mt-4 rounded-2xl bg-white p-4 shadow-sm">
           <view class="border-b border-slate-200 pb-3">
-            <text class="text-base font-semibold text-slate-900">学院专业</text>
-            <text class="mt-1 block text-xs text-slate-500">查看可选择的学院、专业</text>
+            <text class="text-base font-semibold text-slate-900" :user-select="true">学院专业</text>
+            <text class="mt-1 block text-xs text-slate-500" :user-select="true">查看可选择的学院、专业</text>
           </view>
 
           <view class="flex border-b border-slate-200">
@@ -240,9 +242,9 @@
 
           <view v-else class="overflow-x-auto border-b border-slate-200">
             <view class="grid grid-cols-[1fr,1.1fr,1.2fr] gap-3 border-b border-slate-200 py-3 text-xs text-slate-400">
-              <text>学院</text>
-              <text>专业</text>
-              <text>备注</text>
+              <text :user-select="true">学院</text>
+              <text :user-select="true">专业</text>
+              <text :user-select="true">备注</text>
             </view>
             <view
               v-for="(group, groupIndex) in currentMajorGroups"
@@ -250,7 +252,7 @@
               class="grid grid-cols-[1fr,2.3fr] gap-3 border-t border-slate-100 text-sm leading-6"
             >
               <view class="flex items-center border-r border-slate-100 py-3 pr-3 text-slate-800">
-                <text>{{ group.college }}</text>
+                <text :user-select="true">{{ group.college }}</text>
               </view>
               <view>
                 <view
@@ -259,8 +261,8 @@
                   class="grid grid-cols-[1.1fr,1.2fr] gap-3 py-3"
                   :class="rowIndex > 0 ? 'border-t border-slate-100' : ''"
                 >
-                  <text class="text-slate-800">{{ row.name }}</text>
-                  <text class="whitespace-pre-line text-slate-500">{{ row.note || '-' }}</text>
+                  <text class="text-slate-800" :user-select="true">{{ row.name }}</text>
+                  <text class="whitespace-pre-line text-slate-500" :user-select="true">{{ row.note || '-' }}</text>
                 </view>
               </view>
             </view>
@@ -324,8 +326,8 @@
             </view>
 
             <view class="border-b border-slate-200 py-3">
-              <text class="text-sm font-semibold text-orange-600">{{ selectionTitle }}</text>
-              <text class="mt-1 block text-sm leading-6 text-slate-600">{{ selectionDescription }}</text>
+              <text class="text-sm font-semibold text-orange-600" :user-select="true">{{ selectionTitle }}</text>
+              <text class="mt-1 block text-sm leading-6 text-slate-600" :user-select="true">{{ selectionDescription }}</text>
             </view>
 
             <view class="border-b border-slate-200 py-3">
@@ -375,17 +377,18 @@
               class="border-b border-slate-200"
             >
               <view class="flex items-center gap-3 py-3" @tap="toggleQA(item.id)">
-                <text class="w-6 flex-shrink-0 text-center text-sm font-semibold text-orange-600">{{ item.id || '?' }}</text>
-                <text class="min-w-0 flex-1 text-sm leading-6 text-slate-800">{{ item.title || '未命名问题' }}</text>
+                <text class="w-6 flex-shrink-0 text-center text-sm font-semibold text-orange-600" :user-select="true">{{ item.id || '?' }}</text>
+                <text class="min-w-0 flex-1 text-sm leading-6 text-slate-800" :user-select="true">{{ item.title || '未命名问题' }}</text>
                 <text
                   :class="[
                     'i-lucide-chevron-down h-4 w-4 flex-shrink-0 transform text-slate-400 transition-transform duration-200',
                     activeQuestionId === item.id ? 'rotate-180 text-orange-500' : 'rotate-0'
                   ]"
+                  :user-select="true"
                 ></text>
               </view>
               <view v-if="activeQuestionId === item.id" class="pb-3 pl-9 text-sm leading-7 text-slate-600">
-                <text class="whitespace-pre-line">{{ item.content || '内容待补充' }}</text>
+                <text class="whitespace-pre-line" :user-select="true">{{ item.content || '内容待补充' }}</text>
               </view>
             </view>
           </view>
