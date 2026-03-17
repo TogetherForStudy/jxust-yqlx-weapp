@@ -63,8 +63,8 @@
 
         <!-- 通知内容 -->
         <view class="mb-6">
-          <view class="text-gray-700 leading-relaxed break-words">
-            <text class="whitespace-pre-wrap break-words" :user-select="true">{{ notification.content }}</text>
+          <view class="text-gray-700 leading-relaxed">
+            <text class="block whitespace-pre-wrap break-all" :user-select="true">{{ notification.content }}</text>
           </view>
         </view>
 
