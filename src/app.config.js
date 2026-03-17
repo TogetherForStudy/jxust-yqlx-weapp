@@ -23,6 +23,7 @@ export default {
     'pages/final-review/detail/index',
     'pages/major-transfer/index',
     'pages/competition/index',
+    'pages/qualification/index',
     // 通知公告相关页面
     'pages/notifications/index',
     'pages/notifications/detail/index',

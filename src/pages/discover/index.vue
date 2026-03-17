@@ -303,8 +303,8 @@
           </view>
         </view>
         <view
-          @tap="goToCoding"
-          class="bg-white rounded-xl p-3 shadow-sm opacity-60"
+          @tap="goToQualification"
+          class="bg-white rounded-xl p-3 shadow-sm active:scale-95 transition-transform duration-200"
         >
           <view class="flex flex-col items-center text-center">
             <view
@@ -647,6 +647,10 @@ const goToMajorTransfer = () => {
 
 const goToCompetition = () => {
   Taro.navigateTo({ url: "/pages/competition/index" });
+};
+
+const goToQualification = () => {
+  Taro.navigateTo({ url: "/pages/qualification/index" });
 };
 
 const goToHero = () => {
