@@ -14,7 +14,7 @@
               :key="tab.key"
               @tap="activeTab = tab.key"
               :class="[
-                'mr-2 min-w-[72px] flex-shrink-0 border-b-2 px-3 py-3 text-center text-sm transition-colors duration-200 last:mr-0',
+                'mr-2 min-w-[72px] flex-shrink-0 border-b-2 px-3 py-3 text-center transition-colors duration-200 last:mr-0',
                 activeTab === tab.key ? 'border-orange-500 text-orange-600 font-semibold' : 'border-transparent text-slate-500'
               ]"
             >
@@ -26,7 +26,7 @@
 
       <view v-if="pageLoading" class="mt-4 rounded-2xl bg-white py-14 text-center shadow-sm">
         <view class="mx-auto mb-3 h-8 w-8 rounded-full border-2 border-orange-400 border-t-transparent animate-spin"></view>
-        <text class="text-sm text-slate-500">正在加载竞赛数据...</text>
+        <text class="text-slate-500">正在加载竞赛数据...</text>
       </view>
 
       <view v-else class="mt-4 rounded-2xl bg-white p-4 shadow-sm">
@@ -35,14 +35,14 @@
             <view>
               <text class="text-base font-semibold text-slate-900">竞赛目录</text>
             </view>
-            <text class="flex-shrink-0 text-xs text-orange-600">{{ competitionCount }} 项</text>
+            <text class="flex-shrink-0 text-orange-600">{{ competitionCount }} 项</text>
           </view>
-          <text v-if="competitionSource" class="mt-2 block text-xs leading-5 text-slate-400">
+          <text v-if="competitionSource" class="mt-2 block leading-5 text-slate-400">
             数据来源：{{ competitionSource }}
           </text>
         </view>
 
-        <view v-if="pageError" class="py-8 text-center text-sm text-rose-500">
+        <view v-if="pageError" class="py-8 text-center text-rose-500">
           {{ pageError }}
         </view>
 
@@ -54,7 +54,7 @@
             :class="itemIndex > 0 ? 'border-t border-slate-100' : ''"
           >
             <view class="min-w-0 flex-1">
-              <text class="block text-sm leading-6 text-slate-800" :user-select="true">{{ item.name }}</text>
+              <text class="block leading-6 text-slate-800" :user-select="true">{{ item.name }}</text>
             </view>
             <view
               @tap.stop="copyCompetitionLink(item)"
@@ -68,7 +68,7 @@
           </view>
         </view>
 
-        <view v-else-if="displaySections.length === 0" class="py-10 text-center text-sm text-slate-400">
+        <view v-else-if="displaySections.length === 0" class="py-10 text-center text-slate-400">
           暂无竞赛数据
         </view>
 
@@ -79,11 +79,11 @@
             :class="sectionIndex > 0 ? 'border-t border-slate-200' : ''"
           >
             <view class="flex items-center justify-between py-3" :class="activeTab === ALL_TAB_KEY ? 'border-b border-slate-100' : ''">
-              <text class="text-sm font-semibold text-slate-800">{{ section.category }}</text>
-              <text class="text-xs text-slate-400">{{ section.items.length }} 项</text>
+              <text class="font-semibold text-slate-800">{{ section.category }}</text>
+              <text class="text-slate-400">{{ section.items.length }} 项</text>
             </view>
 
-            <view v-if="section.items.length === 0" class="pb-3 text-sm text-slate-400">
+            <view v-if="section.items.length === 0" class="pb-3 text-slate-400">
               暂无内容
             </view>
 
@@ -95,7 +95,7 @@
                 :class="itemIndex > 0 ? 'border-t border-slate-100' : ''"
               >
                 <view class="min-w-0 flex-1">
-                  <text class="block text-sm leading-6 text-slate-800" :user-select="true">{{ item.name }}</text>
+                  <text class="block leading-6 text-slate-800" :user-select="true">{{ item.name }}</text>
                 </view>
                 <view
                   @tap.stop="copyCompetitionLink(item)"
