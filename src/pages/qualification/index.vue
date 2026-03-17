@@ -8,7 +8,7 @@
             :key="tab.key"
             @tap="activeTab = tab.key"
             :class="[
-              'flex-1 border-b-2 px-1 py-3 text-center text-sm transition-colors duration-200',
+              'flex-1 border-b-2 px-1 py-3 text-center transition-colors duration-200',
               activeTab === tab.key ? 'border-orange-500 text-orange-600 font-semibold' : 'border-transparent text-slate-500'
             ]"
           >
@@ -19,7 +19,7 @@
 
       <view v-if="pageLoading" class="mt-4 rounded-2xl bg-white py-14 text-center shadow-sm">
         <view class="mx-auto mb-3 h-8 w-8 rounded-full border-2 border-orange-400 border-t-transparent animate-spin"></view>
-        <text class="text-sm text-slate-500">正在加载考级考证数据...</text>
+        <text class="text-slate-500">正在加载考级考证数据...</text>
       </view>
 
       <view v-else class="mt-4 rounded-2xl bg-white p-4 shadow-sm">
@@ -27,21 +27,21 @@
           <view class="flex items-start justify-between gap-3">
             <view>
               <text class="text-base font-semibold text-slate-900" :user-select="true">{{ activeTitle }}</text>
-              <text v-if="activeDescription" class="mt-1 block text-xs leading-5 text-slate-500" :user-select="true">{{ activeDescription }}</text>
+              <text v-if="activeDescription" class="mt-1 block leading-5 text-slate-500" :user-select="true">{{ activeDescription }}</text>
             </view>
-            <text class="flex-shrink-0 text-xs text-orange-600">{{ activeCount }} 项</text>
+            <text class="flex-shrink-0 text-orange-600">{{ activeCount }} 项</text>
           </view>
         </view>
 
-        <view v-if="activeError" class="py-8 text-center text-sm text-rose-500">
+        <view v-if="activeError" class="py-8 text-center text-rose-500">
           {{ activeError }}
         </view>
 
-        <view v-else-if="activeTab === TEST_TAB && testList.length === 0" class="py-10 text-center text-sm text-slate-400">
+        <view v-else-if="activeTab === TEST_TAB && testList.length === 0" class="py-10 text-center text-slate-400">
           暂无考级考试数据
         </view>
 
-        <view v-else-if="activeTab === QUALIFICATION_TAB && qualificationList.length === 0" class="py-10 text-center text-sm text-slate-400">
+        <view v-else-if="activeTab === QUALIFICATION_TAB && qualificationList.length === 0" class="py-10 text-center text-slate-400">
           暂无职业资格数据
         </view>
 
@@ -53,17 +53,17 @@
             :class="index > 0 ? 'border-t border-slate-100' : ''"
           >
             <view class="flex items-start justify-between gap-3">
-              <text class="block min-w-0 flex-1 text-sm font-semibold leading-6 text-slate-800" :user-select="true">{{ item.name }}</text>
+              <text class="block min-w-0 flex-1 font-semibold leading-6 text-slate-800" :user-select="true">{{ item.name }}</text>
             </view>
 
             <text
               v-if="item.displayDate"
-              class="mt-1 block text-xs font-medium leading-5 text-orange-600"
+              class="mt-1 block font-medium leading-5 text-orange-600"
               :user-select="true"
             >
               {{ item.displayDate }}
             </text>
-            <text class="mt-2 block text-sm leading-6 text-slate-600" :user-select="true">{{ item.intro || '暂无介绍' }}</text>
+            <text class="mt-2 block leading-6 text-slate-600" :user-select="true">{{ item.intro || '暂无介绍' }}</text>
           </view>
         </template>
 
@@ -75,8 +75,8 @@
             :class="index > 0 ? 'border-t border-slate-100' : ''"
           >
             <view class="min-w-0">
-              <text class="block text-sm font-semibold leading-6 text-slate-800" :user-select="true">{{ item.name }}</text>
-              <text class="mt-1 block text-xs leading-5 text-slate-400" :user-select="true">{{ item.displayDate || '时间待更新' }}</text>
+              <text class="block font-semibold leading-6 text-slate-800" :user-select="true">{{ item.name }}</text>
+              <text class="mt-1 block leading-5 text-slate-400" :user-select="true">{{ item.displayDate || '时间待更新' }}</text>
             </view>
 
             <view v-if="item.children.length > 0" class="mt-3 rounded-xl bg-slate-50 px-3 py-2.5">
@@ -87,14 +87,14 @@
                 :class="childIndex > 0 ? 'border-t border-slate-200' : ''"
               >
                 <view class="flex items-start justify-between gap-3">
-                  <text class="min-w-0 flex-1 text-xs font-medium leading-5 text-slate-700" :user-select="true">{{ child.name }}</text>
-                  <text class="flex-shrink-0 text-xs leading-5 text-slate-400" :user-select="true">{{ child.displayDate || '时间待更新' }}</text>
+                  <text class="min-w-0 flex-1 font-medium leading-5 text-slate-700" :user-select="true">{{ child.name }}</text>
+                  <text class="flex-shrink-0 leading-5 text-slate-400" :user-select="true">{{ child.displayDate || '时间待更新' }}</text>
                 </view>
               </view>
             </view>
 
             <view class="mt-3 flex justify-end">
-              <text class="text-xs text-sky-600" :user-select="true">{{ item.category || '职业资格' }}</text>
+              <text class="text-sky-600" :user-select="true">{{ item.category || '职业资格' }}</text>
             </view>
           </view>
         </template>

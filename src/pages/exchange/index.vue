@@ -8,7 +8,7 @@
             :key="tab.key"
             @tap="activeTab = tab.key"
             :class="[
-              'flex-1 border-b-2 px-1 py-3 text-center text-sm transition-colors duration-200',
+              'flex-1 border-b-2 px-1 py-3 text-center transition-colors duration-200',
               activeTab === tab.key ? 'border-orange-500 font-semibold text-orange-600' : 'border-transparent text-slate-500'
             ]"
           >
@@ -19,27 +19,27 @@
 
       <view v-if="pageLoading" class="mt-4 rounded-2xl bg-white py-14 text-center shadow-sm">
         <view class="mx-auto mb-3 h-8 w-8 rounded-full border-2 border-orange-400 border-t-transparent animate-spin"></view>
-        <text class="text-sm text-slate-500">正在加载交换生数据...</text>
+        <text class="text-slate-500">正在加载交换生数据...</text>
       </view>
 
       <view v-else class="mt-4 rounded-2xl bg-white p-4 shadow-sm">
         <view class="border-b border-slate-200 pb-3">
           <view class="flex items-start justify-between gap-3">
             <view>
-              <text class="text-base font-semibold text-slate-900" :user-select="true">关于遴选本科生赴国内高校交流培养的通知</text>
+              <text class="font-semibold text-slate-900" :user-select="true">遴选本科生赴国内高校交流培养的通知</text>
             </view>
           </view>
-          <view class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-400">
+          <view class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-slate-400 text-sm">
             <text :user-select="true">面向：大二下</text>
             <text :user-select="true">发布日期：{{ currentPublishDate || '待发布' }}</text>
           </view>
         </view>
 
-        <view v-if="loadError" class="py-10 text-center text-sm text-rose-500">
+        <view v-if="loadError" class="py-10 text-center text-rose-500">
           {{ loadError }}
         </view>
 
-        <view v-else-if="currentSections.length === 0" class="py-10 text-center text-sm text-slate-400">
+        <view v-else-if="currentSections.length === 0" class="py-10 text-center text-slate-400">
           暂无交换生数据
         </view>
 
@@ -51,10 +51,10 @@
             :class="index > 0 ? 'border-t border-slate-100' : ''"
           >
             <view class="flex items-start justify-between gap-3">
-              <text class="text-sm font-semibold leading-6 text-slate-800" :user-select="true">{{ section.title || `说明 ${index + 1}` }}</text>
+              <text class="font-semibold leading-6 text-slate-800" :user-select="true">{{ section.title || `说明 ${index + 1}` }}</text>
             </view>
 
-            <text v-if="section.description" class="mt-2 block text-sm leading-6 text-slate-600" :user-select="true">
+            <text v-if="section.description" class="mt-2 block leading-6 text-slate-600" :user-select="true">
               {{ section.description }}
             </text>
 
@@ -66,7 +66,7 @@
                 :class="itemIndex > 0 ? 'border-t border-slate-100' : ''"
               >
                 <view class="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-orange-400"></view>
-                <text class="min-w-0 flex-1 text-sm leading-6 text-slate-700" :user-select="true">{{ item }}</text>
+                <text class="min-w-0 flex-1 leading-6 text-slate-700" :user-select="true">{{ item }}</text>
               </view>
             </view>
 
@@ -78,10 +78,10 @@
                 :class="schoolIndex > 0 ? 'border-t border-slate-100' : ''"
               >
                 <view class="flex items-start justify-between gap-3">
-                  <text class="min-w-0 flex-1 text-sm font-semibold leading-6 text-slate-800" :user-select="true">{{ school.name || `学校 ${schoolIndex + 1}` }}</text>
-                  <text v-if="school.quotaLabel" class="flex-shrink-0 text-xs text-orange-600" :user-select="true">{{ school.quotaLabel }}</text>
+                  <text class="min-w-0 flex-1 font-semibold leading-6 text-slate-800" :user-select="true">{{ school.name || `学校 ${schoolIndex + 1}` }}</text>
+                  <text v-if="school.quotaLabel" class="flex-shrink-0 text-orange-600" :user-select="true">{{ school.quotaLabel }}</text>
                 </view>
-                <text v-if="school.remarks" class="mt-1 block text-sm leading-6 text-slate-600" :user-select="true">{{ school.remarks }}</text>
+                <text v-if="school.remarks" class="mt-1 block leading-6 text-slate-600" :user-select="true">{{ school.remarks }}</text>
               </view>
             </view>
           </view>
