@@ -329,8 +329,8 @@
           </view>
         </view>
         <view
-          @tap="goToCoding"
-          class="bg-white rounded-xl p-3 shadow-sm opacity-60"
+          @tap="goToOrganization"
+          class="bg-white rounded-xl p-3 shadow-sm active:scale-95 transition-transform duration-200"
         >
           <view class="flex flex-col items-center text-center">
             <view
@@ -649,12 +649,21 @@ const goToCompetition = () => {
   Taro.navigateTo({ url: "/pages/competition/index" });
 };
 
+const goToOrganization = () => {
+  if (!authStore.requireAuth()) return;
+  Taro.navigateTo({ url: "/pages/organization/index" });
+};
+
 const goToQualification = () => {
   Taro.navigateTo({ url: "/pages/qualification/index" });
 };
 
 const goToExchange = () => {
   Taro.navigateTo({ url: "/pages/exchange/index" });
+};
+
+const goToCollegeJourney = () => {
+  Taro.navigateTo({ url: "/pages/college-journey/index" });
 };
 
 const goToHero = () => {
