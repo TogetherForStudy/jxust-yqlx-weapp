@@ -3,7 +3,7 @@ import { get, request } from '../utils/request'
 export const systemAPI = {
   healthCheck() {
     return request({
-      url: 'https://example.com/health',
+      url: '/health',
       method: 'GET',
       data: {},
       silent: true,

@@ -1,8 +1,9 @@
+/* global API_BASE_URL */
 import Taro from '@tarojs/taro'
 import { useAuthStore } from '../stores/auth'
 
 // API基础配置
-const BASE_URL = 'https://example.com' // 请根据实际情况修改
+const BASE_URL = API_BASE_URL.replace(/\/$/, '')
 const AUTH_REFRESH_BUFFER_MS = 60 * 1000
 const AUTH_BYPASS_REFRESH_ENDPOINTS = [
   '/api/v0/auth/refresh',
@@ -349,6 +350,10 @@ const executeRequest = async (options) => {
 
   // 添加基础URL
   if (!requestOptions.url.startsWith('http')) {
+    if (!BASE_URL) {
+      return Promise.reject(new Error('TARO_APP_API_BASE_URL is required'))
+    }
+
     requestOptions.url = BASE_URL + requestOptions.url
   }
 
@@ -498,4 +503,3 @@ export const del = (url, data, options = {}) => {
     ...options
   })
 }
-
