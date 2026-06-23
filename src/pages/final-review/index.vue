@@ -138,7 +138,7 @@ const fetchCategories = async () => {
       categoryData = JSON.parse(res);
     } else if (res && typeof res === 'object') {
       // 如果返回的是对象，尝试从value字段获取
-      categoryData = res.value || res.data || res;
+      categoryData = Object.prototype.hasOwnProperty.call(res, 'value') ? res.value : res;
       if (typeof categoryData === 'string') {
         categoryData = JSON.parse(categoryData);
       }

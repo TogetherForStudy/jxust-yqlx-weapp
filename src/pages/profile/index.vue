@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/multi-word-component-names -->
 <template>
   <view class="min-h-screen bg-gray-50 flex flex-col justify-between">
     <!-- 主要内容区域 -->
@@ -22,7 +23,7 @@
           <view class="flex justify-between items-center">
               <text class="text-gray-600">账号</text>
             <view class="flex items-center">
-              <text class="px-2 py-0.5 rounded-full text-xs" :class="roleTagClass">{{ roleTagText }}</text>
+              <text class="px-2 py-0.5 rounded-full text-xs" :class="roleTagClass" @tap="showLoginDaysProgress">{{ roleTagText }}</text>
               <text class="pl-2 text-gray-800" :user-select="true">{{ userInfo?.id || "无" }}</text>
             </view>
           </view>
@@ -79,63 +80,6 @@
         </view>
       </view>
 
-      <!-- 管理员功能 -->
-      <view
-        v-if="authStore.isAdmin"
-        class="bg-white rounded-xl mb-4 overflow-hidden"
-      >
-        <view class="grid grid-cols-4 divide-x divide-gray-100">
-          <view
-            class="px-4 py-3 text-base flex flex-col items-center justify-center active:bg-gray-50"
-            @tap="goToReviewManagement"
-          >
-            <text class="i-lucide-star mb-1"></text>
-            <text class="text-xs text-gray-800 text-center">评价管理</text>
-          </view>
-
-          <view
-            class="px-4 py-3 text-base flex flex-col items-center justify-center active:bg-gray-50"
-            @tap="goToHeroManagement"
-          >
-            <text class="i-lucide-trophy mb-1"></text>
-            <text class="text-xs text-gray-800 text-center">英雄管理</text>
-          </view>
-
-          <view
-            class="px-4 py-3 text-base flex flex-col items-center justify-center active:bg-gray-50"
-            @tap="goToConfigManagement"
-          >
-            <text class="i-lucide-settings mb-1"></text>
-            <text class="text-xs text-gray-800 text-center">配置管理</text>
-          </view>
-
-          <view
-            class="px-4 py-3 text-base flex flex-col items-center justify-center active:bg-gray-50"
-            @tap="goToRbacManagement"
-          >
-            <text class="i-lucide-shield mb-1"></text>
-            <text class="text-xs text-gray-800 text-center">权限管理</text>
-          </view>
-        </view>
-        <view class="grid grid-cols-4 divide-x divide-gray-100 border-t border-gray-100">
-          <view
-            class="px-4 py-3 text-base flex flex-col items-center justify-center active:bg-gray-50"
-            @tap="goToResetBindCount"
-          >
-            <text class="i-lucide-refresh-ccw mb-1"></text>
-            <text class="text-xs text-gray-800 text-center">重置绑定</text>
-          </view>
-
-          <view
-            class="px-4 py-3 text-base flex flex-col items-center justify-center active:bg-gray-50"
-            @tap="goToPointsManagement"
-          >
-            <text class="i-lucide-coins mb-1"></text>
-            <text class="text-xs text-gray-800 text-center">积分管理</text>
-          </view>
-        </view>
-      </view>
-
       <!-- 退出登录 -->
       <view
         v-if="authStore.isLoggedIn"
@@ -168,6 +112,54 @@
         </text>
       </view>
     </view>
+
+    <!-- 活跃用户进度弹窗 -->
+    <view v-if="loginDaysModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" @tap.self="loginDaysModal = false">
+      <view class="bg-white rounded-2xl p-6 mx-6 w-full max-w-sm">
+        <view class="text-center mb-4">
+          <text class="text-lg font-semibold text-gray-900">用户等级</text>
+        </view>
+
+        <!-- 进度条 -->
+        <view class="mb-3">
+          <view class="flex justify-between text-xs text-gray-500 mb-1">
+            <text>登录天数</text>
+            <text>{{ loginDaysData.loginDays }}/25</text>
+          </view>
+          <view class="w-full bg-gray-200 rounded-full h-2.5">
+            <view
+              class="h-2.5 rounded-full"
+              :class="loginDaysData.loginDays >= 25 ? 'bg-green-500' : 'bg-blue-500'"
+              :style="{ width: Math.min(100, (loginDaysData.loginDays / 25) * 100) + '%' }"
+            />
+          </view>
+        </view>
+
+        <!-- 说明信息 -->
+        <view class="bg-gray-50 rounded-lg p-3 mb-4 space-y-1">
+          <view class="flex justify-between text-sm">
+            <text class="text-gray-500">当前等级</text>
+            <text class="text-sm">{{ roleTagText }}</text>
+          </view>
+          <view v-if="!isAtLeastActive" class="flex justify-between text-sm">
+            <text class="text-gray-500">下一等级</text>
+            <text class="text-sm text-blue-600">{{ roleTagMap.user_active.text }}</text>
+          </view>
+          <view class="flex justify-between text-sm">
+            <text class="text-gray-500">达成条件</text>
+            <text class="text-gray-800">过去 {{ loginDaysData.pastDays }} 天内登录 25 天</text>
+          </view>
+        </view>
+
+        <!-- 确认按钮 -->
+        <view
+          @tap="loginDaysModal = false"
+          class="w-full text-center py-2.5 bg-blue-500 text-white rounded-lg font-medium"
+        >
+          知道了
+        </view>
+      </view>
+    </view>
   </view>
 </template>
 
@@ -175,12 +167,14 @@
 import { ref, computed } from "vue";
 import { useAuthStore } from "../../stores/auth";
 import Taro from "@tarojs/taro";
-import { courseTableAPI, pointsAPI } from "../../api/index";
+import { courseTableAPI, pointsAPI, userAPI } from "../../api/index";
 
 const authStore = useAuthStore();
 const userPoints = ref(0);
 const pointsLoaded = ref(false);
 const pointsLoadFailed = ref(false);
+const loginDaysModal = ref(false);
+const loginDaysData = ref({ loginDays: 0, pastDays: 100 });
 
 // 计算属性
 const userInfo = computed(() => authStore.userInfo);
@@ -216,6 +210,11 @@ const roleTagClass = computed(() => {
   return roleTagMap.user_basic.class;
 });
 
+const isAtLeastActive = computed(() => {
+  const roleTags = userInfo.value?.role_tags || [];
+  return ['admin', 'operator', 'user_verified', 'user_active'].some(tag => roleTags.includes(tag));
+});
+
 // 方法
 const goToLogin = () => {
   Taro.navigateTo({ url: "/pages/login/index" });
@@ -223,68 +222,6 @@ const goToLogin = () => {
 
 const goToMyPoints = () => {
   Taro.navigateTo({ url: "/pages/points/index" });
-};
-
-const goToReviewManagement = () => {
-  Taro.navigateTo({ url: "/pages/admin/teacher-reviews/index" });
-};
-
-const goToHeroManagement = () => {
-  Taro.navigateTo({ url: "/pages/admin/heroes/index" });
-};
-
-const goToConfigManagement = () => {
-  Taro.navigateTo({ url: "/pages/admin/config/index" });
-};
-
-const goToRbacManagement = () => {
-  Taro.navigateTo({ url: "/pages/admin/rbac/index" });
-};
-
-const goToPointsManagement = () => {
-  Taro.navigateTo({ url: "/pages/admin/points/index" });
-};
-
-const goToResetBindCount = () => {
-  Taro.showModal({
-    title: "重置绑定",
-    editable: true,
-    placeholderText: "用户ID",
-    success: (res) => {
-      if (res.confirm && res.content && res.content.trim() !== "") {
-        const userId = res.content.trim();
-        // 延迟执行，避免与modal关闭冲突
-        setTimeout(async () => {
-          // 显示加载中
-          Taro.showLoading({
-            title: "处理中...",
-            mask: true
-          });
-
-          try {
-            await courseTableAPI.resetBindCount(userId);
-            Taro.hideLoading();
-            // 使用modal显示结果，避免toast冲突
-            Taro.showModal({
-              title: "操作成功",
-              content: "重置绑定成功！",
-              showCancel: false,
-              confirmText: "确定"
-            });
-          } catch (error) {
-            Taro.hideLoading();
-            // 使用modal显示错误，避免toast冲突
-            Taro.showModal({
-              title: "操作失败",
-              content: error.message || "重置绑定失败，请重试",
-              showCancel: false,
-              confirmText: "确定"
-            });
-          }
-        }, 300);
-      }
-    },
-  });
 };
 
 const handleLogout = () => {
@@ -301,6 +238,21 @@ const handleLogout = () => {
 
 const goToTermsOfService = () => {
   Taro.navigateTo({ url: "/pages/terms-of-service/index" });
+};
+
+// 显示登录活跃度进度
+const showLoginDaysProgress = async () => {
+  try {
+    const res = await userAPI.getLoginDays()
+
+    loginDaysData.value = {
+      loginDays: res.login_days || 0,
+      pastDays: res.past_days || 100
+    }
+    loginDaysModal.value = true
+  } catch (error) {
+
+  }
 };
 
 

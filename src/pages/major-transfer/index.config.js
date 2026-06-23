@@ -1,5 +1,6 @@
 export default {
-  navigationBarTitleText: '我的投稿',
+  navigationBarTitleText: '转专业',
+  backgroundColor: '#f8fafc',
   enableShareAppMessage: true,
   enableShareTimeline: true
 }

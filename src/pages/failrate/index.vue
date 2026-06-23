@@ -147,10 +147,6 @@ const loadRandomData = async () => {
     hasMore.value = false; // 随机数据不支持分页
   } catch (error) {
     console.error("获取随机挂科率数据失败:", error);
-    Taro.showToast({
-      title: "加载失败",
-      icon: "error",
-    });
   } finally {
     loading.value = false;
   }
@@ -183,10 +179,7 @@ const searchFailRate = async (keyword, page = 1) => {
 
   } catch (error) {
     console.error("搜索挂科率数据失败:", error);
-    Taro.showToast({
-      title: "搜索失败",
-      icon: "error",
-    });
+
   } finally {
     loading.value = false;
     loadingMore.value = false;

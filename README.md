@@ -198,7 +198,7 @@ npm run build:weapp
 ## 🔧 配置说明
 
 ### 环境配置
-- 修改 `src/utils/request.js` 中的 `BASE_URL` 为实际API地址
+- 复制 `.env.example` 为 `.env.local`，并设置 `TARO_APP_API_BASE_URL`
 - 调整 `src/utils/constants.js` 中的学期配置
 
 ## 贡献指南

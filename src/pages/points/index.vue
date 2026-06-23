@@ -252,10 +252,6 @@ const initPage = async () => {
     pointsStats.value = statsRes
   } catch (error) {
     console.error('初始化页面失败:', error)
-    Taro.showToast({
-      title: '加载失败',
-      icon: 'error'
-    })
   } finally {
     isLoading.value = false
   }
@@ -327,7 +323,7 @@ const getSourceName = (source) => {
     'review': '发布评价',
     'contribution': '投稿信息',
     'redeem': '兑换奖品',
-    'admin_grant': '管理员赋予'
+    'admin_grant': '系统发放'
   }
   return sourceNames[source] || source
 }

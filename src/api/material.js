@@ -29,14 +29,6 @@ export const materialAPI = {
     return post(`/api/v0/materials/${md5}/download`)
   },
 
-  deleteMaterial(md5) {
-    return del(`/api/v0/admin/materials/${md5}`)
-  },
-
-  updateMaterialDesc(md5, data) {
-    return put(`/api/v0/admin/material-desc/${md5}`, data)
-  },
-
   getCategories(params) {
     return get('/api/v0/material-categories', params)
   }

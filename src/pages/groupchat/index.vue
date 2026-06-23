@@ -57,7 +57,7 @@
       <view class="text-center">
         <text class="block mx-auto mb-4 i-lucide-message-circle w-12 h-12 text-gray-300"></text>
         <text class="text-gray-500 mb-2 block">暂无群聊推荐</text>
-        <text class="text-sm text-gray-400">请联系管理员添加群聊配置</text>
+        <text class="text-sm text-gray-400">群聊配置暂未开放</text>
       </view>
     </view>
   </view>

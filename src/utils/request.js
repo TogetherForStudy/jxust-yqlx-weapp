@@ -1,8 +1,14 @@
+/* global API_BASE_URL */
 import Taro from '@tarojs/taro'
 import { useAuthStore } from '../stores/auth'
 
 // API基础配置
-const BASE_URL = 'https://example.com' // 请根据实际情况修改
+const BASE_URL = API_BASE_URL.replace(/\/$/, '')
+const AUTH_REFRESH_BUFFER_MS = 60 * 1000
+const AUTH_BYPASS_REFRESH_ENDPOINTS = [
+  '/api/v0/auth/refresh',
+  '/api/v0/auth/wechat-login'
+]
 
 // 生成UUID v4（使用微信小程序加密随机数生成器）
 const generateUUID = () => {
@@ -134,10 +140,140 @@ const startCacheCleanup = () => {
 }
 startCacheCleanup()
 
+const createRequestError = (message, extra = {}) => {
+  return Object.assign(new Error(message), extra)
+}
+
+let isRequestErrorModalVisible = false
+let queuedRequestErrorMessage = null
+
+const buildRequestErrorContent = (error) => {
+  const message = error?.message || error?.errMsg || '网络错误'
+  const requestId = error?.requestId
+
+  if (!requestId) {
+    return message
+  }
+
+  return `${message}\n\n请求ID: ${requestId}`
+}
+
+const showRequestErrorModal = async (error) => {
+  const content = buildRequestErrorContent(error)
+
+  if (isRequestErrorModalVisible) {
+    queuedRequestErrorMessage = content
+    return
+  }
+
+  isRequestErrorModalVisible = true
+
+  try {
+    await Taro.showModal({
+      title: '请求失败',
+      content,
+      showCancel: false,
+      confirmText: '知道了'
+    })
+  } finally {
+    isRequestErrorModalVisible = false
+
+    if (queuedRequestErrorMessage && queuedRequestErrorMessage !== content) {
+      const nextMessage = queuedRequestErrorMessage
+      queuedRequestErrorMessage = null
+      await showRequestErrorModal({ message: nextMessage })
+    } else {
+      queuedRequestErrorMessage = null
+    }
+  }
+}
+
+const isStandardResponseEnvelope = (data) => {
+  return Boolean(data) &&
+    typeof data === 'object' &&
+    Object.prototype.hasOwnProperty.call(data, 'StatusCode')
+}
+
+const getHeaderValue = (headers = {}, targetName = '') => {
+  if (!headers || !targetName) {
+    return null
+  }
+
+  const matchedKey = Object.keys(headers).find(key => key.toLowerCase() === targetName.toLowerCase())
+  return matchedKey ? headers[matchedKey] : null
+}
+
+const getResponseRequestId = (response = {}) => {
+  if (response?.data?.RequestId) {
+    return response.data.RequestId
+  }
+
+  return getHeaderValue(response?.header || response?.headers, 'x-request-id')
+}
+
+const getBusinessStatusCode = (data) => {
+  if (!isStandardResponseEnvelope(data)) {
+    return null
+  }
+
+  return data.StatusCode
+}
+
+const createResponseError = (response, fallbackMessage, extra = {}) => {
+  const data = response?.data
+  const httpStatusCode = response?.statusCode ?? null
+  const businessStatusCode = getBusinessStatusCode(data)
+  const requestId = getResponseRequestId(response)
+  const message = (data && typeof data === 'object' && data.StatusMessage) || fallbackMessage || '请求失败'
+
+  return createRequestError(message, {
+    httpStatusCode,
+    businessStatusCode,
+    requestId,
+    statusMessage: message,
+    statusCode: businessStatusCode ?? httpStatusCode,
+    response,
+    ...extra
+  })
+}
+
+const getRequestPath = (url = '') => {
+  if (!url) {
+    return ''
+  }
+
+  return url.replace(/^https?:\/\/[^/]+/i, '')
+}
+
+const shouldBypassAuthRefresh = (url = '') => {
+  const requestPath = getRequestPath(url)
+  return AUTH_BYPASS_REFRESH_ENDPOINTS.some(endpoint => requestPath.endsWith(endpoint))
+}
+
+const shouldRetryAfterAuthFailure = (error, options = {}) => {
+  if (!error?.isAuthError || options.retryOnAuthFailure === false) {
+    return false
+  }
+
+  if (options.skipAuthRefresh || shouldBypassAuthRefresh(options.url)) {
+    return false
+  }
+
+  return Boolean(useAuthStore().refreshToken)
+}
+
 // 请求拦截器
 const interceptors = {
   async request(config) {
-    const token = useAuthStore().token
+    const authStore = useAuthStore()
+    const authToken = config.authToken
+    const skipAuthRefresh = config.skipAuthRefresh || shouldBypassAuthRefresh(config.url)
+
+    if (!skipAuthRefresh) {
+      await authStore.ensureValidAccessToken(AUTH_REFRESH_BUFFER_MS)
+    }
+
+    const token = authToken || authStore.token
     if (token) {
       config.header = {
         ...config.header,
@@ -161,35 +297,70 @@ const interceptors = {
         method,
         config.url,
         config.data
-      )
+        )
     }
+
+    delete config.authToken
+    delete config.skipAuthRefresh
+    delete config.retryOnAuthFailure
+    delete config.handleAuthFailure
+    delete config.returnEnvelope
 
     return config
   },
 
-  response(response) {
+  response(response, options = {}) {
     const { statusCode, data } = response
+    const businessStatusCode = getBusinessStatusCode(data)
+    const isAuthError = statusCode === 401 || businessStatusCode === 401
+    const hasStandardEnvelope = isStandardResponseEnvelope(data)
 
     // 处理HTTP状态码
     if (statusCode >= 200 && statusCode < 300) {
-      if (!data || typeof data !== 'object') {
+      if (!hasStandardEnvelope) {
         return data
       }
 
       // 检查业务状态码
       if (data.StatusCode === 0) {
-        return data.Result
-      } else if (data.StatusCode === 401) {
-        // token过期或无效，跳转到登录页
-        useAuthStore().expireToken()
-        return Promise.reject(new Error(data.StatusMessage || '登录已过期'))
-      } else {
-        return Promise.reject(new Error(data.StatusMessage || '请求失败'))
+        return options.returnEnvelope ? data : data.Result
       }
-    } else {
-      return Promise.reject(new Error(`HTTP ${statusCode}`))
+
+      return Promise.reject(createResponseError(
+        response,
+        data.StatusMessage || '请求失败',
+        { isAuthError }
+      ))
     }
+
+    return Promise.reject(createResponseError(
+      response,
+      data?.StatusMessage || `HTTP ${statusCode}`,
+      { isAuthError }
+    ))
   }
+}
+
+const executeRequest = async (options) => {
+  let requestOptions = { ...options }
+  const responseOptions = {
+    returnEnvelope: requestOptions.returnEnvelope
+  }
+  delete requestOptions.silent
+
+  // 添加基础URL
+  if (!requestOptions.url.startsWith('http')) {
+    if (!BASE_URL) {
+      return Promise.reject(new Error('TARO_APP_API_BASE_URL is required'))
+    }
+
+    requestOptions.url = BASE_URL + requestOptions.url
+  }
+
+  // 应用请求拦截器
+  requestOptions = await interceptors.request(requestOptions)
+
+  return Taro.request(requestOptions).then(response => interceptors.response(response, responseOptions))
 }
 
 // 通用请求方法
@@ -198,49 +369,78 @@ export const request = async (options) => {
     return Promise.reject(new Error('Request URL is required'))
   }
 
-  // 添加基础URL
-  if (!options.url.startsWith('http')) {
-    options.url = BASE_URL + options.url
-  }
-
   // 是否静默（不显示全局错误 Toast），由调用方自行处理错误提示
-  const silent = options.silent
-  delete options.silent
+  const {
+    silent = false,
+    retryOnAuthFailure = true,
+    handleAuthFailure = true
+  } = options
 
   // 保存原始请求信息（用于清除幂等性 Key）
   const originalMethod = options.method
   const originalUrl = options.url
   const originalData = options.data
 
-  // 应用请求拦截器
-  options = await interceptors.request(options)
+  const requestOptions = {
+    ...options,
+    silent,
+    retryOnAuthFailure,
+    handleAuthFailure
+  }
 
-  return Taro.request(options)
-    .then(interceptors.response)
-    .catch(error => {
-      console.error('Request error:', error)
-
-      if (!silent) {
-        Taro.showToast({
-          title: error.message || error.errMsg || '网络错误',
-          icon: 'error',
-          duration: 2000
-        })
-      }
-
-      return Promise.reject(error)
-    }).finally(() => {
-      const method = originalMethod?.toUpperCase()
-      if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(method)) {
-        clearIdempotencyKey(method, originalUrl, originalData)
-      }
+  try {
+    return await executeRequest(requestOptions)
+  } catch (error) {
+    console.error('Request error:', {
+      message: error?.message,
+      httpStatusCode: error?.httpStatusCode,
+      businessStatusCode: error?.businessStatusCode,
+      requestId: error?.requestId,
+      error
     })
+
+    let finalError = error
+    if (shouldRetryAfterAuthFailure(error, requestOptions)) {
+      try {
+        await useAuthStore().refreshAccessToken({
+          silent: true,
+          force: true
+        })
+
+        return await request({
+          ...options,
+          retryOnAuthFailure: false
+        })
+      } catch (refreshError) {
+        console.error('Retry after token refresh failed:', refreshError)
+        finalError = refreshError
+      }
+    }
+
+    if (finalError?.isAuthError && handleAuthFailure) {
+      useAuthStore().expireToken(finalError.message || '请重新登录')
+    } else if (!silent) {
+      await showRequestErrorModal(finalError)
+    }
+
+    return Promise.reject(finalError)
+  } finally {
+    const method = originalMethod?.toUpperCase()
+    if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(method)) {
+      clearIdempotencyKey(method, originalUrl, originalData)
+    }
+  }
 }
 
 // GET请求
-export const get = (url, data) => {
+export const get = (url, data, options = {}) => {
   if (!data) {
-    return request({ url, method: 'GET', data: {} })
+    return request({
+      url,
+      method: 'GET',
+      data: {},
+      ...options
+    })
   }
 
   // 处理数组参数（如categories），转换为多个同名参数
@@ -269,34 +469,37 @@ export const get = (url, data) => {
   return request({
     url,
     method: 'GET',
-    data: {} // 传空对象，参数已经在URL中
+    data: {}, // 传空对象，参数已经在URL中
+    ...options
   })
 }
 
 // POST请求
-export const post = (url, data) => {
+export const post = (url, data, options = {}) => {
   return request({
     url,
     method: 'POST',
-    data
+    data,
+    ...options
   })
 }
 
 // PUT请求
-export const put = (url, data) => {
+export const put = (url, data, options = {}) => {
   return request({
     url,
     method: 'PUT',
-    data
+    data,
+    ...options
   })
 }
 
 // DELETE请求
-export const del = (url, data) => {
+export const del = (url, data, options = {}) => {
   return request({
     url,
     method: 'DELETE',
-    data
+    data,
+    ...options
   })
 }
-

@@ -1,9 +1,41 @@
 import { defineConfig } from '@tarojs/cli'
+import { existsSync, readFileSync } from 'fs'
+import { resolve } from 'path'
 import { Plugin } from 'vite'
 import tailwindcss from 'tailwindcss'
 import { UnifiedViteWeappTailwindcssPlugin as uvtw } from 'weapp-tailwindcss/vite'
 import devConfig from './dev'
 import prodConfig from './prod'
+
+const loadLocalEnv = () => {
+  const envFiles = ['.env.local', '.env']
+
+  envFiles.forEach((fileName) => {
+    const filePath = resolve(process.cwd(), fileName)
+    if (!existsSync(filePath)) return
+
+    readFileSync(filePath, 'utf8')
+      .split(/\r?\n/)
+      .forEach((line) => {
+        const trimmed = line.trim()
+        if (!trimmed || trimmed.startsWith('#')) return
+
+        const separatorIndex = trimmed.indexOf('=')
+        if (separatorIndex === -1) return
+
+        const key = trimmed.slice(0, separatorIndex).trim()
+        const value = trimmed.slice(separatorIndex + 1).trim().replace(/^['"]|['"]$/g, '')
+
+        if (key && process.env[key] === undefined) {
+          process.env[key] = value
+        }
+      })
+  })
+}
+
+loadLocalEnv()
+
+const API_BASE_URL = process.env.TARO_APP_API_BASE_URL || ''
 
 // https://taro-docs.jd.com/docs/next/config#defineconfig-辅助函数
 export default defineConfig(async (merge, { command, mode }) => {
@@ -21,6 +53,7 @@ export default defineConfig(async (merge, { command, mode }) => {
     outputRoot: 'dist',
     plugins: [],
     defineConstants: {
+      API_BASE_URL: JSON.stringify(API_BASE_URL)
     },
     copy: {
       patterns: [
