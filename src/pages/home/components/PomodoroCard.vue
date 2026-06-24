@@ -1,16 +1,16 @@
 <template>
   <view class="px-4">
     <view class="flex justify-between items-center mb-2">
-      <text class="text-gray-800 font-medium">番茄钟</text>
+      <text class="text-fg font-medium">番茄钟</text>
       <view
-        class="w-7 h-7 rounded-full bg-white border border-gray-200 flex items-center justify-center"
+        class="w-7 h-7 rounded-full bg-surface border border-line flex items-center justify-center"
         @tap="openRankingModal"
       >
         <text class="i-lucide-trophy w-3.5 h-3.5 text-amber-500"></text>
       </view>
     </view>
 
-    <view class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <view class="bg-surface rounded-xl shadow-sm border border-line overflow-hidden">
       <view class="p-4">
         <view class="flex gap-2 mb-4">
           <view
@@ -29,16 +29,16 @@
         </view>
 
         <view
-          class="rounded-2xl p-4 bg-gradient-to-br text-slate-800 shadow-sm border"
+          class="rounded-2xl p-4 bg-gradient-to-br text-fg shadow-sm border"
           :class="currentPreset.panelClass"
         >
           <view class="flex items-start justify-between gap-3">
             <view class="min-w-0 flex-1">
-              <text class="text-xs text-slate-500">{{ helperText }}</text>
+              <text class="text-xs text-fg-muted">{{ helperText }}</text>
               <text class="block text-[40px] leading-none font-black tracking-[2px] mt-2">{{ formattedTime }}</text>
             </view>
             <view
-              class="px-2.5 py-1 rounded-full text-xs font-medium border bg-white bg-opacity-80"
+              class="px-2.5 py-1 rounded-full text-xs font-medium border bg-surface bg-opacity-80"
               :class="currentPreset.badgeClass"
             >
               {{ isRunning ? '进行中' : '待开始' }}
@@ -53,7 +53,7 @@
                 :style="{ width: `${progressPercent}%` }"
               ></view>
             </view>
-            <view class="flex items-center justify-between mt-2 text-xs text-slate-500">
+            <view class="flex items-center justify-between mt-2 text-xs text-fg-muted">
               <text>{{ progressText }}</text>
               <text>{{ currentPreset.shortLabel }}</text>
             </view>
@@ -74,7 +74,7 @@
               </view>
             </view>
             <view
-              class="rounded-xl py-3 text-center text-sm font-semibold border bg-white bg-opacity-75 active:bg-white"
+              class="rounded-xl py-3 text-center text-sm font-semibold border bg-surface bg-opacity-75 active:bg-surface"
               :class="currentPreset.secondaryButtonClass"
               @tap="confirmResetTimer"
             >
@@ -97,44 +97,44 @@
     >
       <view class="absolute inset-0 bg-black bg-opacity-40" @tap="showRankingModal = false"></view>
       <view
-        class="relative bg-white rounded-2xl w-full max-w-md max-h-[70vh] overflow-hidden shadow-2xl"
+        class="relative bg-surface rounded-2xl w-full max-w-md max-h-[70vh] overflow-hidden shadow-2xl"
         :catch-move="true"
         @tap.stop=""
         @touchmove.stop="handleRankingModalTouchMove"
       >
-        <view class="px-4 py-2 border-b border-gray-100 flex items-center justify-between">
-          <text class="text-base font-semibold text-gray-800">专注排行榜</text>
+        <view class="px-4 py-2 border-b border-line flex items-center justify-between">
+          <text class="text-base font-semibold text-fg">专注排行榜</text>
           <view class="w-7 h-7 flex items-center justify-center" @tap="showRankingModal = false">
-            <text class="i-lucide-x w-5 h-5 text-gray-400"></text>
+            <text class="i-lucide-x w-5 h-5 text-fg-subtle"></text>
           </view>
         </view>
 
         <view
           v-if="authStore.isLoggedIn"
-          class="px-4 py-2.5 bg-gray-50 border-b border-gray-100 flex items-center justify-center"
+          class="px-4 py-2.5 bg-page border-b border-line flex items-center justify-center"
         >
-          <text class="text-sm text-gray-500">我的累计完成</text>
-          <text class="text-sm font-semibold text-gray-800 ml-2">{{ completedCount }} 次</text>
+          <text class="text-sm text-fg-muted">我的累计完成</text>
+          <text class="text-sm font-semibold text-fg ml-2">{{ completedCount }} 次</text>
         </view>
 
         <view v-if="!authStore.isLoggedIn" class="flex flex-col items-center justify-center py-10 px-6">
-          <view class="i-lucide-timer-reset text-2xl text-gray-400 mb-3"></view>
-          <text class="text-base text-gray-700">登录后查看排行榜与同步进度</text>
-          <text class="text-sm text-gray-500 mt-1">当前仍可使用本地番茄钟</text>
+          <view class="i-lucide-timer-reset text-2xl text-fg-subtle mb-3"></view>
+          <text class="text-base text-fg">登录后查看排行榜与同步进度</text>
+          <text class="text-sm text-fg-muted mt-1">当前仍可使用本地番茄钟</text>
         </view>
 
         <view v-else-if="isLoadingRanking && ranking.length === 0" class="flex items-center justify-center py-10">
-          <text class="text-sm text-gray-500">加载中...</text>
+          <text class="text-sm text-fg-muted">加载中...</text>
         </view>
 
         <view v-else-if="ranking.length === 0" class="flex flex-col items-center justify-center py-10 px-6">
-          <view class="i-lucide-award text-2xl text-gray-400 mb-3"></view>
-          <text class="text-base text-gray-700">还没有排行数据</text>
-          <text class="text-sm text-gray-500 mt-1">完成一个番茄后会自动同步</text>
+          <view class="i-lucide-award text-2xl text-fg-subtle mb-3"></view>
+          <text class="text-base text-fg">还没有排行数据</text>
+          <text class="text-sm text-fg-muted mt-1">完成一个番茄后会自动同步</text>
         </view>
 
         <scroll-view v-else scroll-y class="max-h-[52vh]" style="max-height: 52vh;">
-          <view class="px-4 py-2 border-b border-gray-100 bg-gray-50 grid grid-cols-[44px_1fr_84px] gap-3 text-xs text-gray-500 font-medium">
+          <view class="px-4 py-2 border-b border-line bg-page grid grid-cols-[44px_1fr_84px] gap-3 text-xs text-fg-muted font-medium">
             <text></text>
             <text>昵称</text>
             <text class="text-right whitespace-nowrap">专注次数</text>
@@ -155,9 +155,9 @@
                 </view>
               </view>
               <view class="min-w-0">
-                <text class="block text-sm font-medium text-gray-800 truncate">番茄{{ item.nickname }}</text>
+                <text class="block text-sm font-medium text-fg truncate">番茄{{ item.nickname }}</text>
               </view>
-              <text class="text-sm font-semibold text-gray-700 text-right tabular-nums">{{ item.pomodoro_count }}</text>
+              <text class="text-sm font-semibold text-fg text-right tabular-nums">{{ item.pomodoro_count }}</text>
             </view>
           </view>
         </scroll-view>
@@ -187,14 +187,14 @@ const modePresets = [
     shortLabel: '25 分钟',
     duration: 25 * 60,
     helper: '完成后转入短休',
-    panelClass: 'from-rose-50 via-red-50 to-orange-50 border-red-100',
-    activeClass: 'bg-red-400 border-red-400 text-white',
-    inactiveClass: 'bg-white border-gray-200 text-gray-500',
-    badgeClass: 'text-red-500 border-red-200',
-    trackClass: 'bg-white bg-opacity-70',
+    panelClass: 'from-rose-50 via-red-50 to-orange-50 border-red-100 dark:from-rose-950 dark:via-red-950 dark:to-orange-950 dark:border-red-900',
+    activeClass: 'bg-red-400 border-danger text-white',
+    inactiveClass: 'bg-surface border-line text-fg-muted',
+    badgeClass: 'text-danger border-danger',
+    trackClass: 'bg-surface bg-opacity-70',
     progressClass: 'bg-red-400',
     primaryButtonClass: 'bg-red-400',
-    secondaryButtonClass: 'border-red-200 text-red-700'
+    secondaryButtonClass: 'border-danger text-danger'
   },
   {
     key: 'shortBreak',
@@ -202,14 +202,14 @@ const modePresets = [
     shortLabel: '5 分钟',
     duration: 5 * 60,
     helper: '快速放松一下，再回来继续推进',
-    panelClass: 'from-emerald-100 via-teal-50 to-lime-50 border-emerald-200',
+    panelClass: 'from-emerald-100 via-teal-50 to-lime-50 border-emerald-200 dark:from-emerald-950 dark:via-teal-950 dark:to-lime-950 dark:border-emerald-900',
     activeClass: 'bg-emerald-500 border-emerald-500 text-white',
-    inactiveClass: 'bg-white border-gray-200 text-gray-500',
-    badgeClass: 'text-emerald-700 border-emerald-200',
-    trackClass: 'bg-white bg-opacity-70',
+    inactiveClass: 'bg-surface border-line text-fg-muted',
+    badgeClass: 'text-emerald-700 border-emerald-200 dark:text-emerald-200 dark:border-emerald-700',
+    trackClass: 'bg-surface bg-opacity-70',
     progressClass: 'bg-emerald-500',
     primaryButtonClass: 'bg-emerald-500',
-    secondaryButtonClass: 'border-emerald-200 text-emerald-700'
+    secondaryButtonClass: 'border-emerald-200 text-emerald-700 dark:border-emerald-700 dark:text-emerald-200'
   },
   {
     key: 'longBreak',
@@ -217,14 +217,14 @@ const modePresets = [
     shortLabel: '15 分钟',
     duration: 15 * 60,
     helper: '做一轮深度恢复，下一轮继续开工',
-    panelClass: 'from-sky-100 via-cyan-50 to-indigo-50 border-sky-200',
+    panelClass: 'from-sky-100 via-cyan-50 to-indigo-50 border-sky-200 dark:from-sky-950 dark:via-cyan-950 dark:to-indigo-950 dark:border-sky-900',
     activeClass: 'bg-sky-500 border-sky-500 text-white',
-    inactiveClass: 'bg-white border-gray-200 text-gray-500',
-    badgeClass: 'text-sky-700 border-sky-200',
-    trackClass: 'bg-white bg-opacity-70',
+    inactiveClass: 'bg-surface border-line text-fg-muted',
+    badgeClass: 'text-sky-700 border-sky-200 dark:text-sky-200 dark:border-sky-700',
+    trackClass: 'bg-surface bg-opacity-70',
     progressClass: 'bg-sky-500',
     primaryButtonClass: 'bg-sky-500',
-    secondaryButtonClass: 'border-sky-200 text-sky-700'
+    secondaryButtonClass: 'border-sky-200 text-sky-700 dark:border-sky-700 dark:text-sky-200'
   }
 ]
 
@@ -608,17 +608,17 @@ const handleSessionCompletion = async () => {
 }
 
 const getRankBadgeClass = (index) => {
-  if (index === 0) return 'bg-yellow-100 text-yellow-700'
-  if (index === 1) return 'bg-blue-100 text-blue-700'
-  if (index === 2) return 'bg-orange-100 text-orange-600'
-  return 'bg-gray-100 text-gray-500'
+  if (index === 0) return 'bg-warning-soft text-warning'
+  if (index === 1) return 'bg-brand-soft text-brand'
+  if (index === 2) return 'bg-warning-soft text-warning'
+  return 'bg-surface-muted text-fg-muted'
 }
 
 const getRankingRowClass = (index) => {
-  if (index === 0) return 'bg-amber-50'
-  if (index === 1) return 'bg-blue-50'
-  if (index === 2) return 'bg-orange-50'
-  return 'bg-white'
+  if (index === 0) return 'bg-warning-soft'
+  if (index === 1) return 'bg-brand-soft'
+  if (index === 2) return 'bg-warning-soft'
+  return 'bg-surface'
 }
 
 watch(

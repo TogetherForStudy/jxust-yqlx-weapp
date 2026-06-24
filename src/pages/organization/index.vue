@@ -1,9 +1,14 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
-  <view class="h-screen bg-gray-50 flex flex-col">
-    <view class="bg-white px-4 py-3 shadow-sm shrink-0">
-      <view class="flex items-center gap-2 bg-gray-100 rounded-lg px-3 py-2 h-10">
-        <text class="i-lucide-search text-gray-400 w-4 h-4"></text>
+  <page-meta
+    :page-style="themeStore.pageStyle"
+    :background-color="themeStore.nativeTheme.pageBg"
+    :background-text-style="themeStore.nativeTheme.backgroundTextStyle"
+  />
+  <view class="h-screen bg-page flex flex-col text-fg" :class="[themeStore.rootClass]">
+    <view class="bg-surface px-4 py-3 shadow-sm shrink-0">
+      <view class="flex items-center gap-2 bg-surface-muted rounded-lg px-3 py-2 h-10">
+        <text class="i-lucide-search text-fg-subtle w-4 h-4"></text>
         <input
           v-model="draftFilters.query"
           placeholder="搜索组织名称"
@@ -12,21 +17,21 @@
           @confirm="applyFilters"
         />
         <view v-if="draftFilters.query" @tap="clearKeyword" class="flex h-full items-center px-1">
-          <text class="i-lucide-x text-gray-400 w-4 h-4"></text>
+          <text class="i-lucide-x text-fg-subtle w-4 h-4"></text>
         </view>
         <view class="flex h-full items-center px-1" @tap="applyFilters">
-          <text class="text-blue-500 leading-none">搜索</text>
+          <text class="text-brand leading-none">搜索</text>
         </view>
       </view>
     </view>
 
     <view class="flex-1 flex flex-col min-h-0">
       <view v-if="pageLoading" class="flex-1 flex items-center justify-center">
-        <text class="text-gray-500">加载中...</text>
+        <text class="text-fg-muted">加载中...</text>
       </view>
 
       <view v-else-if="pageError" class="flex-1 p-4">
-        <view class="bg-white rounded-lg p-6 text-center shadow-sm">
+        <view class="bg-surface rounded-lg p-6 text-center shadow-sm">
           <text class="block text-rose-500">{{ pageError }}</text>
           <view class="mt-4 inline-flex rounded-full bg-rose-50 px-4 py-2" @tap="reloadPage">
             <text class="text-rose-500">重新加载</text>
@@ -45,88 +50,88 @@
         <view class="p-4 space-y-3">
           <view class="grid grid-cols-3 gap-2">
             <picker :value="typeIndex" :range="typeOptions" @change="onTypeChange">
-              <view class="bg-white rounded-lg px-3 py-2 shadow-sm">
-                <text class="block text-gray-400">类型</text>
-                <text class="mt-1 block truncate text-gray-700">{{ draftFilters.organization_type || '无' }}</text>
+              <view class="bg-surface rounded-lg px-3 py-2 shadow-sm">
+                <text class="block text-fg-subtle">类型</text>
+                <text class="mt-1 block truncate text-fg">{{ draftFilters.organization_type || '无' }}</text>
               </view>
             </picker>
 
             <picker :value="affiliationIndex" :range="affiliationOptions" @change="onAffiliationChange">
-              <view class="bg-white rounded-lg px-3 py-2 shadow-sm">
-                <text class="block text-gray-400">所属</text>
-                <text class="mt-1 block truncate text-gray-700">{{ draftFilters.affiliation || '无' }}</text>
+              <view class="bg-surface rounded-lg px-3 py-2 shadow-sm">
+                <text class="block text-fg-subtle">所属</text>
+                <text class="mt-1 block truncate text-fg">{{ draftFilters.affiliation || '无' }}</text>
               </view>
             </picker>
 
             <picker :value="campusIndex" :range="campusOptions" @change="onCampusChange">
-              <view class="bg-white rounded-lg px-3 py-2 shadow-sm">
-                <text class="block text-gray-400">校区</text>
-                <text class="mt-1 block truncate text-gray-700">{{ draftFilters.campus || '无' }}</text>
+              <view class="bg-surface rounded-lg px-3 py-2 shadow-sm">
+                <text class="block text-fg-subtle">校区</text>
+                <text class="mt-1 block truncate text-fg">{{ draftFilters.campus || '无' }}</text>
               </view>
             </picker>
           </view>
 
-          <view class="flex items-center justify-between text-gray-500">
+          <view class="flex items-center justify-between text-fg-muted">
             <text>{{ listHint }}</text>
             <view class="flex items-center gap-2">
-              <view v-if="hasActiveFilters" class="px-2 py-1 rounded-full bg-orange-50 text-orange-600">
+              <view v-if="hasActiveFilters" class="px-2 py-1 rounded-full bg-warning-soft text-warning">
                 <text class="text-xs">已筛选</text>
               </view>
               <text>{{ totalLabel }}</text>
             </view>
           </view>
 
-          <view v-if="organizations.length === 0" class="bg-white rounded-lg p-8 text-center shadow-sm">
-            <text class="i-lucide-users-round text-gray-300 w-10 h-10 block mx-auto mb-3"></text>
-            <text class="text-gray-500">暂无符合条件的组织</text>
+          <view v-if="organizations.length === 0" class="bg-surface rounded-lg p-8 text-center shadow-sm">
+            <text class="i-lucide-users-round text-fg-subtle w-10 h-10 block mx-auto mb-3"></text>
+            <text class="text-fg-muted">暂无符合条件的组织</text>
           </view>
 
           <template v-else>
             <view
               v-for="item in organizations"
               :key="item.id"
-              class="bg-white rounded-lg px-4 py-3 shadow-sm"
+              class="bg-surface rounded-lg px-4 py-3 shadow-sm"
               @tap="goToOrganizationDetail(item)"
             >
               <view class="flex justify-between items-start gap-3">
                 <view class="min-w-0 flex-1">
-                  <text class="block text-gray-800 font-medium leading-6">{{ item.name }}</text>
+                  <text class="block text-fg font-medium leading-6">{{ item.name }}</text>
                 </view>
                 <view
                   :class="[
                     'px-2 rounded-full leading-6 shrink-0 text-sm',
-                    item.organization_type ? 'bg-orange-100 text-orange-600' : 'bg-gray-100 text-gray-500'
+                    item.organization_type ? 'bg-warning-soft text-warning' : 'bg-surface-muted text-fg-muted'
                   ]"
                 >
                   {{ item.organization_type || '未分类' }}
                 </view>
               </view>
 
-              <view class="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-gray-600">
+              <view class="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-fg-muted">
                 <view class="flex items-center min-w-0">
-                  <text class="i-lucide-building w-3 h-3 text-gray-400 mr-1 shrink-0"></text>
+                  <text class="i-lucide-building w-3 h-3 text-fg-subtle mr-1 shrink-0"></text>
                   <text class="truncate text-sm">{{ item.affiliation || '未知所属' }}</text>
                 </view>
                 <view class="flex items-center min-w-0 justify-start">
-                  <text class="i-lucide-map-pinned w-3 h-3 text-gray-400 mr-1 shrink-0"></text>
+                  <text class="i-lucide-map-pinned w-3 h-3 text-fg-subtle mr-1 shrink-0"></text>
                   <text class="truncate text-sm">{{ item.campus || '未知校区' }}</text>
                 </view>
               </view>
 
               <view v-if="item.introduction" class="mt-2">
-                <text class="text-gray-500 leading-5">{{ getOrganizationDescription(item) }}</text>
+                <text class="text-fg-muted leading-5">{{ getOrganizationDescription(item) }}</text>
               </view>
             </view>
           </template>
 
           <view v-if="loadingMore" class="text-center py-4">
-            <text class="text-gray-500">加载更多...</text>
+            <text class="text-fg-muted">加载更多...</text>
           </view>
 
           <view v-else-if="!hasMore" class="text-center py-2">
             <view class="flex flex-col items-center gap-1 text-sm">
-              <text class="text-gray-400">已加载全部</text>
-              <text class="text-gray-400">如需录入请联系客服</text>
+              <text class="text-fg-subtle">已加载全部</text>
+              <text class="text-fg-subtle">如需录入请联系客服</text>
             </view>
           </view>
         </view>
@@ -136,9 +141,12 @@
 </template>
 
 <script setup>
+import { useThemePage } from '../../composables/useThemePage'
 import { computed, onMounted, ref } from 'vue'
 import Taro from '@tarojs/taro'
 import { organizationAPI } from '../../api'
+
+const themeStore = useThemePage()
 
 const PAGE_SIZE = 10
 const typeOptions = ['无', '部门', '社团', '工作室', '学生组织']

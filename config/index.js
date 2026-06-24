@@ -55,6 +55,14 @@ export default defineConfig(async (merge, { command, mode }) => {
     },
     copy: {
       patterns: [
+        {
+          from: resolve(process.cwd(), 'src/theme.json'),
+          to: resolve(process.cwd(), 'dist/theme.json')
+        },
+        {
+          from: resolve(process.cwd(), 'src/assets/icons'),
+          to: resolve(process.cwd(), 'dist/assets/icons')
+        }
       ],
       options: {
       }

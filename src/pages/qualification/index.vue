@@ -1,7 +1,12 @@
 <template>
-  <scroll-view class="h-screen bg-slate-50" :scroll-y="true">
+  <page-meta
+    :page-style="themeStore.pageStyle"
+    :background-color="themeStore.nativeTheme.pageBg"
+    :background-text-style="themeStore.nativeTheme.backgroundTextStyle"
+  />
+  <scroll-view class="h-screen bg-page text-fg" :scroll-y="true" :class="[themeStore.rootClass]">
     <view class="px-4 pt-3 pb-8">
-      <view class="rounded-2xl bg-white px-2 shadow-sm">
+      <view class="rounded-2xl bg-surface px-2 shadow-sm">
         <view class="flex">
           <view
             v-for="tab in topTabs"
@@ -9,7 +14,7 @@
             @tap="activeTab = tab.key"
             :class="[
               'flex-1 border-b-2 px-1 py-3 text-center transition-colors duration-200',
-              activeTab === tab.key ? 'border-orange-500 text-orange-600 font-semibold' : 'border-transparent text-slate-500'
+              activeTab === tab.key ? 'border-warning text-warning font-semibold' : 'border-transparent text-fg-muted'
             ]"
           >
             {{ tab.label }}
@@ -17,19 +22,19 @@
         </view>
       </view>
 
-      <view v-if="pageLoading" class="mt-4 rounded-2xl bg-white py-14 text-center shadow-sm">
-        <view class="mx-auto mb-3 h-8 w-8 rounded-full border-2 border-orange-400 border-t-transparent animate-spin"></view>
-        <text class="text-slate-500">正在加载考级考证数据...</text>
+      <view v-if="pageLoading" class="mt-4 rounded-2xl bg-surface py-14 text-center shadow-sm">
+        <view class="mx-auto mb-3 h-8 w-8 rounded-full border-2 border-warning border-t-transparent animate-spin"></view>
+        <text class="text-fg-muted">正在加载考级考证数据...</text>
       </view>
 
-      <view v-else class="mt-4 rounded-2xl bg-white p-4 shadow-sm">
-        <view class="border-b border-slate-200 pb-3">
+      <view v-else class="mt-4 rounded-2xl bg-surface p-4 shadow-sm">
+        <view class="border-b border-line pb-3">
           <view class="flex items-start justify-between gap-3">
             <view>
-              <text class="text-base font-semibold text-slate-900" :user-select="true">{{ activeTitle }}</text>
-              <text v-if="activeDescription" class="mt-1 block leading-5 text-slate-500" :user-select="true">{{ activeDescription }}</text>
+              <text class="text-base font-semibold text-fg" :user-select="true">{{ activeTitle }}</text>
+              <text v-if="activeDescription" class="mt-1 block leading-5 text-fg-muted" :user-select="true">{{ activeDescription }}</text>
             </view>
-            <text class="flex-shrink-0 text-orange-600">{{ activeCount }} 项</text>
+            <text class="flex-shrink-0 text-warning">{{ activeCount }} 项</text>
           </view>
         </view>
 
@@ -37,11 +42,11 @@
           {{ activeError }}
         </view>
 
-        <view v-else-if="activeTab === TEST_TAB && testList.length === 0" class="py-10 text-center text-slate-400">
+        <view v-else-if="activeTab === TEST_TAB && testList.length === 0" class="py-10 text-center text-fg-subtle">
           暂无考级考试数据
         </view>
 
-        <view v-else-if="activeTab === QUALIFICATION_TAB && qualificationList.length === 0" class="py-10 text-center text-slate-400">
+        <view v-else-if="activeTab === QUALIFICATION_TAB && qualificationList.length === 0" class="py-10 text-center text-fg-subtle">
           暂无职业资格数据
         </view>
 
@@ -50,20 +55,20 @@
             v-for="(item, index) in testList"
             :key="item.id"
             class="py-4"
-            :class="index > 0 ? 'border-t border-slate-100' : ''"
+            :class="index > 0 ? 'border-t border-line' : ''"
           >
             <view class="flex items-start justify-between gap-3">
-              <text class="block min-w-0 flex-1 font-semibold leading-6 text-slate-800" :user-select="true">{{ item.name }}</text>
+              <text class="block min-w-0 flex-1 font-semibold leading-6 text-fg" :user-select="true">{{ item.name }}</text>
             </view>
 
             <text
               v-if="item.displayDate"
-              class="mt-1 block font-medium leading-5 text-orange-600"
+              class="mt-1 block font-medium leading-5 text-warning"
               :user-select="true"
             >
               {{ item.displayDate }}
             </text>
-            <text class="mt-2 block leading-6 text-slate-600" :user-select="true">{{ item.intro || '暂无介绍' }}</text>
+            <text class="mt-2 block leading-6 text-fg-muted" :user-select="true">{{ item.intro || '暂无介绍' }}</text>
           </view>
         </template>
 
@@ -72,23 +77,23 @@
             v-for="(item, index) in qualificationList"
             :key="item.id"
             class="py-4"
-            :class="index > 0 ? 'border-t border-slate-100' : ''"
+            :class="index > 0 ? 'border-t border-line' : ''"
           >
             <view class="min-w-0">
-              <text class="block font-semibold leading-6 text-slate-800" :user-select="true">{{ item.name }}</text>
-              <text class="mt-1 block leading-5 text-slate-400" :user-select="true">{{ item.displayDate || '时间待更新' }}</text>
+              <text class="block font-semibold leading-6 text-fg" :user-select="true">{{ item.name }}</text>
+              <text class="mt-1 block leading-5 text-fg-subtle" :user-select="true">{{ item.displayDate || '时间待更新' }}</text>
             </view>
 
-            <view v-if="item.children.length > 0" class="mt-3 rounded-xl bg-slate-50 px-3 py-2.5">
+            <view v-if="item.children.length > 0" class="mt-3 rounded-xl bg-page px-3 py-2.5">
               <view
                 v-for="(child, childIndex) in item.children"
                 :key="`${item.id}-${child.name}-${childIndex}`"
                 class="py-2"
-                :class="childIndex > 0 ? 'border-t border-slate-200' : ''"
+                :class="childIndex > 0 ? 'border-t border-line' : ''"
               >
                 <view class="flex items-start justify-between gap-3">
-                  <text class="min-w-0 flex-1 font-medium leading-5 text-slate-700" :user-select="true">{{ child.name }}</text>
-                  <text class="flex-shrink-0 leading-5 text-slate-400" :user-select="true">{{ child.displayDate || '时间待更新' }}</text>
+                  <text class="min-w-0 flex-1 font-medium leading-5 text-fg" :user-select="true">{{ child.name }}</text>
+                  <text class="flex-shrink-0 leading-5 text-fg-subtle" :user-select="true">{{ child.displayDate || '时间待更新' }}</text>
                 </view>
               </view>
             </view>
@@ -104,9 +109,12 @@
 </template>
 
 <script setup>
+import { useThemePage } from '../../composables/useThemePage'
 import { computed, onMounted, ref } from 'vue'
 import Taro from '@tarojs/taro'
 import { configAPI } from '../../api/index'
+
+const themeStore = useThemePage()
 
 const TEST_TAB = 'tests'
 const QUALIFICATION_TAB = 'qualifications'

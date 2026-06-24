@@ -1,6 +1,11 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
-  <view class="min-h-screen bg-gray-50 flex flex-col justify-between">
+  <page-meta
+    :page-style="themeStore.pageStyle"
+    :background-color="themeStore.nativeTheme.pageBg"
+    :background-text-style="themeStore.nativeTheme.backgroundTextStyle"
+  />
+  <view class="min-h-screen bg-page flex flex-col justify-between text-fg" :class="[themeStore.rootClass]">
     <!-- 主要内容区域 -->
     <view>
       <!-- 用户信息头部 -->
@@ -18,18 +23,18 @@
 
     <!-- 个人信息卡片 -->
     <view v-if="authStore.isLoggedIn" class="px-4 -mt-6">
-      <view class="bg-white rounded-xl p-4 shadow-sm mb-4">
+      <view class="bg-surface rounded-xl p-4 shadow-sm mb-4">
         <view class="space-y-3">
           <view class="flex justify-between items-center">
-              <text class="text-gray-600">账号</text>
+              <text class="text-fg-muted">账号</text>
             <view class="flex items-center">
               <text class="px-2 py-0.5 rounded-full text-xs" :class="roleTagClass" @tap="showLoginDaysProgress">{{ roleTagText }}</text>
-              <text class="pl-2 text-gray-800" :user-select="true">{{ userInfo?.id || "无" }}</text>
+              <text class="pl-2 text-fg" :user-select="true">{{ userInfo?.id || "无" }}</text>
             </view>
           </view>
           <view class="flex justify-between items-center">
-            <text class="text-gray-600">班级</text>
-            <text class="text-gray-800" :user-select="true">{{ userInfo?.class_id || "无" }}</text>
+            <text class="text-fg-muted">班级</text>
+            <text class="text-fg" :user-select="true">{{ userInfo?.class_id || "无" }}</text>
           </view>
         </view>
       </view>
@@ -38,45 +43,59 @@
     <!-- 功能菜单 -->
     <view class="px-4" :class="authStore.isLoggedIn ? '' : 'mt-4'">
       <!-- 我的积分 -->
-      <view v-if="authStore.isLoggedIn" class="bg-white rounded-xl mb-4 overflow-hidden">
+      <view v-if="authStore.isLoggedIn" class="bg-surface rounded-xl mb-4 overflow-hidden">
         <view
-          class="px-4 py-3 text-base flex items-center justify-between active:bg-gray-50"
+          class="px-4 py-3 text-base flex items-center justify-between active:bg-page"
           @tap="goToMyPoints"
         >
           <view class="flex items-center space-x-3">
             <text class="i-lucide-coins"></text>
-            <text class="text-gray-800">我的积分</text>
+            <text class="text-fg">我的积分</text>
           </view>
           <view class="flex items-center space-x-2">
-            <text v-if="!pointsLoaded && pointsLoadFailed" class="i-lucide-triangle-alert text-gray-400"></text>
-            <text v-else-if="!pointsLoaded" class="i-lucide-loader-circle text-gray-400 animate-spin"></text>
-            <text v-else class="text-gray-600">{{ userPoints }}</text>
-            <text class="i-lucide-chevron-right text-gray-400"></text>
+            <text v-if="!pointsLoaded && pointsLoadFailed" class="i-lucide-triangle-alert text-fg-subtle"></text>
+            <text v-else-if="!pointsLoaded" class="i-lucide-loader-circle text-fg-subtle animate-spin"></text>
+            <text v-else class="text-fg-muted">{{ userPoints }}</text>
+            <text class="i-lucide-chevron-right text-fg-subtle"></text>
           </view>
         </view>
       </view>
 
       <!-- 我的功能 -->
-      <view class="bg-white rounded-xl mb-4 overflow-hidden">
+      <view class="bg-surface rounded-xl mb-4 overflow-hidden">
         <view
-          class="px-4 py-3 border-b border-gray-100 flex items-center justify-between"
+          class="px-4 py-3 border-b border-line flex items-center justify-between"
         >
-          <button class="flex items-center space-x-3 w-full h-full leading-normal text-base text-ms p-0 after:border-none bg-white hover:bg-gray-50" open-type="contact">
+          <button class="flex items-center space-x-3 w-full h-full leading-normal text-base text-ms p-0 after:border-none bg-surface hover:bg-page" open-type="contact">
             <text class="i-lucide-user"></text>
-            <text class="text-gray-800">客服反馈</text>
+            <text class="text-fg">客服反馈</text>
           </button>
-          <text class="i-lucide-chevron-right text-gray-400"></text>
+          <text class="i-lucide-chevron-right text-fg-subtle"></text>
         </view>
 
         <view
-          class="px-4 py-3 border-b border-gray-100 text-base flex items-center justify-between active:bg-gray-50"
+          class="px-4 py-3 border-b border-line text-base flex items-center justify-between active:bg-page"
+          @tap="handleThemeModeSelect"
+        >
+          <view class="flex items-center space-x-3">
+            <text class="i-lucide-moon"></text>
+            <text class="text-fg">显示模式</text>
+          </view>
+          <view class="flex items-center space-x-2">
+            <text class="text-fg-muted">{{ themeStore.modeLabel }}</text>
+            <text class="i-lucide-chevron-right text-fg-subtle"></text>
+          </view>
+        </view>
+
+        <view
+          class="px-4 py-3 border-b border-line text-base flex items-center justify-between active:bg-page"
           @tap="goToTermsOfService"
         >
           <view class="flex items-center space-x-3">
             <text class="i-lucide-file-text"></text>
-            <text class="text-gray-800">使用条款</text>
+            <text class="text-fg">使用条款</text>
           </view>
-          <text class="i-lucide-chevron-right text-gray-400"></text>
+          <text class="i-lucide-chevron-right text-fg-subtle"></text>
         </view>
       </view>
 
@@ -84,7 +103,7 @@
       <view
         v-if="authStore.isLoggedIn"
         @tap="handleLogout"
-        class="w-full mx-auto text-center bg-gray-100 text-base text-red-500 border border-gray-100 rounded-md p-2"
+        class="w-full mx-auto text-center bg-surface-muted text-base text-danger border border-line rounded-md p-2"
       >
         退出登录
       </view>
@@ -92,7 +111,7 @@
       <view
         v-else
         @tap="goToLogin"
-        class="w-full mx-auto text-center bg-gray-100 text-base text-blue-500 border border-gray-100 rounded-md p-2"
+        class="w-full mx-auto text-center bg-surface-muted text-base text-brand border border-line rounded-md p-2"
       >
         登录
       </view>
@@ -103,58 +122,58 @@
     <!-- 底部开源项目信息 -->
     <view class="p-4 mt-4">
       <view class="flex flex-col gap-1 justify-center items-center">
-        <text class="text-xs text-gray-400"> 江理一起来学开源项目 </text>
-        <text class="text-xs text-gray-400">
+        <text class="text-xs text-fg-subtle"> 江理一起来学开源项目 </text>
+        <text class="text-xs text-fg-subtle">
           TogetherForStudy/jxust-yqlx-weapp
         </text>
-        <text class="text-xs text-gray-400">
+        <text class="text-xs text-fg-subtle">
           TogetherForStudy/jxust-yqlx-server
         </text>
       </view>
     </view>
 
     <!-- 活跃用户进度弹窗 -->
-    <view v-if="loginDaysModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" @tap.self="loginDaysModal = false">
-      <view class="bg-white rounded-2xl p-6 mx-6 w-full max-w-sm">
+    <view v-if="loginDaysModal" class="fixed inset-0 bg-overlay flex items-center justify-center z-50" @tap.self="loginDaysModal = false">
+      <view class="bg-surface rounded-2xl p-6 mx-6 w-full max-w-sm">
         <view class="text-center mb-4">
-          <text class="text-lg font-semibold text-gray-900">用户等级</text>
+          <text class="text-lg font-semibold text-fg">用户等级</text>
         </view>
 
         <!-- 进度条 -->
         <view class="mb-3">
-          <view class="flex justify-between text-xs text-gray-500 mb-1">
+          <view class="flex justify-between text-xs text-fg-muted mb-1">
             <text>登录天数</text>
             <text>{{ loginDaysData.loginDays }}/25</text>
           </view>
-          <view class="w-full bg-gray-200 rounded-full h-2.5">
+          <view class="w-full bg-line rounded-full h-2.5">
             <view
               class="h-2.5 rounded-full"
-              :class="loginDaysData.loginDays >= 25 ? 'bg-green-500' : 'bg-blue-500'"
+              :class="loginDaysData.loginDays >= 25 ? 'bg-success' : 'bg-brand'"
               :style="{ width: Math.min(100, (loginDaysData.loginDays / 25) * 100) + '%' }"
             />
           </view>
         </view>
 
         <!-- 说明信息 -->
-        <view class="bg-gray-50 rounded-lg p-3 mb-4 space-y-1">
+        <view class="bg-page rounded-lg p-3 mb-4 space-y-1">
           <view class="flex justify-between text-sm">
-            <text class="text-gray-500">当前等级</text>
+            <text class="text-fg-muted">当前等级</text>
             <text class="text-sm">{{ roleTagText }}</text>
           </view>
           <view v-if="!isAtLeastActive" class="flex justify-between text-sm">
-            <text class="text-gray-500">下一等级</text>
-            <text class="text-sm text-blue-600">{{ roleTagMap.user_active.text }}</text>
+            <text class="text-fg-muted">下一等级</text>
+            <text class="text-sm text-brand">{{ roleTagMap.user_active.text }}</text>
           </view>
           <view class="flex justify-between text-sm">
-            <text class="text-gray-500">达成条件</text>
-            <text class="text-gray-800">过去 {{ loginDaysData.pastDays }} 天内登录 25 天</text>
+            <text class="text-fg-muted">达成条件</text>
+            <text class="text-fg">过去 {{ loginDaysData.pastDays }} 天内登录 25 天</text>
           </view>
         </view>
 
         <!-- 确认按钮 -->
         <view
           @tap="loginDaysModal = false"
-          class="w-full text-center py-2.5 bg-blue-500 text-white rounded-lg font-medium"
+          class="w-full text-center py-2.5 bg-brand text-white rounded-lg font-medium"
         >
           知道了
         </view>
@@ -164,10 +183,13 @@
 </template>
 
 <script setup>
+import { useThemePage } from '../../composables/useThemePage'
 import { ref, computed } from "vue";
 import { useAuthStore } from "../../stores/auth";
 import Taro from "@tarojs/taro";
 import { courseTableAPI, pointsAPI, userAPI } from "../../api/index";
+
+const themeStore = useThemePage()
 
 const authStore = useAuthStore();
 const userPoints = ref(0);
@@ -181,11 +203,11 @@ const userInfo = computed(() => authStore.userInfo);
 
 // 角色标签映射：优先级 admin > operator > user_verified > user_active > user_basic
 const roleTagMap = {
-  admin: { text: '管理员', class: 'bg-red-100 text-red-600' },
+  admin: { text: '管理员', class: 'bg-danger-soft text-danger' },
   operator: { text: '运营', class: 'bg-purple-100 text-purple-600' },
-  user_verified: { text: '认证用户', class: 'bg-green-100 text-green-600' },
-  user_active: { text: '活跃用户', class: 'bg-blue-100 text-blue-600' },
-  user_basic: { text: '基本用户', class: 'bg-gray-100 text-gray-600' }
+  user_verified: { text: '认证用户', class: 'bg-success-soft text-success' },
+  user_active: { text: '活跃用户', class: 'bg-brand-soft text-brand' },
+  user_basic: { text: '基本用户', class: 'bg-surface-muted text-fg-muted' }
 };
 
 const roleTagPriority = ['admin', 'operator', 'user_verified', 'user_active', 'user_basic'];
@@ -234,6 +256,22 @@ const handleLogout = () => {
       }
     },
   });
+};
+
+const handleThemeModeSelect = async () => {
+  const modes = ['system', 'light', 'dark'];
+  const labels = ['跟随系统', '浅色', '深色'];
+
+  try {
+    const { tapIndex } = await Taro.showActionSheet({
+      itemList: labels,
+    });
+
+    themeStore.setMode(modes[tapIndex]);
+  } catch (error) {
+    if (error?.errMsg?.includes('cancel')) return;
+    console.error('切换显示模式失败:', error);
+  }
 };
 
 const goToTermsOfService = () => {

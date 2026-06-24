@@ -40,53 +40,53 @@ export const WEEK_DAYS = ['周一', '周二', '周三', '周四', '周五', '周
 // 课程颜色配置 - 预设10套颜色组合
 export const COURSE_COLORS = [
   {
-    backgroundColor: 'bg-blue-100',
-    textColor: 'text-blue-800',
+    backgroundColor: 'bg-blue-100 dark:bg-blue-950',
+    textColor: 'text-blue-800 dark:text-blue-200',
     name: 'blue'
   },
   {
-    backgroundColor: 'bg-purple-100',
-    textColor: 'text-purple-800',
+    backgroundColor: 'bg-purple-100 dark:bg-purple-950',
+    textColor: 'text-purple-800 dark:text-purple-200',
     name: 'purple'
   },
   {
-    backgroundColor: 'bg-green-100',
-    textColor: 'text-green-800',
+    backgroundColor: 'bg-success-soft',
+    textColor: 'text-success',
     name: 'green'
   },
   {
-    backgroundColor: 'bg-yellow-100',
-    textColor: 'text-yellow-800',
+    backgroundColor: 'bg-warning-soft',
+    textColor: 'text-warning',
     name: 'yellow'
   },
   {
-    backgroundColor: 'bg-red-100',
-    textColor: 'text-red-800',
+    backgroundColor: 'bg-danger-soft',
+    textColor: 'text-danger',
     name: 'red'
   },
   {
-    backgroundColor: 'bg-indigo-100',
-    textColor: 'text-indigo-800',
+    backgroundColor: 'bg-indigo-100 dark:bg-indigo-950',
+    textColor: 'text-indigo-800 dark:text-indigo-200',
     name: 'indigo'
   },
   {
-    backgroundColor: 'bg-pink-100',
-    textColor: 'text-pink-800',
+    backgroundColor: 'bg-pink-100 dark:bg-pink-950',
+    textColor: 'text-pink-800 dark:text-pink-200',
     name: 'pink'
   },
   {
-    backgroundColor: 'bg-teal-100',
-    textColor: 'text-teal-800',
+    backgroundColor: 'bg-teal-100 dark:bg-teal-950',
+    textColor: 'text-teal-800 dark:text-teal-200',
     name: 'teal'
   },
   {
-    backgroundColor: 'bg-orange-100',
-    textColor: 'text-orange-800',
+    backgroundColor: 'bg-orange-100 dark:bg-orange-950',
+    textColor: 'text-orange-800 dark:text-orange-200',
     name: 'orange'
   },
   {
-    backgroundColor: 'bg-cyan-100',
-    textColor: 'text-cyan-800',
+    backgroundColor: 'bg-cyan-100 dark:bg-cyan-950',
+    textColor: 'text-cyan-800 dark:text-cyan-200',
     name: 'cyan'
   }
 ]

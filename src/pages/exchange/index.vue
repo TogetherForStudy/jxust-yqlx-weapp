@@ -1,7 +1,12 @@
 <template>
-  <scroll-view class="h-screen bg-slate-50" :scroll-y="true">
+  <page-meta
+    :page-style="themeStore.pageStyle"
+    :background-color="themeStore.nativeTheme.pageBg"
+    :background-text-style="themeStore.nativeTheme.backgroundTextStyle"
+  />
+  <scroll-view class="h-screen bg-page text-fg" :scroll-y="true" :class="[themeStore.rootClass]">
     <view class="px-4 pt-3 pb-8">
-      <view class="rounded-2xl bg-white px-2 shadow-sm">
+      <view class="rounded-2xl bg-surface px-2 shadow-sm">
         <view class="flex">
           <view
             v-for="tab in topTabs"
@@ -9,7 +14,7 @@
             @tap="activeTab = tab.key"
             :class="[
               'flex-1 border-b-2 px-1 py-3 text-center transition-colors duration-200',
-              activeTab === tab.key ? 'border-orange-500 font-semibold text-orange-600' : 'border-transparent text-slate-500'
+              activeTab === tab.key ? 'border-warning font-semibold text-warning' : 'border-transparent text-fg-muted'
             ]"
           >
             {{ tab.label }}
@@ -17,19 +22,19 @@
         </view>
       </view>
 
-      <view v-if="pageLoading" class="mt-4 rounded-2xl bg-white py-14 text-center shadow-sm">
-        <view class="mx-auto mb-3 h-8 w-8 rounded-full border-2 border-orange-400 border-t-transparent animate-spin"></view>
-        <text class="text-slate-500">正在加载交换生数据...</text>
+      <view v-if="pageLoading" class="mt-4 rounded-2xl bg-surface py-14 text-center shadow-sm">
+        <view class="mx-auto mb-3 h-8 w-8 rounded-full border-2 border-warning border-t-transparent animate-spin"></view>
+        <text class="text-fg-muted">正在加载交换生数据...</text>
       </view>
 
-      <view v-else class="mt-4 rounded-2xl bg-white p-4 shadow-sm">
-        <view class="border-b border-slate-200 pb-3">
+      <view v-else class="mt-4 rounded-2xl bg-surface p-4 shadow-sm">
+        <view class="border-b border-line pb-3">
           <view class="flex items-start justify-between gap-3">
             <view>
-              <text class="font-semibold text-slate-900" :user-select="true">遴选本科生赴国内高校交流培养的通知</text>
+              <text class="font-semibold text-fg" :user-select="true">遴选本科生赴国内高校交流培养的通知</text>
             </view>
           </view>
-          <view class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-slate-400 text-sm">
+          <view class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-fg-subtle text-sm">
             <text :user-select="true">面向：大二下</text>
             <text :user-select="true">发布日期：{{ currentPublishDate || '待发布' }}</text>
           </view>
@@ -39,7 +44,7 @@
           {{ loadError }}
         </view>
 
-        <view v-else-if="currentSections.length === 0" class="py-10 text-center text-slate-400">
+        <view v-else-if="currentSections.length === 0" class="py-10 text-center text-fg-subtle">
           暂无交换生数据
         </view>
 
@@ -48,13 +53,13 @@
             v-for="(section, index) in currentSections"
             :key="`${activeTab}-${section.title}-${index}`"
             class="py-4"
-            :class="index > 0 ? 'border-t border-slate-100' : ''"
+            :class="index > 0 ? 'border-t border-line' : ''"
           >
             <view class="flex items-start justify-between gap-3">
-              <text class="font-semibold leading-6 text-slate-800" :user-select="true">{{ section.title || `说明 ${index + 1}` }}</text>
+              <text class="font-semibold leading-6 text-fg" :user-select="true">{{ section.title || `说明 ${index + 1}` }}</text>
             </view>
 
-            <text v-if="section.description" class="mt-2 block leading-6 text-slate-600" :user-select="true">
+            <text v-if="section.description" class="mt-2 block leading-6 text-fg-muted" :user-select="true">
               {{ section.description }}
             </text>
 
@@ -63,25 +68,25 @@
                 v-for="(item, itemIndex) in section.items"
                 :key="`${section.title}-item-${itemIndex}`"
                 class="flex items-start gap-2 py-2"
-                :class="itemIndex > 0 ? 'border-t border-slate-100' : ''"
+                :class="itemIndex > 0 ? 'border-t border-line' : ''"
               >
-                <view class="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-orange-400"></view>
-                <text class="min-w-0 flex-1 leading-6 text-slate-700" :user-select="true">{{ item }}</text>
+                <view class="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-warning"></view>
+                <text class="min-w-0 flex-1 leading-6 text-fg" :user-select="true">{{ item }}</text>
               </view>
             </view>
 
-            <view v-if="section.schools.length > 0" class="mt-3 border-t border-slate-100">
+            <view v-if="section.schools.length > 0" class="mt-3 border-t border-line">
               <view
                 v-for="(school, schoolIndex) in section.schools"
                 :key="`${section.title}-school-${school.name}-${schoolIndex}`"
                 class="py-3"
-                :class="schoolIndex > 0 ? 'border-t border-slate-100' : ''"
+                :class="schoolIndex > 0 ? 'border-t border-line' : ''"
               >
                 <view class="flex items-start justify-between gap-3">
-                  <text class="min-w-0 flex-1 font-semibold leading-6 text-slate-800" :user-select="true">{{ school.name || `学校 ${schoolIndex + 1}` }}</text>
-                  <text v-if="school.quotaLabel" class="flex-shrink-0 text-orange-600" :user-select="true">{{ school.quotaLabel }}</text>
+                  <text class="min-w-0 flex-1 font-semibold leading-6 text-fg" :user-select="true">{{ school.name || `学校 ${schoolIndex + 1}` }}</text>
+                  <text v-if="school.quotaLabel" class="flex-shrink-0 text-warning" :user-select="true">{{ school.quotaLabel }}</text>
                 </view>
-                <text v-if="school.remarks" class="mt-1 block leading-6 text-slate-600" :user-select="true">{{ school.remarks }}</text>
+                <text v-if="school.remarks" class="mt-1 block leading-6 text-fg-muted" :user-select="true">{{ school.remarks }}</text>
               </view>
             </view>
           </view>
@@ -92,9 +97,12 @@
 </template>
 
 <script setup>
+import { useThemePage } from '../../composables/useThemePage'
 import { computed, onMounted, ref } from 'vue'
 import Taro from '@tarojs/taro'
 import { configAPI } from '../../api'
+
+const themeStore = useThemePage()
 
 const LAST_YEAR_TAB = 'lastYear'
 const THIS_YEAR_TAB = 'thisYear'

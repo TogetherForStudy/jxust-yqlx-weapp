@@ -2,44 +2,44 @@
   <!-- 今日课程卡片 -->
   <view class="px-4">
       <view class="flex justify-between items-center mb-2">
-        <text class="text-gray-800 font-medium">今日课程</text>
+        <text class="text-fg font-medium">今日课程</text>
       </view>
 
       <!-- 今日课程内容 -->
       <view
-        class="bg-white rounded-xl shadow-sm border border-gray-100"
+        class="bg-surface rounded-xl shadow-sm border border-line"
       >
         <!-- 加载状态 -->
         <view v-if="scheduleStore.isLoading" class="flex items-center justify-center py-8">
-          <text class="text-gray-500 text-sm">加载中...</text>
+          <text class="text-fg-muted text-sm">加载中...</text>
         </view>
 
         <!-- 未绑定班级状态 -->
-        <view v-else-if="!authStore.userClass" class="flex flex-col items-center justify-center py-8" :class="{ 'active:bg-gray-50': authStore.isLoggedIn }" @tap="authStore.isLoggedIn && goToBindClass()">
-          <view class="i-lucide-book-open text-2xl text-gray-400 mb-2"></view>
-          <text class="text-gray-500 text-sm">绑定课表后查看今日课程</text>
-          <text v-if="authStore.isLoggedIn" class="text-blue-500 text-xs mt-1">点击前往绑定 ›</text>
+        <view v-else-if="!authStore.userClass" class="flex flex-col items-center justify-center py-8" :class="{ 'active:bg-page': authStore.isLoggedIn }" @tap="authStore.isLoggedIn && goToBindClass()">
+          <view class="i-lucide-book-open text-2xl text-fg-subtle mb-2"></view>
+          <text class="text-fg-muted text-sm">绑定课表后查看今日课程</text>
+          <text v-if="authStore.isLoggedIn" class="text-brand text-xs mt-1">点击前往绑定 ›</text>
         </view>
 
         <!-- 非当前学期状态 -->
         <view v-else-if="scheduleStore.isSemesterMismatch" class="flex flex-col items-center justify-center py-8">
-          <view class="i-lucide-info text-2xl text-orange-500 mb-2"></view>
-          <text class="text-gray-700 font-medium">非本学期课表</text>
-          <text class="text-gray-500 text-sm">查看今日课程需切换至当前学期</text>
+          <view class="i-lucide-info text-2xl text-warning mb-2"></view>
+          <text class="text-fg font-medium">非本学期课表</text>
+          <text class="text-fg-muted text-sm">查看今日课程需切换至当前学期</text>
         </view>
 
         <!-- 今日无课程状态 -->
         <view v-else-if="todayCourses.length === 0" class="flex flex-col items-center justify-center py-8">
-          <view class="i-lucide-coffee text-2xl text-green-500 mb-2"></view>
-          <text class="text-gray-700 font-medium">今日无课程</text>
-          <text class="text-gray-500 text-sm">享受轻松的一天</text>
+          <view class="i-lucide-coffee text-2xl text-success mb-2"></view>
+          <text class="text-fg font-medium">今日无课程</text>
+          <text class="text-fg-muted text-sm">享受轻松的一天</text>
         </view>
 
         <!-- 全部课程已结束 -->
         <view v-else-if="allCoursesFinished" class="flex flex-col items-center justify-center py-8">
-          <view class="i-lucide-coffee text-2xl text-green-500 mb-2"></view>
-          <text class="text-gray-700 font-medium">今日课程已全部结束</text>
-          <text class="text-gray-500 text-sm">学习一天啦，好好休息</text>
+          <view class="i-lucide-coffee text-2xl text-success mb-2"></view>
+          <text class="text-fg font-medium">今日课程已全部结束</text>
+          <text class="text-fg-muted text-sm">学习一天啦，好好休息</text>
         </view>
 
         <!-- 有课程时显示课程列表（按时间段分组） -->
@@ -51,9 +51,9 @@
             <!-- 单门课程：直接显示 -->
             <template v-if="group.courses.length === 1">
               <view
-                class="flex items-center active:bg-gray-50 transition-all duration-200 border border-transparent"
+                class="flex items-center active:bg-page transition-all duration-200 border border-transparent"
                 :class="[
-                  { 'border-t border-gray-100': gIndex > 0 },
+                  { 'border-t border-line': gIndex > 0 },
                   getCourseStatusClass(group.courses[0].timeStatus, group.courses[0].minutesToStart)
                 ]"
               >
@@ -64,29 +64,29 @@
                   ></view>
                 </view>
                 <view class="flex-1 min-w-0">
-                  <view class="font-semibold text-gray-900 text-sm mb-1 truncate">
+                  <view class="font-semibold text-fg text-sm mb-1 truncate">
                     {{ group.courses[0].course }}
                   </view>
-                  <view class="grid grid-cols-3 text-sm text-gray-600">
+                  <view class="grid grid-cols-3 text-sm text-fg-muted">
                     <view class="flex items-center col-span-1">
-                      <view class="i-lucide-user w-3 h-3 mr-1.5 text-gray-400 shrink-0"></view>
+                      <view class="i-lucide-user w-3 h-3 mr-1.5 text-fg-subtle shrink-0"></view>
                       <text class="truncate">{{ group.courses[0].teacher }}</text>
                     </view>
                     <view class="flex items-center col-span-2">
-                      <view class="i-lucide-map-pin w-3 h-3 mx-1.5 text-gray-400 shrink-0"></view>
+                      <view class="i-lucide-map-pin w-3 h-3 mx-1.5 text-fg-subtle shrink-0"></view>
                       <text class="truncate">{{ group.courses[0].classroom }}</text>
                     </view>
                   </view>
                 </view>
                 <view class="flex-shrink-0 text-right">
-                  <view class="text-sm font-medium text-gray-800 mb-1 w-24">
+                  <view class="text-sm font-medium text-fg mb-1 w-24">
                     {{ getTimeSlotTime(group.period) }}
                   </view>
                   <view>
-                    <view v-if="group.courses[0].timeStatus === 'ongoing'" class="text-sm text-green-600 font-medium">
+                    <view v-if="group.courses[0].timeStatus === 'ongoing'" class="text-sm text-success font-medium">
                       {{ group.courses[0].remainingMinutes }}分钟后下课
                     </view>
-                    <view v-else-if="group.courses[0].timeStatus === 'upcoming' && group.courses[0].minutesToStart <= 20" class="text-sm text-orange-600 font-medium">
+                    <view v-else-if="group.courses[0].timeStatus === 'upcoming' && group.courses[0].minutesToStart <= 20" class="text-sm text-warning font-medium">
                       {{ group.courses[0].minutesToStart }}分钟后上课
                     </view>
                   </view>
@@ -99,7 +99,7 @@
               <view>
                 <!-- 第一门课程（始终显示） -->
                 <view
-                  class="flex items-center active:bg-gray-50 transition-all duration-200 border border-transparent"
+                  class="flex items-center active:bg-page transition-all duration-200 border border-transparent"
                   :class="getCourseStatusClass(group.courses[0].timeStatus, group.courses[0].minutesToStart)"
                 >
                   <view class="flex-shrink-0 mr-2">
@@ -109,29 +109,29 @@
                     ></view>
                   </view>
                   <view class="flex-1 min-w-0">
-                    <view class="font-semibold text-gray-900 text-sm mb-1 truncate">
+                    <view class="font-semibold text-fg text-sm mb-1 truncate">
                       {{ group.courses[0].course }}
                     </view>
-                    <view class="grid grid-cols-3 text-sm text-gray-600">
+                    <view class="grid grid-cols-3 text-sm text-fg-muted">
                       <view class="flex items-center col-span-1">
-                        <view class="i-lucide-user w-3 h-3 mr-1.5 text-gray-400 shrink-0"></view>
+                        <view class="i-lucide-user w-3 h-3 mr-1.5 text-fg-subtle shrink-0"></view>
                         <text class="truncate">{{ group.courses[0].teacher }}</text>
                       </view>
                       <view class="flex items-center col-span-2">
-                        <view class="i-lucide-map-pin w-3 h-3 mx-1.5 text-gray-400 shrink-0"></view>
+                        <view class="i-lucide-map-pin w-3 h-3 mx-1.5 text-fg-subtle shrink-0"></view>
                         <text class="truncate">{{ group.courses[0].classroom }}</text>
                       </view>
                     </view>
                   </view>
                   <view class="flex-shrink-0 text-right">
-                    <view class="text-sm font-medium text-gray-800 mb-1 w-24">
+                    <view class="text-sm font-medium text-fg mb-1 w-24">
                       {{ getTimeSlotTime(group.period) }}
                     </view>
                     <view>
-                      <view v-if="group.courses[0].timeStatus === 'ongoing'" class="text-sm text-green-600 font-medium">
+                      <view v-if="group.courses[0].timeStatus === 'ongoing'" class="text-sm text-success font-medium">
                         {{ group.courses[0].remainingMinutes }}分钟后下课
                       </view>
-                      <view v-else-if="group.courses[0].timeStatus === 'upcoming' && group.courses[0].minutesToStart <= 20" class="text-sm text-orange-600 font-medium">
+                      <view v-else-if="group.courses[0].timeStatus === 'upcoming' && group.courses[0].minutesToStart <= 20" class="text-sm text-warning font-medium">
                         {{ group.courses[0].minutesToStart }}分钟后上课
                       </view>
                     </view>
@@ -141,14 +141,14 @@
                 <!-- 展开/收起窄条（固定在第一条下方） -->
                 <view
                   @tap="togglePeriod(group.period)"
-                  class="flex items-center justify-center py-1 bg-gray-50 active:bg-gray-100 transition-colors"
+                  class="flex items-center justify-center py-1 bg-page active:bg-surface-muted transition-colors"
                   :class="expandedPeriods[group.period] ? '' : 'rounded-b-lg'"
                 >
-                  <text class="text-xs text-gray-400 mr-1">
+                  <text class="text-xs text-fg-subtle mr-1">
                     {{ expandedPeriods[group.period] ? '收起' : `还有${group.courses.length - 1}门课` }}
                   </text>
                   <view
-                    class="i-lucide-chevron-down w-3 h-3 text-gray-400 transition-transform duration-200"
+                    class="i-lucide-chevron-down w-3 h-3 text-fg-subtle transition-transform duration-200"
                     :class="{ 'rotate-180': expandedPeriods[group.period] }"
                   ></view>
                 </view>
@@ -158,7 +158,7 @@
                   <view
                     v-for="(course, cIndex) in group.courses.slice(1)"
                     :key="`${group.period}-${cIndex}-${course.course}`"
-                    class="flex items-center active:bg-gray-50 transition-all duration-200 border border-transparent"
+                    class="flex items-center active:bg-page transition-all duration-200 border border-transparent"
                     :class="getCourseStatusClass(course.timeStatus, course.minutesToStart)"
                   >
                     <view class="flex-shrink-0 mr-2">
@@ -168,29 +168,29 @@
                       ></view>
                     </view>
                     <view class="flex-1 min-w-0">
-                      <view class="font-semibold text-gray-900 text-sm mb-1 truncate">
+                      <view class="font-semibold text-fg text-sm mb-1 truncate">
                         {{ course.course }}
                       </view>
-                      <view class="grid grid-cols-3 text-sm text-gray-600">
+                      <view class="grid grid-cols-3 text-sm text-fg-muted">
                         <view class="flex items-center col-span-1">
-                          <view class="i-lucide-user w-3 h-3 mr-1.5 text-gray-400 shrink-0"></view>
+                          <view class="i-lucide-user w-3 h-3 mr-1.5 text-fg-subtle shrink-0"></view>
                           <text class="truncate">{{ course.teacher }}</text>
                         </view>
                         <view class="flex items-center col-span-2">
-                          <view class="i-lucide-map-pin w-3 h-3 mx-1.5 text-gray-400 shrink-0"></view>
+                          <view class="i-lucide-map-pin w-3 h-3 mx-1.5 text-fg-subtle shrink-0"></view>
                           <text class="truncate">{{ course.classroom }}</text>
                         </view>
                       </view>
                     </view>
                     <view class="flex-shrink-0 text-right">
-                      <view class="text-sm font-medium text-gray-800 mb-1 w-24">
+                      <view class="text-sm font-medium text-fg mb-1 w-24">
                         {{ getTimeSlotTime(course.period) }}
                       </view>
                       <view>
-                        <view v-if="course.timeStatus === 'ongoing'" class="text-sm text-green-600 font-medium">
+                        <view v-if="course.timeStatus === 'ongoing'" class="text-sm text-success font-medium">
                           {{ course.remainingMinutes }}分钟后下课
                         </view>
-                        <view v-else-if="course.timeStatus === 'upcoming' && course.minutesToStart <= 20" class="text-sm text-orange-600 font-medium">
+                        <view v-else-if="course.timeStatus === 'upcoming' && course.minutesToStart <= 20" class="text-sm text-warning font-medium">
                           {{ course.minutesToStart }}分钟后上课
                         </view>
                       </view>
@@ -341,14 +341,14 @@ const getTimeSlotTime = (period) => {
 const getTimeSlotColorClass = (timeStatus, minutesToStart = 0) => {
   switch (timeStatus) {
     case 'finished':
-      return 'bg-gray-300'  // 已结束 - 灰色
+      return 'bg-line'  // 已结束 - 灰色
     case 'ongoing':
-      return 'bg-green-400' // 正在进行 - 绿色
+      return 'bg-success' // 正在进行 - 绿色
     case 'upcoming':
       // 30分钟内即将开始 - 橙色，否则蓝色
-      return minutesToStart <= 20 ? 'bg-orange-400' : 'bg-blue-400'
+      return minutesToStart <= 20 ? 'bg-warning' : 'bg-brand'
     default:
-      return 'bg-gray-300'
+      return 'bg-line'
   }
 }
 
@@ -358,10 +358,10 @@ const getCourseStatusClass = (timeStatus, minutesToStart = 0) => {
     case 'finished':
       return 'opacity-60'
     case 'ongoing':
-      return 'bg-green-50 border-green-200'
+      return 'bg-success-soft border-success'
     case 'upcoming':
       // 30分钟内即将开始 - 橙色背景
-      return minutesToStart <= 20 ? 'bg-orange-50 border-orange-200' : ''
+      return minutesToStart <= 20 ? 'bg-warning-soft border-warning' : ''
     default:
       return ''
   }

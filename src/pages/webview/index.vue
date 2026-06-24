@@ -1,10 +1,18 @@
 <template>
+  <page-meta
+    :page-style="themeStore.pageStyle"
+    :background-color="themeStore.nativeTheme.pageBg"
+    :background-text-style="themeStore.nativeTheme.backgroundTextStyle"
+  />
   <web-view :src="webviewUrl"></web-view>
 </template>
 
 <script setup>
+import { useThemePage } from '../../composables/useThemePage'
 import { ref, onMounted } from 'vue'
 import Taro from '@tarojs/taro'
+
+const themeStore = useThemePage()
 
 const webviewUrl = ref('')
 

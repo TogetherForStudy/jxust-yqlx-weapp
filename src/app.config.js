@@ -1,4 +1,6 @@
 export default {
+  darkmode: true,
+  themeLocation: 'theme.json',
   pages: [
     'pages/home/index',
     'pages/schedule/index',
@@ -37,40 +39,43 @@ export default {
     'pages/points/index',
   ],
   window: {
-    backgroundTextStyle: 'light',
-    navigationBarBackgroundColor: '#fff',
+    backgroundTextStyle: '@backgroundTextStyle',
+    backgroundColor: '@pageBgColor',
+    backgroundColorTop: '@pageBgColorTop',
+    backgroundColorBottom: '@pageBgColorBottom',
+    navigationBarBackgroundColor: '@navBgColor',
     navigationBarTitleText: '江理一起来学',
-    navigationBarTextStyle: 'black'
+    navigationBarTextStyle: '@navTxtStyle'
   },
   tabBar: {
-    color: '#666666',
-    selectedColor: '#3b82f6',
-    backgroundColor: '#ffffff',
-    borderStyle: 'black',
+    color: '@tabFontColor',
+    selectedColor: '@tabSelectedColor',
+    backgroundColor: '@tabBgColor',
+    borderStyle: '@tabBorderStyle',
     list: [
       {
         pagePath: 'pages/home/index',
         text: '首页',
-        iconPath: 'assets/icons/home.png',
-        selectedIconPath: 'assets/icons/home-active.png'
+        iconPath: '@tabHomeIcon',
+        selectedIconPath: '@tabHomeSelectedIcon'
       },
       {
         pagePath: 'pages/schedule/index',
         text: '课表',
-        iconPath: 'assets/icons/schedule.png',
-        selectedIconPath: 'assets/icons/schedule-active.png'
+        iconPath: '@tabScheduleIcon',
+        selectedIconPath: '@tabScheduleSelectedIcon'
       },
       {
         pagePath: 'pages/discover/index',
         text: '发现',
-        iconPath: 'assets/icons/discover.png',
-        selectedIconPath: 'assets/icons/discover-active.png'
+        iconPath: '@tabDiscoverIcon',
+        selectedIconPath: '@tabDiscoverSelectedIcon'
       },
       {
         pagePath: 'pages/profile/index',
         text: '我的',
-        iconPath: 'assets/icons/profile.png',
-        selectedIconPath: 'assets/icons/profile-active.png'
+        iconPath: '@tabProfileIcon',
+        selectedIconPath: '@tabProfileSelectedIcon'
       }
     ]
   }

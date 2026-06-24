@@ -1,12 +1,17 @@
 <template>
-  <view class="min-h-screen bg-gray-50">
+  <page-meta
+    :page-style="themeStore.pageStyle"
+    :background-color="themeStore.nativeTheme.pageBg"
+    :background-text-style="themeStore.nativeTheme.backgroundTextStyle"
+  />
+  <view class="min-h-screen bg-page text-fg" :class="[themeStore.rootClass]">
     <!-- 当用户未绑定班级时的提示页面 -->
     <view v-if="!authStore.userClass && !scheduleStore.isLoading" class="flex flex-col items-center justify-center h-screen px-8">
       <view class="i-lucide-book-open text-3xl mb-4"></view>
-      <view class="text-xl font-semibold text-gray-700 mb-2">课程表</view>
-      <view class="text-gray-500 text-center mb-8">绑定班级后即可查看课程表</view>
+      <view class="text-xl font-semibold text-fg mb-2">课程表</view>
+      <view class="text-fg-muted text-center mb-8">绑定班级后即可查看课程表</view>
       <view
-        class="bg-blue-500 text-white px-8 py-3 rounded-lg font-medium shadow-lg"
+        class="bg-brand text-white px-8 py-3 rounded-lg font-medium shadow-lg"
         @tap="handleBindClass"
       >
         绑定班级
@@ -16,7 +21,7 @@
     <!-- 课程表页面 -->
     <view v-if="authStore.userClass && !scheduleStore.isLoading" class="h-screen flex flex-col">
       <!-- 顶部控制栏 -->
-      <view class="bg-white shadow-sm p-2 grid grid-cols-3">
+      <view class="bg-surface shadow-sm p-2 grid grid-cols-3">
         <!-- 左侧班级信息 -->
         <view @tap="handleBindClass" class="flex items-center">
           <view class="text-sm font-medium max-w-30 truncate">{{ authStore.userClass }}</view>
@@ -27,20 +32,20 @@
           <view
             @tap="previousWeek"
             class="i-lucide-chevron-left w-5 h-5 transition-all duration-200"
-            :class="{ 'animate-pulse bg-blue-500 rounded-full scale-125': previousWeekAnimate }"
+            :class="{ 'animate-pulse bg-brand rounded-full scale-125': previousWeekAnimate }"
           >
           </view>
           <view
             @tap="handleWeekClick"
             class="text-sm font-medium mx-2 transition-all duration-200"
-            :class="{ 'animate-pulse  text-blue-500 scale-125': previousWeekAnimate || nextWeekAnimate }"
+            :class="{ 'animate-pulse  text-brand scale-125': previousWeekAnimate || nextWeekAnimate }"
           >
             {{ scheduleStore.isInSemester ? `第${scheduleStore.currentWeek}周` : '假期中' }}
           </view>
           <view
             @tap="nextWeek"
             class="i-lucide-chevron-right w-5 h-5 transition-all duration-200"
-            :class="{ 'animate-pulse bg-blue-500 rounded-full scale-125': nextWeekAnimate }"
+            :class="{ 'animate-pulse bg-brand rounded-full scale-125': nextWeekAnimate }"
           >
           </view>
         </view>
@@ -49,21 +54,21 @@
         <view class="flex items-center justify-end gap-3">
           <view
             @tap="showHelpModal = true"
-            class="i-lucide-help-circle w-4 h-4 text-gray-500 active:text-blue-500"
+            class="i-lucide-help-circle w-4 h-4 text-fg-muted active:text-brand"
           ></view>
           <view
             @tap="toggleWeekend"
-            :class="showWeekend ? 'text-blue-500' : 'text-gray-500'"
+            :class="showWeekend ? 'text-brand' : 'text-fg-muted'"
             class="i-lucide-calendar-days w-4 h-4 active:scale-110 transition-all"
           ></view>
           <view
             @tap="toggleNotCurrentWeek"
-            :class="showNotCurrentWeek ? 'text-blue-500' : 'text-gray-500'"
+            :class="showNotCurrentWeek ? 'text-brand' : 'text-fg-muted'"
             class="i-lucide-eye w-4 h-4 active:scale-110 transition-all"
           ></view>
           <view
             @tap="handleSemesterClick"
-            class="i-lucide-calendar-range w-4 h-4 text-gray-500 active:text-blue-500"
+            class="i-lucide-calendar-range w-4 h-4 text-fg-muted active:text-brand"
           ></view>
         </view>
       </view>
@@ -85,7 +90,7 @@
         v-if="scheduleStore.isSemesterMismatch"
         class="fixed bottom-0 left-0 right-0 z-40 flex justify-center pb-8"
       >
-        <view class="bg-gray-100 text-gray-800 px-4 py-2 rounded-full text-xs">
+        <view class="bg-surface-muted text-fg px-4 py-2 rounded-full text-xs">
           当前学期：{{ scheduleStore.semester }}
         </view>
       </view>
@@ -95,7 +100,7 @@
         v-if="!scheduleStore.isSemesterMismatch && !scheduleStore.isInSemesterWeek"
         class="fixed bottom-0 left-0 right-0 z-40 flex justify-center pb-8"
       >
-        <view class="bg-blue-50 text-blue-600 px-4 py-2 rounded-full text-xs">
+        <view class="bg-brand-soft text-brand px-4 py-2 rounded-full text-xs">
           假期中
         </view>
       </view>
@@ -103,7 +108,7 @@
 
     <!-- 加载状态 -->
     <view v-if="scheduleStore.isLoading" class="flex items-center justify-center h-screen">
-      <view class="text-gray-500">加载中...</view>
+      <view class="text-fg-muted">加载中...</view>
     </view>
 
     <!-- 课程详情弹窗 -->
@@ -131,14 +136,14 @@
     <view v-if="showWeekSelector" class="fixed inset-0 z-50 flex items-center justify-center">
       <!-- 遮罩层 -->
       <view
-        class="absolute inset-0 bg-black bg-opacity-50"
+        class="absolute inset-0 bg-overlay"
         @tap="handleCloseWeekSelector"
       ></view>
 
       <!-- 弹窗内容 -->
-      <view class="relative bg-white rounded-lg mx-8 max-w-xs w-full max-h-96">
+      <view class="relative bg-surface rounded-lg mx-8 max-w-xs w-full max-h-96">
         <!-- 标题 -->
-        <view class="px-4 py-3 border-b border-gray-200">
+        <view class="px-4 py-3 border-b border-line">
           <view class="text-base font-semibold text-center">选择周数</view>
         </view>
 
@@ -149,9 +154,9 @@
               v-for="option in scheduleStore.weekOptions"
               :key="option.value"
               @tap="handleWeekSelect(option.value)"
-              class="rounded-lg bg-gray-100 text-center py-3 active:bg-gray-200 text-base"
+              class="rounded-lg bg-surface-muted text-center py-3 active:bg-line text-base"
               :class="{
-                'bg-blue-50 text-blue-600': option.value === scheduleStore.currentWeek,
+                'bg-brand-soft text-brand': option.value === scheduleStore.currentWeek,
                 'ring-2 ring-blue-600': option.isCurrentWeek
               }"
             >
@@ -167,71 +172,71 @@
     <view v-if="showHelpModal" class="fixed inset-0 z-50 flex items-center justify-center">
       <!-- 遮罩层 -->
       <view
-        class="absolute inset-0 bg-black bg-opacity-50"
+        class="absolute inset-0 bg-overlay"
         @tap="showHelpModal = false"
       ></view>
 
       <!-- 弹窗内容 -->
-      <view class="relative bg-white rounded-lg mx-4 max-w-sm w-full">
+      <view class="relative bg-surface rounded-lg mx-4 max-w-sm w-full">
         <!-- 标题 -->
         <view class="px-4 pt-5 pb-3">
-          <view class="text-base font-semibold text-center text-gray-800">功能说明</view>
+          <view class="text-base font-semibold text-center text-fg">功能说明</view>
         </view>
 
         <!-- 离线数据提醒 -->
-        <view class="mx-4 flex items-center gap-2 px-3 py-2 bg-yellow-50 rounded-lg border border-yellow-200">
-          <view class="i-lucide-alert-triangle w-4 h-4 text-yellow-500 shrink-0"></view>
-          <view class="text-xs text-yellow-700">课表为离线数据，可能与实际有差异，请与教务系统核对后使用，可自由编辑！</view>
+        <view class="mx-4 flex items-center gap-2 px-3 py-2 bg-warning-soft rounded-lg border border-warning">
+          <view class="i-lucide-alert-triangle w-4 h-4 text-warning shrink-0"></view>
+          <view class="text-xs text-warning">课表为离线数据，可能与实际有差异，请与教务系统核对后使用，可自由编辑！</view>
         </view>
 
         <!-- 功能说明网格 -->
         <view class="px-4 py-3 grid grid-cols-2 gap-2">
-          <view class="bg-gray-50 rounded-lg px-3 py-2">
-            <view class="i-lucide-user-plus w-4 h-4 text-blue-500 mb-1"></view>
-            <view class="text-xs font-medium text-gray-800">绑定班级</view>
-            <view class="text-xs text-gray-400">点击左上角班级名</view>
+          <view class="bg-page rounded-lg px-3 py-2">
+            <view class="i-lucide-user-plus w-4 h-4 text-brand mb-1"></view>
+            <view class="text-xs font-medium text-fg">绑定班级</view>
+            <view class="text-xs text-fg-subtle">点击左上角班级名</view>
           </view>
 
-          <view class="bg-gray-50 rounded-lg px-3 py-2">
-            <view class="i-lucide-edit w-4 h-4 text-green-500 mb-1"></view>
-            <view class="text-xs font-medium text-gray-800">编辑课程</view>
-            <view class="text-xs text-gray-400">点击格子新增/编辑</view>
+          <view class="bg-page rounded-lg px-3 py-2">
+            <view class="i-lucide-edit w-4 h-4 text-success mb-1"></view>
+            <view class="text-xs font-medium text-fg">编辑课程</view>
+            <view class="text-xs text-fg-subtle">点击格子新增/编辑</view>
           </view>
 
-          <view class="bg-gray-50 rounded-lg px-3 py-2">
+          <view class="bg-page rounded-lg px-3 py-2">
             <view class="i-lucide-move-horizontal w-4 h-4 text-purple-500 mb-1"></view>
-            <view class="text-xs font-medium text-gray-800">周切换</view>
-            <view class="text-xs text-gray-400">左右滑动或点箭头</view>
+            <view class="text-xs font-medium text-fg">周切换</view>
+            <view class="text-xs text-fg-subtle">左右滑动或点箭头</view>
           </view>
 
-          <view class="bg-gray-50 rounded-lg px-3 py-2">
-            <view class="i-lucide-calendar-check w-4 h-4 text-red-500 mb-1"></view>
-            <view class="text-xs font-medium text-gray-800">选择周数</view>
-            <view class="text-xs text-gray-400">点击顶部「第X周」</view>
+          <view class="bg-page rounded-lg px-3 py-2">
+            <view class="i-lucide-calendar-check w-4 h-4 text-danger mb-1"></view>
+            <view class="text-xs font-medium text-fg">选择周数</view>
+            <view class="text-xs text-fg-subtle">点击顶部「第X周」</view>
           </view>
 
-          <view class="bg-gray-50 rounded-lg px-3 py-2">
-            <view class="i-lucide-pointer w-4 h-4 text-orange-500 mb-1"></view>
-            <view class="text-xs font-medium text-gray-800">回到本周</view>
-            <view class="text-xs text-gray-400">点击星期栏快速回</view>
+          <view class="bg-page rounded-lg px-3 py-2">
+            <view class="i-lucide-pointer w-4 h-4 text-warning mb-1"></view>
+            <view class="text-xs font-medium text-fg">回到本周</view>
+            <view class="text-xs text-fg-subtle">点击星期栏快速回</view>
           </view>
 
-          <view class="bg-gray-50 rounded-lg px-3 py-2">
+          <view class="bg-page rounded-lg px-3 py-2">
             <view class="i-lucide-calendar-range w-4 h-4 text-indigo-500 mb-1"></view>
-            <view class="text-xs font-medium text-gray-800">切换学期</view>
-            <view class="text-xs text-gray-400">右上角 <view class="i-lucide-calendar-range w-3 h-3 inline-block align-middle"></view> 按钮</view>
+            <view class="text-xs font-medium text-fg">切换学期</view>
+            <view class="text-xs text-fg-subtle">右上角 <view class="i-lucide-calendar-range w-3 h-3 inline-block align-middle"></view> 按钮</view>
           </view>
 
-          <view class="bg-gray-50 rounded-lg px-3 py-2">
+          <view class="bg-page rounded-lg px-3 py-2">
             <view class="i-lucide-calendar-days w-4 h-4 text-teal-500 mb-1"></view>
-            <view class="text-xs font-medium text-gray-800">显示周末</view>
-            <view class="text-xs text-gray-400">右上角 <view class="i-lucide-calendar-days w-3 h-3 inline-block align-middle"></view> 按钮</view>
+            <view class="text-xs font-medium text-fg">显示周末</view>
+            <view class="text-xs text-fg-subtle">右上角 <view class="i-lucide-calendar-days w-3 h-3 inline-block align-middle"></view> 按钮</view>
           </view>
 
-          <view class="bg-gray-50 rounded-lg px-3 py-2">
+          <view class="bg-page rounded-lg px-3 py-2">
             <view class="i-lucide-eye w-4 h-4 text-cyan-500 mb-1"></view>
-            <view class="text-xs font-medium text-gray-800">全部课程</view>
-            <view class="text-xs text-gray-400">右上角 <view class="i-lucide-eye w-3 h-3 inline-block align-middle"></view> 显示非本周</view>
+            <view class="text-xs font-medium text-fg">全部课程</view>
+            <view class="text-xs text-fg-subtle">右上角 <view class="i-lucide-eye w-3 h-3 inline-block align-middle"></view> 显示非本周</view>
           </view>
         </view>
 
@@ -239,13 +244,13 @@
         <view class="px-4 pb-5 pt-3 flex gap-3">
           <view
             @tap="handleHelpModalConfirm(true)"
-            class="bg-blue-500 text-white text-center py-2 flex-1 rounded-lg text-sm font-medium active:bg-blue-600"
+            class="bg-brand text-white text-center py-2 flex-1 rounded-lg text-sm font-medium active:bg-brand"
           >
             不再显示
           </view>
           <view
             @tap="handleHelpModalConfirm(false)"
-            class="bg-gray-100 text-gray-700 text-center py-2 flex-1 rounded-lg text-sm font-medium active:bg-gray-200"
+            class="bg-surface-muted text-fg text-center py-2 flex-1 rounded-lg text-sm font-medium active:bg-line"
           >
             我知道了
           </view>
@@ -264,19 +269,19 @@
     <view v-if="showSemesterModal" class="fixed inset-0 z-50 flex items-center justify-center">
       <!-- 遮罩层 -->
       <view
-        class="absolute inset-0 bg-black bg-opacity-50"
+        class="absolute inset-0 bg-overlay"
         @tap="showSemesterModal = false"
       ></view>
 
       <!-- 弹窗内容 -->
-      <view class="relative bg-white rounded-lg mx-6 max-w-sm w-full">
+      <view class="relative bg-surface rounded-lg mx-6 max-w-sm w-full">
         <!-- 标题 -->
         <view class="flex items-center justify-between gap-2 px-6 pt-4 pb-3">
           <view class="flex items-center gap-2">
-            <view class="i-lucide-calendar-range w-5 h-5 text-gray-400"></view>
-          <view class="text-gray-800">切换学期</view>
+            <view class="i-lucide-calendar-range w-5 h-5 text-fg-subtle"></view>
+          <view class="text-fg">切换学期</view>
           </view>
-          <view @tap="showSemesterModal = false" class="i-lucide-x w-5 h-5 text-gray-400"></view>
+          <view @tap="showSemesterModal = false" class="i-lucide-x w-5 h-5 text-fg-subtle"></view>
         </view>
 
         <!-- 学期列表 -->
@@ -287,13 +292,13 @@
               :key="semester.id"
               @tap="handleSemesterSelect(semester.id)"
               class="flex items-center justify-between px-3 py-2 rounded-lg border-2 transition-all active:scale-98"
-              :class="semester.id === scheduleStore.semester ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-gray-50 active:bg-gray-100'"
+              :class="semester.id === scheduleStore.semester ? 'border-brand bg-brand-soft' : 'border-line bg-page active:bg-surface-muted'"
             >
               <view class="flex-1">
-                <view :class="semester.id === scheduleStore.semester ? 'text-blue-600' : 'text-gray-800'">
+                <view :class="semester.id === scheduleStore.semester ? 'text-brand' : 'text-fg'">
                   {{ semester.id }}
                 </view>
-                <view class="text-xs text-gray-500 mt-1">
+                <view class="text-xs text-fg-muted mt-1">
                   {{ formatSemesterInfo(semester) }}
                 </view>
               </view>
@@ -305,7 +310,7 @@
         <view class="px-6 pb-4 pt-4">
           <view
             @tap="showSemesterModal = false"
-            class="bg-gray-100 text-gray-700 text-center py-2 px-4 rounded-lg font-medium active:bg-gray-200"
+            class="bg-surface-muted text-fg text-center py-2 px-4 rounded-lg font-medium active:bg-line"
           >
             取消
           </view>
@@ -316,6 +321,7 @@
 </template>
 
 <script setup>
+import { useThemePage } from '../../composables/useThemePage'
 import { ref, onMounted } from 'vue'
 import Taro from '@tarojs/taro'
 import { useScheduleStore } from '../../stores/schedule'
@@ -324,6 +330,8 @@ import ScheduleTable from './components/ScheduleTable.vue'
 import CourseDetailModal from './components/CourseDetailModal.vue'
 import CourseEditModal from './components/CourseEditModal.vue'
 import SemesterChangeModal from './components/SemesterChangeModal.vue'
+
+const themeStore = useThemePage()
 
 // 定义组件名称
 defineOptions({

@@ -1,34 +1,39 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
-  <view class="min-h-screen bg-gray-50">
+  <page-meta
+    :page-style="themeStore.pageStyle"
+    :background-color="themeStore.nativeTheme.pageBg"
+    :background-text-style="themeStore.nativeTheme.backgroundTextStyle"
+  />
+  <view class="min-h-screen bg-page text-fg" :class="[themeStore.rootClass]">
     <view class="p-4 space-y-4 pb-16">
-      <view class="bg-white rounded-2xl p-4 shadow-sm">
+      <view class="bg-surface rounded-2xl p-4 shadow-sm">
         <view class="flex items-center justify-between gap-2">
           <view>
-            <view class="text-base font-semibold text-gray-900 line-clamp-1">
+            <view class="text-base font-semibold text-fg line-clamp-1">
             {{ projectInfo.name }}
           </view>
           </view>
-          <view v-if="onlineCount !== null" class="flex items-center gap-1 text-xs text-gray-500 flex-shrink-0">
+          <view v-if="onlineCount !== null" class="flex items-center gap-1 text-xs text-fg-muted flex-shrink-0">
             <text>{{ onlineCount }} 人一起在学</text>
           </view>
         </view>
-        <view class="mt-3 text-sm text-gray-600 leading-relaxed whitespace-pre-line">
+        <view class="mt-3 text-sm text-fg-muted leading-relaxed whitespace-pre-line">
           {{ projectInfo.description || "暂无项目简介" }}
         </view>
       </view>
 
-      <view class="bg-white rounded-2xl p-4 shadow-sm space-y-3">
+      <view class="bg-surface rounded-2xl p-4 shadow-sm space-y-3">
         <template v-if="!mode">
           <view class="flex items-center justify-between">
             <view>
-              <view class="text-base font-medium text-gray-900">复习设置</view>
-              <view class="text-xs text-gray-400 mt-1">选择模式、题目来源和顺序</view>
+              <view class="text-base font-medium text-fg">复习设置</view>
+              <view class="text-xs text-fg-subtle mt-1">选择模式、题目来源和顺序</view>
             </view>
             <!-- 清空错题本按钮 -->
             <view v-if="useWrongBook && wrongBookIds.length > 0">
               <view
-                class="px-3 py-1 text-xs rounded-full border border-red-200 text-red-600 bg-red-50 active:scale-[0.98] transition-all duration-150"
+                class="px-3 py-1 text-xs rounded-full border border-danger text-danger bg-danger-soft active:scale-[0.98] transition-all duration-150"
                 @tap="clearWrongBook"
               >
                 清空错题本
@@ -38,19 +43,19 @@
 
           <view class="flex items-center justify-between mt-3">
             <view>
-              <view class="text-xs text-gray-500">题目来源</view>
+              <view class="text-xs text-fg-muted">题目来源</view>
             </view>
             <view class="flex gap-2">
               <view
                 class="px-3 py-1 text-xs rounded-full border"
-                :class="!useWrongBook ? 'border-indigo-500 text-indigo-600 bg-indigo-50' : 'border-gray-200 text-gray-500'"
+                :class="!useWrongBook ? 'border-brand text-brand bg-indigo-50' : 'border-line text-fg-muted'"
                 @tap="setSource(false)"
               >
                 全部题
               </view>
               <view
                 class="px-3 py-1 text-xs rounded-full border"
-                :class="useWrongBook ? 'border-indigo-500 text-indigo-600 bg-indigo-50' : 'border-gray-200 text-gray-500'"
+                :class="useWrongBook ? 'border-brand text-brand bg-indigo-50' : 'border-line text-fg-muted'"
                 @tap="setSource(true)"
               >
                 错题本
@@ -60,19 +65,19 @@
 
           <view class="flex items-center justify-between mt-3">
             <view>
-              <view class="text-xs text-gray-500">出题顺序</view>
+              <view class="text-xs text-fg-muted">出题顺序</view>
             </view>
             <view class="flex gap-2">
               <view
                 class="px-3 py-1 text-xs rounded-full border"
-                :class="randomOrder ? 'border-gray-200 text-gray-500' : 'border-indigo-500 text-indigo-600 bg-indigo-50'"
+                :class="randomOrder ? 'border-line text-fg-muted' : 'border-brand text-brand bg-indigo-50'"
                 @tap="setRandom(false)"
               >
                 顺序
               </view>
               <view
                 class="px-3 py-1 text-xs rounded-full border"
-                :class="randomOrder ? 'border-indigo-500 text-indigo-600 bg-indigo-50' : 'border-gray-200 text-gray-500'"
+                :class="randomOrder ? 'border-brand text-brand bg-indigo-50' : 'border-line text-fg-muted'"
                 @tap="setRandom(true)"
               >
                 乱序
@@ -82,21 +87,21 @@
           <view class="grid grid-cols-2 gap-3">
             <view
               class="rounded-2xl border px-4 py-5 active:scale-[0.98] transition-all duration-150"
-              :class="mode === 'study' ? 'border-green-500 bg-green-50' : 'border-gray-100 bg-gray-50'"
+              :class="mode === 'study' ? 'border-success bg-success-soft' : 'border-line bg-page'"
               @tap="startSession('study')"
             >
-              <view class="text-sm font-semibold text-gray-900">学习模式</view>
-              <view class="text-xs text-gray-500 mt-1">
+              <view class="text-sm font-semibold text-fg">学习模式</view>
+              <view class="text-xs text-fg-muted mt-1">
                 直接展示答案，点击正确选项进入下一题
               </view>
             </view>
             <view
               class="rounded-2xl border px-4 py-5 active:scale-[0.98] transition-all duration-150"
-              :class="mode === 'practice' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-100 bg-gray-50'"
+              :class="mode === 'practice' ? 'border-brand bg-indigo-50' : 'border-line bg-page'"
               @tap="startSession('practice')"
             >
-              <view class="text-sm font-semibold text-gray-900">考试模式</view>
-              <view class="text-xs text-gray-500 mt-1">
+              <view class="text-sm font-semibold text-fg">考试模式</view>
+              <view class="text-xs text-fg-muted mt-1">
                 不展示答案，需要作答后显示答案
               </view>
             </view>
@@ -104,7 +109,7 @@
 
           <!-- 接续进度 -->
           <view v-if="savedProgressList.length > 0" class="mt-3 space-y-2">
-            <view class="text-xs text-gray-500 mb-2">暂存记录</view>
+            <view class="text-xs text-fg-muted mb-2">暂存记录</view>
             <view
               v-for="(progress, index) in savedProgressList"
               :key="index"
@@ -123,7 +128,7 @@
                 <view class="flex items-center gap-2">
 
                   <view
-                    class="w-6 h-6 flex items-center justify-center rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                    class="w-6 h-6 flex items-center justify-center rounded-full text-fg-subtle hover:text-danger hover:bg-danger-soft transition-colors"
                     @tap.stop="deleteProgress(progress.type, progress.isOldVersion)"
                   >
                     <text class="i-lucide-trash-2 w-4 h-4"></text>
@@ -136,13 +141,13 @@
         <template v-else>
           <view class="flex items-center justify-between">
             <view>
-              <view class="text-base font-medium text-gray-900">当前练习</view>
-              <view class="text-xs text-gray-500 mt-1">
+              <view class="text-base font-medium text-fg">当前练习</view>
+              <view class="text-xs text-fg-muted mt-1">
                 {{ modeLabel }} · {{ orderLabel }}
               </view>
             </view>
             <view
-              class="px-3 py-2 text-xs rounded-full border border-gray-200 text-gray-600"
+              class="px-3 py-2 text-xs rounded-full border border-line text-fg-muted"
               @tap="handleBackToSelection"
             >
               返回
@@ -153,9 +158,9 @@
 
       <view
         v-if="mode && questionIds.length"
-        class="bg-white rounded-2xl p-4 shadow-sm"
+        class="bg-surface rounded-2xl p-4 shadow-sm"
       >
-        <view class="flex items-center justify-between text-sm text-gray-600">
+        <view class="flex items-center justify-between text-sm text-fg-muted">
           <text>题目进度</text>
           <text>{{ progressText }}</text>
         </view>
@@ -177,35 +182,35 @@
 
       <view
         v-if="mode && !currentQuestion && (loadingList || loadingQuestion)"
-        class="bg-white rounded-2xl p-8 shadow-sm text-center text-gray-400"
+        class="bg-surface rounded-2xl p-8 shadow-sm text-center text-fg-subtle"
       >
         正在加载题目...
       </view>
 
       <view
         v-if="mode && !loadingList && !loadingQuestion && !questionIds.length"
-        class="bg-white rounded-2xl p-8 shadow-sm text-center text-gray-400"
+        class="bg-surface rounded-2xl p-8 shadow-sm text-center text-fg-subtle"
       >
         暂无题目，稍后再试
       </view>
 
       <view
         v-if="sessionFinished"
-        class="bg-white rounded-2xl p-6 shadow-sm text-center"
+        class="bg-surface rounded-2xl p-6 shadow-sm text-center"
       >
-        <view class="text-lg font-semibold text-gray-900">本次复习已完成</view>
-        <view class="text-sm text-gray-500 mt-2">
+        <view class="text-lg font-semibold text-fg">本次复习已完成</view>
+        <view class="text-sm text-fg-muted mt-2">
           可切换模式继续巩固知识
         </view>
         <view class="mt-4 flex gap-3">
           <view
-            class="flex items-center justify-center flex-1 h-11 rounded-full border border-gray-200 text-gray-700"
+            class="flex items-center justify-center flex-1 h-11 rounded-full border border-line text-fg"
             @tap="resetSession"
           >
             重新选择
           </view>
           <view
-            class="flex items-center justify-center flex-1 h-11 rounded-full bg-indigo-500 text-white"
+            class="flex items-center justify-center flex-1 h-11 rounded-full bg-brand text-white"
             @tap="startSession(mode)"
           >
             再刷一遍
@@ -216,11 +221,11 @@
       <view
         id="question-container"
         v-if="currentQuestion"
-        class="relative bg-white rounded-2xl p-5 shadow-sm"
+        class="relative bg-surface rounded-2xl p-5 shadow-sm"
       >
         <view
           v-if="loadingQuestion"
-          class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/70 text-gray-400 text-sm"
+          class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-surface/70 text-fg-subtle text-sm"
         >
           正在加载下一题...
         </view>
@@ -229,15 +234,15 @@
           :class="loadingQuestion ? 'pointer-events-none opacity-60' : ''"
         >
           <view class="flex items-center justify-between">
-            <view class="px-3 py-1 rounded-full text-xs bg-indigo-50 text-indigo-600">
+            <view class="px-3 py-1 rounded-full text-xs bg-indigo-50 text-brand">
               {{ questionTypeText }}
             </view>
-            <view class="text-xs text-gray-400">
+            <view class="text-xs text-fg-subtle">
               第 {{ currentIndex + 1 }} / {{ questionIds.length }} 题
             </view>
           </view>
           <view>
-            <text class="text-gray-900 text-base" :user-select="true">
+            <text class="text-fg text-base" :user-select="true">
             {{ currentQuestion.title }}
           </text>
           </view>
@@ -250,14 +255,14 @@
             <view
               v-if="mode === 'study'"
               class="px-3 py-1 rounded-full border text-xs"
-              :class="showAnswer ? 'border-blue-200 text-blue-700 bg-blue-50' : 'border-gray-200 text-gray-600 bg-gray-50'"
+              :class="showAnswer ? 'border-line text-brand bg-brand-soft' : 'border-line text-fg-muted bg-page'"
               @tap="showAnswer = !showAnswer"
             >
               {{ showAnswer ? "隐藏答案" : "显示答案" }}
             </view>
             <view
               class="px-3 py-1 rounded-full border text-xs"
-              :class="inWrongBook ? 'border-green-200 text-green-700 bg-green-50' : 'border-red-200 text-red-500 bg-red-50'"
+              :class="inWrongBook ? 'border-success text-success bg-success-soft' : 'border-danger text-danger bg-danger-soft'"
               @tap="toggleWrongBook()"
             >
               {{ inWrongBook ? "移出错题本" : "加入错题本" }}
@@ -273,7 +278,7 @@
               v-for="(sub, index) in currentQuestion.sub_questions"
               :key="sub.id"
             >
-              <text class="text-gray-900 text-base" :user-select="true">
+              <text class="text-fg text-base" :user-select="true">
                 {{ sub.title }}
               </text>
               <view class="mt-3 space-y-2">
@@ -292,7 +297,7 @@
               <!-- 分割线：在非最后一个子题后显示 -->
               <view
                 v-if="index < currentQuestion.sub_questions.length - 1"
-                class="mt-4 h-[1px] bg-gray-200"
+                class="mt-4 h-[1px] bg-line"
               ></view>
             </view>
           </view>
@@ -303,7 +308,7 @@
           >
             <textarea
               v-if="mode === 'practice'"
-              class="box-border border-solid border-[1px] border-gray-300 rounded-lg h-20 resize-none w-full p-2"
+              class="box-border border-solid border-[1px] border-line rounded-lg h-20 resize-none w-full p-2"
               placeholder="请输入你的答案"
               :value="answerState.textAnswer"
               @input="onTextAnswerInput"
@@ -331,8 +336,8 @@
           <view
             v-if="currentQuestion.type === 2 && ((mode === 'study' && showAnswer) || (mode === 'practice' && hasSubmitted))"
           >
-          <view class="text-indigo-600 mb-2 text-[30rpx]">参考答案</view>
-          <text class="text-gray-900 whitespace-pre-wrap leading-relaxed text-[30rpx]" :user-select="true">{{ getCorrectText(currentQuestion) }}</text>
+          <view class="text-brand mb-2 text-[30rpx]">参考答案</view>
+          <text class="text-fg whitespace-pre-wrap leading-relaxed text-[30rpx]" :user-select="true">{{ getCorrectText(currentQuestion) }}</text>
           </view>
 
           <view class="pt-2">
@@ -342,14 +347,14 @@
             >
               <view
                 class="flex-1 flex items-center justify-center h-11 rounded-full text-sm font-medium border"
-                :class="isFirstQuestion ? 'border-gray-100 text-gray-300 bg-gray-100' : 'border-gray-300 text-gray-700 bg-white'"
+                :class="isFirstQuestion ? 'border-line text-fg-subtle bg-surface-muted' : 'border-line text-fg bg-surface'"
                 @tap="!isFirstQuestion && goPrevQuestion()"
               >
                 上一题
               </view>
               <view
                 class="flex-1 flex items-center justify-center h-11 rounded-full text-sm font-medium"
-                :class="hasSubmitted ? 'bg-green-500 text-white' : canSubmit ? 'bg-indigo-500 text-white' : 'bg-gray-200 text-gray-400'"
+                :class="hasSubmitted ? 'bg-success text-white' : canSubmit ? 'bg-brand text-white' : 'bg-line text-fg-subtle'"
                 :disabled="!canSubmit && !hasSubmitted"
                 @tap="hasSubmitted ? goNextQuestion() : handleSubmit()"
               >
@@ -362,13 +367,13 @@
             >
               <view
                 class="flex-1 flex items-center justify-center h-11 rounded-full text-sm font-medium border"
-                :class="isFirstQuestion ? 'border-gray-100 text-gray-300 bg-gray-100' : 'border-gray-300 text-gray-700 bg-white'"
+                :class="isFirstQuestion ? 'border-line text-fg-subtle bg-surface-muted' : 'border-line text-fg bg-surface'"
                 @tap="!isFirstQuestion && goPrevQuestion()"
               >
                 上一题
               </view>
               <view
-                class="flex-1 flex items-center justify-center h-11 rounded-full bg-green-500 text-white text-sm font-medium"
+                class="flex-1 flex items-center justify-center h-11 rounded-full bg-success text-white text-sm font-medium"
                 @tap="goNextQuestion"
               >
                 下一题
@@ -382,9 +387,12 @@
 </template>
 
 <script setup>
+import { useThemePage } from '../../../composables/useThemePage'
 import { reactive, ref, computed, onMounted, onBeforeUnmount, nextTick } from "vue";
 import Taro from "@tarojs/taro";
 import { questionsAPI, statAPI } from "../../../api";
+
+const themeStore = useThemePage()
 
 defineOptions({
   name: "FinalReviewDetail",
@@ -570,13 +578,13 @@ const getProgressInfo = (progress) => {
 const getProgressCardClass = (type) => {
   switch (type) {
     case 'study':
-      return 'border-green-200 bg-green-50';
+      return 'border-success bg-success-soft';
     case 'practice':
       return 'border-indigo-200 bg-indigo-50';
     case 'wrongbook':
-      return 'border-orange-200 bg-orange-50';
+      return 'border-warning bg-warning-soft';
     default:
-      return 'border-gray-200 bg-gray-50';
+      return 'border-line bg-page';
   }
 };
 
@@ -589,33 +597,33 @@ const getProgressTitleClass = (type) => {
     case 'wrongbook':
       return 'text-orange-900';
     default:
-      return 'text-gray-900';
+      return 'text-fg';
   }
 };
 
 const getProgressInfoClass = (type) => {
   switch (type) {
     case 'study':
-      return 'text-green-600';
+      return 'text-success';
     case 'practice':
-      return 'text-indigo-600';
+      return 'text-brand';
     case 'wrongbook':
-      return 'text-orange-600';
+      return 'text-warning';
     default:
-      return 'text-gray-600';
+      return 'text-fg-muted';
   }
 };
 
 const getProgressButtonClass = (type) => {
   switch (type) {
     case 'study':
-      return 'bg-green-500 text-white';
+      return 'bg-success text-white';
     case 'practice':
-      return 'bg-indigo-500 text-white';
+      return 'bg-brand text-white';
     case 'wrongbook':
-      return 'bg-orange-500 text-white';
+      return 'bg-warning text-white';
     default:
-      return 'bg-gray-500 text-white';
+      return 'bg-fg-subtle text-white';
   }
 };
 
@@ -1048,10 +1056,10 @@ const handleOptionTap = (optionKey, question, subId = null) => {
 
 const getOptionClass = (question, optionKey, subId = null) => {
   const status = getOptionStatus(question, optionKey, subId);
-  const base = "border-gray-100 bg-white text-gray-800";
+  const base = "border-line bg-surface text-fg";
   const selected = "border-indigo-400 bg-indigo-50 text-indigo-700";
-  const correct = "border-green-500 bg-green-50 text-green-700";
-  const wrong = "border-red-400 bg-red-50 text-red-600";
+  const correct = "border-success bg-success-soft text-success";
+  const wrong = "border-danger bg-danger-soft text-danger";
 
   switch (status) {
     case "correct":

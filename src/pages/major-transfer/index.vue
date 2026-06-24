@@ -1,7 +1,12 @@
 <template>
-  <view class="min-h-screen bg-slate-50">
+  <page-meta
+    :page-style="themeStore.pageStyle"
+    :background-color="themeStore.nativeTheme.pageBg"
+    :background-text-style="themeStore.nativeTheme.backgroundTextStyle"
+  />
+  <view class="min-h-screen bg-page text-fg" :class="[themeStore.rootClass]">
     <view class="px-4 pt-3 pb-8">
-      <view class="rounded-2xl bg-white px-2 shadow-sm">
+      <view class="rounded-2xl bg-surface px-2 shadow-sm">
         <view class="flex">
           <view
             v-for="tab in topTabs"
@@ -9,7 +14,7 @@
             @tap="activeSection = tab.key"
             :class="[
               'flex-1 border-b-2 px-1 py-3 text-center transition-colors duration-200',
-              activeSection === tab.key ? 'border-orange-500 text-orange-600 font-semibold' : 'border-transparent text-slate-500'
+              activeSection === tab.key ? 'border-warning text-warning font-semibold' : 'border-transparent text-fg-muted'
             ]"
           >
             {{ tab.label }}
@@ -17,46 +22,46 @@
         </view>
       </view>
 
-      <view v-if="pageLoading" class="mt-4 rounded-2xl bg-white py-14 text-center shadow-sm">
-        <view class="mx-auto mb-3 h-8 w-8 rounded-full border-2 border-orange-400 border-t-transparent animate-spin"></view>
-        <text class="text-slate-500">正在加载转专业数据...</text>
+      <view v-if="pageLoading" class="mt-4 rounded-2xl bg-surface py-14 text-center shadow-sm">
+        <view class="mx-auto mb-3 h-8 w-8 rounded-full border-2 border-warning border-t-transparent animate-spin"></view>
+        <text class="text-fg-muted">正在加载转专业数据...</text>
       </view>
 
       <template v-else>
-        <view v-if="activeSection === 'notice'" class="mt-4 rounded-2xl bg-white p-4 shadow-sm">
-          <view class="border-b border-slate-200 pb-3">
+        <view v-if="activeSection === 'notice'" class="mt-4 rounded-2xl bg-surface p-4 shadow-sm">
+          <view class="border-b border-line pb-3">
             <view class="flex items-center justify-between">
-              <text class="font-semibold text-slate-900">通知文件</text>
+              <text class="font-semibold text-fg">通知文件</text>
             </view>
-            <text class="mt-1 block text-slate-500 text-sm">按年份和学期查看，点击通知展开附件列表</text>
+            <text class="mt-1 block text-fg-muted text-sm">按年份和学期查看，点击通知展开附件列表</text>
           </view>
 
-          <view class="flex border-b border-slate-200">
+          <view class="flex border-b border-line">
             <view
               v-for="tab in yearTabs"
               :key="tab.key"
               @tap="noticeYearTab = tab.key"
               :class="[
                 'mr-6 border-b-2 py-3',
-                noticeYearTab === tab.key ? 'border-orange-500 text-orange-600 font-semibold' : 'border-transparent text-slate-500'
+                noticeYearTab === tab.key ? 'border-warning text-warning font-semibold' : 'border-transparent text-fg-muted'
               ]"
             >
               {{ tab.label }}
             </view>
           </view>
 
-          <view v-if="sectionErrors.notice" class="border-b border-slate-200 py-4 text-rose-500">
+          <view v-if="sectionErrors.notice" class="border-b border-line py-4 text-rose-500">
             {{ sectionErrors.notice }}
           </view>
 
           <view v-else>
-            <view v-for="season in currentNoticeSeasons" :key="season.key" class="border-b border-slate-200">
+            <view v-for="season in currentNoticeSeasons" :key="season.key" class="border-b border-line">
               <view class="flex items-center justify-between py-3">
-                <text class="font-semibold text-slate-800" :user-select="true">{{ season.label }}</text>
+                <text class="font-semibold text-fg" :user-select="true">{{ season.label }}</text>
               </view>
 
-              <view class="border-t border-slate-100">
-                <view v-if="season.items.length === 0" class="border-t border-slate-100 py-3 text-slate-400">
+              <view class="border-t border-line">
+                <view v-if="season.items.length === 0" class="border-t border-line py-3 text-fg-subtle">
                   暂无通知
                 </view>
 
@@ -64,23 +69,23 @@
                   <view
                     v-for="(notice, noticeIndex) in season.items"
                     :key="`${noticeYearTab}-${season.key}-${noticeIndex}`"
-                    class="border-t border-slate-100"
+                    class="border-t border-line"
                   >
                     <view class="flex items-start gap-3 py-3" @tap="toggleNotice(`${noticeYearTab}-${season.key}-${noticeIndex}`)">
-                      <text class="i-lucide-file-text mt-0.5 h-4 w-4 flex-shrink-0 text-orange-500" :user-select="true"></text>
+                      <text class="i-lucide-file-text mt-0.5 h-4 w-4 flex-shrink-0 text-warning" :user-select="true"></text>
                       <view class="flex-1">
                         <view class="flex items-center justify-between gap-3">
-                          <text class="flex-1 leading-6 text-slate-800 line-clamp-2">{{ notice.name || '未命名通知' }}</text>
-                          <text :class="Number(notice.status) === 1 ? 'flex-shrink-0 text-emerald-600' : 'flex-shrink-0 text-slate-400'" :user-select="true">
+                          <text class="flex-1 leading-6 text-fg line-clamp-2">{{ notice.name || '未命名通知' }}</text>
+                          <text :class="Number(notice.status) === 1 ? 'flex-shrink-0 text-emerald-600' : 'flex-shrink-0 text-fg-subtle'" :user-select="true">
                             {{ Number(notice.status) === 1 ? '已发布' : '未发布' }}
                           </text>
                         </view>
-                        <view class="mt-1 flex items-center justify-between text-slate-400 text-sm">
+                        <view class="mt-1 flex items-center justify-between text-fg-subtle text-sm">
                           <text>{{ notice.publishDate || '发布时间待定' }}</text>
                           <text
                             :class="[
                               'i-lucide-chevron-down h-4 w-4 transform transition-transform duration-200',
-                              isNoticeExpanded(`${noticeYearTab}-${season.key}-${noticeIndex}`) ? 'rotate-180 text-orange-500' : 'rotate-0'
+                              isNoticeExpanded(`${noticeYearTab}-${season.key}-${noticeIndex}`) ? 'rotate-180 text-warning' : 'rotate-0'
                             ]"
                           ></text>
                         </view>
@@ -89,22 +94,22 @@
 
                     <view
                       v-if="isNoticeExpanded(`${noticeYearTab}-${season.key}-${noticeIndex}`)"
-                      class="border-t border-slate-100 pb-3 pl-7 pt-2"
+                      class="border-t border-line pb-3 pl-7 pt-2"
                     >
                       <view class="space-y-2">
                         <view
                           v-for="(attachment, attachmentIndex) in normalizeAttachments(notice.attachments)"
                           :key="`${noticeYearTab}-${season.key}-${noticeIndex}-${attachmentIndex}`"
-                          class="flex items-center gap-2 text-slate-600"
+                          class="flex items-center gap-2 text-fg-muted"
                         >
-                          <text class="i-lucide-paperclip h-3.5 w-3.5 flex-shrink-0 text-slate-400"></text>
+                          <text class="i-lucide-paperclip h-3.5 w-3.5 flex-shrink-0 text-fg-subtle"></text>
                           <text class="min-w-0 flex-1 line-clamp-2 text-sm">{{ attachment.name }}</text>
                         </view>
                       </view>
                       <view class="mt-2 flex items-center justify-between">
-                        <text class="text-slate-500">附件 {{ getNoticeAttachmentCount(notice.attachments) }} 个</text>
+                        <text class="text-fg-muted">附件 {{ getNoticeAttachmentCount(notice.attachments) }} 个</text>
                         <text
-                          :class="Number(notice.status) === 1 ? 'text-orange-600' : 'text-slate-400'"
+                          :class="Number(notice.status) === 1 ? 'text-warning' : 'text-fg-subtle'"
                           @tap.stop="handleAttachmentTap(notice)"
                         >
                           {{ Number(notice.status) === 1 ? '复制下载链接' : '暂未发布' }}
@@ -118,90 +123,90 @@
           </view>
 
           <view class="pt-4">
-            <view class="border-b border-slate-200 pb-3">
-              <text class="font-semibold text-slate-900">情况说明</text>
-              <text class="mt-1 block text-slate-500 text-sm">常规机会、特殊情形和禁止转专业情况</text>
+            <view class="border-b border-line pb-3">
+              <text class="font-semibold text-fg">情况说明</text>
+              <text class="mt-1 block text-fg-muted text-sm">常规机会、特殊情形和禁止转专业情况</text>
             </view>
 
-            <view class="flex border-b border-slate-200">
+            <view class="flex border-b border-line">
               <view
                 v-for="tab in explainTabs"
                 :key="tab.key"
                 @tap="explainTab = tab.key"
                 :class="[
                   'mr-6 border-b-2 py-3',
-                  explainTab === tab.key ? 'border-orange-500 text-orange-600 font-semibold' : 'border-transparent text-slate-500'
+                  explainTab === tab.key ? 'border-warning text-warning font-semibold' : 'border-transparent text-fg-muted'
                 ]"
               >
                 {{ tab.label }}
               </view>
             </view>
 
-            <view v-if="sectionErrors.explain" class="border-b border-slate-200 py-4 text-rose-500">
+            <view v-if="sectionErrors.explain" class="border-b border-line py-4 text-rose-500">
               {{ sectionErrors.explain }}
             </view>
 
             <view v-else>
-              <view v-if="explainTab === 'regular'" class="border-b border-slate-200 py-3">
+              <view v-if="explainTab === 'regular'" class="border-b border-line py-3">
                 <view class="mb-2 flex items-center gap-2">
-                  <view class="h-2 w-2 rounded-full bg-orange-400"></view>
-                  <text class="font-semibold text-slate-800">常规机会</text>
+                  <view class="h-2 w-2 rounded-full bg-warning"></view>
+                  <text class="font-semibold text-fg">常规机会</text>
                 </view>
-                <view v-if="majorExplain.regularChances.length === 0" class="py-2 text-slate-400">暂无说明</view>
+                <view v-if="majorExplain.regularChances.length === 0" class="py-2 text-fg-subtle">暂无说明</view>
                 <view v-else>
                   <view
                     v-for="(chance, index) in majorExplain.regularChances"
                     :key="`${chance.name}-${index}`"
-                    class="border-t border-slate-100 py-3 first:border-t-0 first:pt-0"
+                    class="border-t border-line py-3 first:border-t-0 first:pt-0"
                   >
                     <view class="flex items-center justify-between gap-3">
-                      <text class="font-semibold text-slate-800" :user-select="true">{{ chance.name || `机会 ${index + 1}` }}</text>
-                      <text class="text-orange-600" :user-select="true">常规批次</text>
+                      <text class="font-semibold text-fg" :user-select="true">{{ chance.name || `机会 ${index + 1}` }}</text>
+                      <text class="text-warning" :user-select="true">常规批次</text>
                     </view>
-                    <view class="mt-2 grid grid-cols-2 gap-x-4 gap-y-4 leading-5 text-slate-600">
+                    <view class="mt-2 grid grid-cols-2 gap-x-4 gap-y-4 leading-5 text-fg-muted">
                       <text :user-select="true">咨询时间：{{ chance.consultTime || '未说明' }}</text>
                       <text :user-select="true">申请时间：{{ chance.applyTime || '未说明' }}</text>
                       <text :user-select="true">考核时间：{{ chance.assessmentTime || '未说明' }}</text>
                       <text :user-select="true">转入时间：{{ chance.transferTime || '未说明' }}</text>
                       <text v-if="chance.approvalTime" class="col-span-2" :user-select="true">审批时间：{{ chance.approvalTime }}</text>
                     </view>
-                    <text class="mt-2 block leading-6 text-slate-500" :user-select="true">{{ chance.principle || '暂无原则说明' }}</text>
+                    <text class="mt-2 block leading-6 text-fg-muted" :user-select="true">{{ chance.principle || '暂无原则说明' }}</text>
                   </view>
                 </view>
               </view>
 
-              <view v-else-if="explainTab === 'special'" class="border-b border-slate-200 py-3">
+              <view v-else-if="explainTab === 'special'" class="border-b border-line py-3">
                 <view class="mb-2 flex items-center gap-2">
                   <view class="h-2 w-2 rounded-full bg-sky-400"></view>
-                  <text class="font-semibold text-slate-800" :user-select="true">特殊情况</text>
+                  <text class="font-semibold text-fg" :user-select="true">特殊情况</text>
                 </view>
-                <view v-if="majorExplain.specialCases.length === 0" class="py-2 text-slate-400">暂无特殊情况说明</view>
+                <view v-if="majorExplain.specialCases.length === 0" class="py-2 text-fg-subtle">暂无特殊情况说明</view>
                 <view v-else>
                   <view
                     v-for="(item, index) in majorExplain.specialCases"
                     :key="`${item.title}-${index}`"
-                    class="border-t border-slate-100 py-3 first:border-t-0 first:pt-0"
+                    class="border-t border-line py-3 first:border-t-0 first:pt-0"
                   >
-                      <text class="font-semibold text-slate-800" :user-select="true">{{ item.title || `特殊情况 ${index + 1}` }}</text>
-                      <text class="mt-1 block leading-6 text-slate-600" :user-select="true">{{ item.content || '暂无说明' }}</text>
+                      <text class="font-semibold text-fg" :user-select="true">{{ item.title || `特殊情况 ${index + 1}` }}</text>
+                      <text class="mt-1 block leading-6 text-fg-muted" :user-select="true">{{ item.content || '暂无说明' }}</text>
                   </view>
                 </view>
               </view>
 
-              <view v-else class="border-b border-slate-200 py-3">
+              <view v-else class="border-b border-line py-3">
                 <view class="mb-2 flex items-center gap-2">
                   <view class="h-2 w-2 rounded-full bg-rose-400"></view>
-                    <text class="font-semibold text-slate-800" :user-select="true">禁止转专业情形</text>
+                    <text class="font-semibold text-fg" :user-select="true">禁止转专业情形</text>
                 </view>
-                <view v-if="majorExplain.prohibited.length === 0" class="py-2 text-slate-400">暂无限制说明</view>
+                <view v-if="majorExplain.prohibited.length === 0" class="py-2 text-fg-subtle">暂无限制说明</view>
                 <view v-else>
                   <view
                     v-for="(item, index) in majorExplain.prohibited"
                     :key="`${index}-${item}`"
-                    class="flex items-start gap-2 border-t border-slate-100 py-2.5 first:border-t-0 first:pt-0"
+                    class="flex items-start gap-2 border-t border-line py-2.5 first:border-t-0 first:pt-0"
                   >
                     <view class="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-rose-400"></view>
-                      <text class="leading-6 text-slate-700" :user-select="true">{{ item }}</text>
+                      <text class="leading-6 text-fg" :user-select="true">{{ item }}</text>
                   </view>
                 </view>
               </view>
@@ -209,36 +214,36 @@
           </view>
         </view>
 
-        <view v-else-if="activeSection === 'major'" class="mt-4 rounded-2xl bg-white p-4 shadow-sm">
-          <view class="border-b border-slate-200 pb-3">
-            <text class="font-semibold text-slate-900">学院专业</text>
-            <text class="mt-1 block text-slate-500 text-sm">查看可选择的学院、专业</text>
+        <view v-else-if="activeSection === 'major'" class="mt-4 rounded-2xl bg-surface p-4 shadow-sm">
+          <view class="border-b border-line pb-3">
+            <text class="font-semibold text-fg">学院专业</text>
+            <text class="mt-1 block text-fg-muted text-sm">查看可选择的学院、专业</text>
           </view>
 
-          <view class="flex border-b border-slate-200">
+          <view class="flex border-b border-line">
             <view
               v-for="tab in yearTabs"
               :key="tab.key"
               @tap="majorListTab = tab.key"
               :class="[
                 'mr-6 border-b-2 py-3',
-                majorListTab === tab.key ? 'border-orange-500 text-orange-600 font-semibold' : 'border-transparent text-slate-500'
+                majorListTab === tab.key ? 'border-warning text-warning font-semibold' : 'border-transparent text-fg-muted'
               ]"
             >
               {{ tab.label }}
             </view>
           </view>
 
-          <view v-if="sectionErrors.majorList" class="border-b border-slate-200 py-4 text-rose-500">
+          <view v-if="sectionErrors.majorList" class="border-b border-line py-4 text-rose-500">
             {{ sectionErrors.majorList }}
           </view>
 
-          <view v-else-if="currentMajorGroups.length === 0" class="border-b border-slate-200 py-8 text-center text-slate-400">
+          <view v-else-if="currentMajorGroups.length === 0" class="border-b border-line py-8 text-center text-fg-subtle">
             无
           </view>
 
-          <view v-else class="overflow-x-auto border-b border-slate-200">
-            <view class="grid grid-cols-[1fr,1.1fr,1.2fr] gap-3 border-b border-slate-200 py-3 text-slate-400">
+          <view v-else class="overflow-x-auto border-b border-line">
+            <view class="grid grid-cols-[1fr,1.1fr,1.2fr] gap-3 border-b border-line py-3 text-fg-subtle">
               <text :user-select="true">学院</text>
               <text :user-select="true">专业</text>
               <text :user-select="true">备注</text>
@@ -246,9 +251,9 @@
             <view
               v-for="(group, groupIndex) in currentMajorGroups"
               :key="`${group.college}-${groupIndex}`"
-              class="grid grid-cols-[1fr,2.3fr] gap-3 border-t border-slate-100 leading-6"
+              class="grid grid-cols-[1fr,2.3fr] gap-3 border-t border-line leading-6"
             >
-              <view class="flex items-center border-r border-slate-100 py-3 pr-3 text-slate-800">
+              <view class="flex items-center border-r border-line py-3 pr-3 text-fg">
                 <text :user-select="true">{{ group.college }}</text>
               </view>
               <view>
@@ -256,60 +261,60 @@
                   v-for="(row, rowIndex) in group.rows"
                   :key="`${group.college}-${row.name}-${rowIndex}`"
                   class="grid grid-cols-[1.1fr,1.2fr] gap-3 py-3"
-                  :class="rowIndex > 0 ? 'border-t border-slate-100' : ''"
+                  :class="rowIndex > 0 ? 'border-t border-line' : ''"
                 >
-                  <text class="text-slate-800" :user-select="true">{{ row.name }}</text>
-                  <text class="whitespace-pre-line text-slate-500" :user-select="true">{{ row.note || '-' }}</text>
+                  <text class="text-fg" :user-select="true">{{ row.name }}</text>
+                  <text class="whitespace-pre-line text-fg-muted" :user-select="true">{{ row.note || '-' }}</text>
                 </view>
               </view>
             </view>
           </view>
         </view>
 
-        <view v-else-if="activeSection === 'data'" class="mt-4 rounded-2xl bg-white p-4 shadow-sm">
-          <view class="border-b border-slate-200 pb-3">
+        <view v-else-if="activeSection === 'data'" class="mt-4 rounded-2xl bg-surface p-4 shadow-sm">
+          <view class="border-b border-line pb-3">
             <view class="flex items-start justify-between gap-3">
               <view>
-                <text class="font-semibold text-slate-900">数据分析</text>
-                <text class="mt-1 block text-slate-500 text-sm">桑基图展示学院流向，点击可高亮</text>
+                <text class="font-semibold text-fg">数据分析</text>
+                <text class="mt-1 block text-fg-muted text-sm">桑基图展示学院流向，点击可高亮</text>
               </view>
-              <text class="text-orange-600 text-sm">{{ majorDataSourceYear }}级数据</text>
+              <text class="text-warning text-sm">{{ majorDataSourceYear }}级数据</text>
             </view>
             <view class="mt-2 flex gap-6">
-              <text class="text-slate-600">总人数 <text class="font-semibold text-slate-900 text-sm">{{ totalFlowCount }}</text></text>
-              <text class="text-slate-600">流向数 <text class="font-semibold text-slate-900 text-sm">{{ currentFlowData.length }}</text></text>
+              <text class="text-fg-muted">总人数 <text class="font-semibold text-fg text-sm">{{ totalFlowCount }}</text></text>
+              <text class="text-fg-muted">流向数 <text class="font-semibold text-fg text-sm">{{ currentFlowData.length }}</text></text>
             </view>
           </view>
 
-          <view class="flex border-b border-slate-200">
+          <view class="flex border-b border-line">
             <view
               v-for="tab in dataTabs"
               :key="tab.key"
               @tap="switchDataMode(tab.key)"
               :class="[
                 'mr-6 border-b-2 py-3',
-                dataTab === tab.key ? 'border-orange-500 text-orange-600 font-semibold' : 'border-transparent text-slate-500'
+                dataTab === tab.key ? 'border-warning text-warning font-semibold' : 'border-transparent text-fg-muted'
               ]"
             >
               {{ tab.label }}
             </view>
           </view>
 
-          <view v-if="sectionErrors.majorData" class="border-b border-slate-200 py-4 text-rose-500">
+          <view v-if="sectionErrors.majorData" class="border-b border-line py-4 text-rose-500">
             {{ sectionErrors.majorData }}
           </view>
 
-          <view v-else-if="currentFlowData.length === 0" class="border-b border-slate-200 py-8 text-center text-slate-400">
+          <view v-else-if="currentFlowData.length === 0" class="border-b border-line py-8 text-center text-fg-subtle">
             暂无数据
           </view>
 
           <view v-else>
-            <view class="border-b border-slate-200 py-3">
+            <view class="border-b border-line py-3">
               <view class="mb-2 flex items-center justify-between">
-                <text class="font-semibold text-slate-800">学院流向桑基图</text>
-                <text class="text-slate-400 text-sm">左侧来源，右侧目标</text>
+                <text class="font-semibold text-fg">学院流向桑基图</text>
+                <text class="text-fg-subtle text-sm">左侧来源，右侧目标</text>
               </view>
-              <view id="major-sankey-wrapper" class="overflow-hidden border border-slate-100">
+              <view id="major-sankey-wrapper" class="overflow-hidden border border-line">
                 <canvas
                   canvas-id="major-sankey-canvas"
                   id="major-sankey-canvas"
@@ -322,15 +327,15 @@
               </view>
             </view>
 
-            <view class="border-b border-slate-200 py-3">
-              <text class="font-semibold text-orange-600" :user-select="true">{{ selectionTitle }}</text>
-              <text class="mt-1 block leading-6 text-slate-600" :user-select="true">{{ selectionDescription }}</text>
+            <view class="border-b border-line py-3">
+              <text class="font-semibold text-warning" :user-select="true">{{ selectionTitle }}</text>
+              <text class="mt-1 block leading-6 text-fg-muted" :user-select="true">{{ selectionDescription }}</text>
             </view>
 
-            <view class="border-b border-slate-200 py-3">
+            <view class="border-b border-line py-3">
               <view class="mb-2 flex items-center justify-between">
-                <text class="font-semibold text-slate-800">主要流向</text>
-                <text class="text-slate-400 text-sm">点击高亮</text>
+                <text class="font-semibold text-fg">主要流向</text>
+                <text class="text-fg-subtle text-sm">点击高亮</text>
               </view>
               <view>
                 <view
@@ -338,8 +343,8 @@
                   :key="`${flow.source}-${flow.target}-${index}`"
                   @tap="selectFlow(flow)"
                   :class="[
-                    'flex items-center justify-between border-t border-slate-100 py-2 first:border-t-0',
-                    isSelectedFlow(flow) ? 'text-orange-600' : 'text-slate-600'
+                    'flex items-center justify-between border-t border-line py-2 first:border-t-0',
+                    isSelectedFlow(flow) ? 'text-warning' : 'text-fg-muted'
                   ]"
                 >
                   <text>{{ flow.source }} → {{ flow.target }}</text>
@@ -350,20 +355,20 @@
           </view>
         </view>
 
-        <view v-else class="mt-4 rounded-2xl bg-white p-4 shadow-sm">
-          <view class="border-b border-slate-200 pb-3">
+        <view v-else class="mt-4 rounded-2xl bg-surface p-4 shadow-sm">
+          <view class="border-b border-line pb-3">
             <view class="flex items-center justify-between">
-              <text class="font-semibold text-slate-900">常见问题</text>
-              <text class="text-orange-600">{{ majorQA.length }} 问</text>
+              <text class="font-semibold text-fg">常见问题</text>
+              <text class="text-warning">{{ majorQA.length }} 问</text>
             </view>
-            <text class="mt-1 block text-slate-500 text-sm">点击问题展开答案</text>
+            <text class="mt-1 block text-fg-muted text-sm">点击问题展开答案</text>
           </view>
 
-          <view v-if="sectionErrors.majorQA" class="border-b border-slate-200 py-4 text-rose-500">
+          <view v-if="sectionErrors.majorQA" class="border-b border-line py-4 text-rose-500">
             {{ sectionErrors.majorQA }}
           </view>
 
-          <view v-else-if="majorQA.length === 0" class="border-b border-slate-200 py-8 text-center text-slate-400">
+          <view v-else-if="majorQA.length === 0" class="border-b border-line py-8 text-center text-fg-subtle">
             暂无常见问题
           </view>
 
@@ -371,20 +376,20 @@
             <view
               v-for="item in majorQA"
               :key="item.id || item.title"
-              class="border-b border-slate-200"
+              class="border-b border-line"
             >
               <view class="flex items-center gap-3 py-3" @tap="toggleQA(item.id)">
-                <text class="w-6 flex-shrink-0 text-center font-semibold text-orange-600" :user-select="true">{{ item.id || '?' }}</text>
-                <text class="min-w-0 flex-1 leading-6 text-slate-800" :user-select="true">{{ item.title || '未命名问题' }}</text>
+                <text class="w-6 flex-shrink-0 text-center font-semibold text-warning" :user-select="true">{{ item.id || '?' }}</text>
+                <text class="min-w-0 flex-1 leading-6 text-fg" :user-select="true">{{ item.title || '未命名问题' }}</text>
                 <text
                   :class="[
-                    'i-lucide-chevron-down h-4 w-4 flex-shrink-0 transform text-slate-400 transition-transform duration-200',
-                    activeQuestionId === item.id ? 'rotate-180 text-orange-500' : 'rotate-0'
+                    'i-lucide-chevron-down h-4 w-4 flex-shrink-0 transform text-fg-subtle transition-transform duration-200',
+                    activeQuestionId === item.id ? 'rotate-180 text-warning' : 'rotate-0'
                   ]"
                   :user-select="true"
                 ></text>
               </view>
-              <view v-if="activeQuestionId === item.id" class="pb-3 pl-9 leading-7 text-slate-600">
+              <view v-if="activeQuestionId === item.id" class="pb-3 pl-9 leading-7 text-fg-muted">
                 <text class="whitespace-pre-line" :user-select="true">{{ item.content || '内容待补充' }}</text>
               </view>
             </view>
@@ -396,9 +401,12 @@
 </template>
 
 <script setup>
+import { useThemePage } from '../../composables/useThemePage'
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import Taro from '@tarojs/taro'
 import { configAPI } from '../../api/index'
+
+const themeStore = useThemePage()
 
 const topTabs = [
   { key: 'notice', label: '通知文件' },
@@ -953,7 +961,7 @@ const buildChartLayout = () => {
     return {
       ...flow,
       width,
-      color: sourceNode?.color || targetNode?.color || '#94a3b8',
+      color: sourceNode?.color || targetNode?.color || themeStore.tokens.themeFgSubtle,
       points,
       startX: linkStartX,
       startY,
@@ -984,7 +992,7 @@ const drawChart = () => {
   const ctx = Taro.createCanvasContext('major-sankey-canvas')
 
   ctx.clearRect(0, 0, chartWidth.value, chartHeight.value)
-  ctx.setFillStyle('#ffffff')
+  ctx.setFillStyle(themeStore.tokens.themeSurface)
   ctx.fillRect(0, 0, chartWidth.value, chartHeight.value)
 
   links.forEach((link) => {
@@ -1020,19 +1028,19 @@ const drawChart = () => {
     const isRelatedNode = selectedChartItem.value?.type === 'link'
       && (selectedChartItem.value.source === node.name || selectedChartItem.value.target === node.name)
     const highlight = !selectedChartItem.value || isSelectedNode || isRelatedNode
-    const fillColor = highlight ? node.color : '#cbd5e1'
+    const fillColor = highlight ? node.color : themeStore.tokens.themeLine
 
     ctx.setFillStyle(fillColor)
     ctx.fillRect(node.x, node.y, node.width, node.height)
 
     if (isSelectedNode) {
-      ctx.setStrokeStyle(hexToRgba('#f97316', 0.35))
+      ctx.setStrokeStyle(hexToRgba(themeStore.tokens.themeWarning, 0.35))
       ctx.setLineWidth(2)
       ctx.strokeRect(node.x - 2, node.y - 2, node.width + 4, node.height + 4)
     }
 
     ctx.setFontSize(11)
-    ctx.setFillStyle('#334155')
+    ctx.setFillStyle(themeStore.tokens.themeFg)
     const maxWidth = Math.min(120, chartWidth.value * 0.28)
     const label = truncateText(ctx, getShortCollegeName(node.name), maxWidth)
     const labelY = node.y + node.height / 2
@@ -1040,13 +1048,13 @@ const drawChart = () => {
     if (node.side === 'source') {
       ctx.setTextAlign('right')
       ctx.fillText(label, node.x - 8, labelY)
-      ctx.setFillStyle('#94a3b8')
+      ctx.setFillStyle(themeStore.tokens.themeFgSubtle)
       ctx.setFontSize(10)
       ctx.fillText(`${node.total}`, node.x - 8, labelY + 14)
     } else {
       ctx.setTextAlign('left')
       ctx.fillText(label, node.x + node.width + 8, labelY)
-      ctx.setFillStyle('#94a3b8')
+      ctx.setFillStyle(themeStore.tokens.themeFgSubtle)
       ctx.setFontSize(10)
       ctx.fillText(`${node.total}`, node.x + node.width + 8, labelY + 14)
     }
@@ -1200,6 +1208,13 @@ watch(selectedChartItem, () => {
     drawChart()
   }
 }, { deep: true })
+
+watch(() => themeStore.effectiveTheme, async () => {
+  if (activeSection.value === 'data') {
+    await nextTick()
+    drawChart()
+  }
+})
 
 onMounted(async () => {
   await loadPageData()

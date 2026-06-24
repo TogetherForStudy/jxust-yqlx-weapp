@@ -1,6 +1,7 @@
 export default {
+  enablePageMeta: true,
   navigationBarTitleText: '登录',
-  navigationBarBackgroundColor: '#ffffff',
-  navigationBarTextStyle: 'black',
-  backgroundColor: '#f5f5f5'
+  navigationBarBackgroundColor: '@navBgColor',
+  navigationBarTextStyle: '@navTxtStyle',
+  backgroundColor: '@pageBgColor'
 }

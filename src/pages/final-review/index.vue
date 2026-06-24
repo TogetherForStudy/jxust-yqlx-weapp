@@ -1,15 +1,20 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
-  <view class="min-h-screen bg-gray-50">
+  <page-meta
+    :page-style="themeStore.pageStyle"
+    :background-color="themeStore.nativeTheme.pageBg"
+    :background-text-style="themeStore.nativeTheme.backgroundTextStyle"
+  />
+  <view class="min-h-screen bg-page text-fg" :class="[themeStore.rootClass]">
     <!-- 分类筛选标签 -->
-    <view v-if="categories.length > 0" class="bg-white px-4 py-3 border-b border-gray-100">
+    <view v-if="categories.length > 0" class="bg-surface px-4 py-3 border-b border-line">
       <view class="flex flex-wrap items-center gap-2">
         <view
           :class="[
             'px-4 py-1.5 rounded-full text-sm',
             selectedCategory === 'all'
-              ? 'bg-indigo-500 text-white'
-              : 'bg-gray-100 text-gray-700'
+              ? 'bg-brand text-white'
+              : 'bg-surface-muted text-fg'
           ]"
           @tap="selectCategory('all')"
         >
@@ -21,8 +26,8 @@
           :class="[
             'px-4 py-1.5 rounded-full text-sm',
             selectedCategory === category
-              ? 'bg-indigo-500 text-white'
-              : 'bg-gray-100 text-gray-700'
+              ? 'bg-brand text-white'
+              : 'bg-surface-muted text-fg'
           ]"
           @tap="selectCategory(category)"
         >
@@ -36,15 +41,15 @@
         <view
           v-for="skeleton in 3"
           :key="`skeleton-${skeleton}`"
-          class="bg-white rounded-2xl p-4 shadow-sm animate-pulse"
+          class="bg-surface rounded-2xl p-4 shadow-sm animate-pulse"
         >
-          <view class="h-4 bg-gray-200 rounded w-1/2 mb-3"></view>
-          <view class="h-3 bg-gray-100 rounded w-full mb-2"></view>
-          <view class="h-3 bg-gray-100 rounded w-5/6"></view>
+          <view class="h-4 bg-line rounded w-1/2 mb-3"></view>
+          <view class="h-3 bg-surface-muted rounded w-full mb-2"></view>
+          <view class="h-3 bg-surface-muted rounded w-5/6"></view>
         </view>
       </view>
 
-      <view v-else-if="filteredProjects.length === 0" class="text-center text-gray-400 pt-12">
+      <view v-else-if="filteredProjects.length === 0" class="text-center text-fg-subtle pt-12">
         暂无可用项目，稍后再试
       </view>
 
@@ -52,23 +57,23 @@
         <view
           v-for="project in filteredProjects"
           :key="project.id"
-          class="bg-white rounded-2xl p-4 shadow-sm active:scale-[0.98] transition-transform duration-150"
+          class="bg-surface rounded-2xl p-4 shadow-sm active:scale-[0.98] transition-transform duration-150"
           @tap="openProject(project)"
         >
           <view class="flex justify-between gap-4">
             <view>
-              <text class="text-base font-semibold text-gray-900">
+              <text class="text-base font-semibold text-fg">
                 {{ project.name || project.title }}
               </text>
               <view
                 v-if="project.user_count != null && project.usage_count != null"
-                class="mt-1 text-xs text-gray-500"
+                class="mt-1 text-xs text-fg-muted"
               >
                 {{ project.user_count }} 人已刷 {{ project.usage_count }} 题
               </view>
             </view>
             <view class="text-right">
-              <view class="text-xs text-gray-400">题量</view>
+              <view class="text-xs text-fg-subtle">题量</view>
               <text class="text-lg font-semibold text-indigo-500">
                 {{ project.question_count || project.total || '--' }}
               </text>
@@ -81,9 +86,12 @@
 </template>
 
 <script setup>
+import { useThemePage } from '../../composables/useThemePage'
 import { ref, onMounted, computed } from "vue";
 import Taro from "@tarojs/taro";
 import { questionsAPI, configAPI } from "../../api";
+
+const themeStore = useThemePage()
 
 const loading = ref(false);
 const projects = ref([]);

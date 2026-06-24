@@ -1,6 +1,11 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
-  <view class="h-screen bg-gray-50 flex flex-col">
+  <page-meta
+    :page-style="themeStore.pageStyle"
+    :background-color="themeStore.nativeTheme.pageBg"
+    :background-text-style="themeStore.nativeTheme.backgroundTextStyle"
+  />
+  <view class="h-screen bg-page flex flex-col text-fg" :class="[themeStore.rootClass]">
     <!-- 积分概览卡片 -->
     <view class="bg-gradient-to-br from-blue-500 to-indigo-600 pt-6 pb-6 px-6 flex-shrink-0">
       <view class="flex items-center justify-between">
@@ -18,13 +23,13 @@
         <!-- 右侧：统计按钮 -->
         <view class="flex items-center space-x-2">
           <view
-            class="px-4 py-2 bg-white/20 rounded-full active:bg-white/30"
+            class="px-4 py-2 bg-surface/20 rounded-full active:bg-surface/30"
             @tap="showSourceStatsModal"
           >
             <text class="text-white text-sm">统计</text>
           </view>
           <view
-            class="px-4 py-2 bg-white/20 rounded-full active:bg-white/30"
+            class="px-4 py-2 bg-surface/20 rounded-full active:bg-surface/30"
             @tap="handleRedeem"
           >
             <text class="text-white text-sm">兑换</text>
@@ -35,28 +40,28 @@
 
     <!-- 积分流水 -->
     <view class="px-4 -mt-4 mb-4 flex-1 h-[1px] flex flex-col">
-      <view class="bg-white rounded-xl shadow-sm flex-1 flex flex-col overflow-hidden">
+      <view class="bg-surface rounded-xl shadow-sm flex-1 flex flex-col overflow-hidden">
         <!-- 标题栏 -->
-        <view class="px-4 py-3 border-b border-gray-100 flex items-center justify-between flex-shrink-0">
-          <text class="text-gray-800 font-medium">积分流水</text>
+        <view class="px-4 py-3 border-b border-line flex items-center justify-between flex-shrink-0">
+          <text class="text-fg font-medium">积分流水</text>
           <view class="flex space-x-2">
             <view
               class="px-3 py-1 rounded-full text-xs"
-              :class="typeFilter === null ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600'"
+              :class="typeFilter === null ? 'bg-brand text-white' : 'bg-surface-muted text-fg-muted'"
               @tap="setTypeFilter(null)"
             >
               全部
             </view>
             <view
               class="px-3 py-1 rounded-full text-xs"
-              :class="typeFilter === 1 ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-600'"
+              :class="typeFilter === 1 ? 'bg-success text-white' : 'bg-surface-muted text-fg-muted'"
               @tap="setTypeFilter(1)"
             >
               获得
             </view>
             <view
               class="px-3 py-1 rounded-full text-xs"
-              :class="typeFilter === 2 ? 'bg-red-500 text-white' : 'bg-gray-100 text-gray-600'"
+              :class="typeFilter === 2 ? 'bg-danger text-white' : 'bg-surface-muted text-fg-muted'"
               @tap="setTypeFilter(2)"
             >
               消费
@@ -74,15 +79,15 @@
           <!-- 加载状态 -->
           <view v-if="isLoading && transactions.length === 0" class="py-8">
             <view class="flex items-center justify-center">
-              <text class="text-gray-500 text-sm">加载中...</text>
+              <text class="text-fg-muted text-sm">加载中...</text>
             </view>
           </view>
 
           <!-- 空状态 -->
           <view v-else-if="transactions.length === 0" class="py-8">
             <view class="flex flex-col items-center justify-center">
-              <text class="i-lucide-coins text-gray-300 text-4xl mb-2"></text>
-              <text class="text-gray-500 text-sm">暂无积分记录</text>
+              <text class="i-lucide-coins text-fg-subtle text-4xl mb-2"></text>
+              <text class="text-fg-muted text-sm">暂无积分记录</text>
             </view>
           </view>
 
@@ -91,16 +96,16 @@
             <view
               v-for="transaction in transactions"
               :key="transaction.id"
-              class="px-4 py-3 border-b border-gray-50 flex items-center justify-between gap-4"
+              class="px-4 py-3 border-b border-line flex items-center justify-between gap-4"
             >
               <view class="flex-1">
-                <text class="text-gray-800 text-sm block">{{ transaction.description }}</text>
-                <text class="text-gray-400 text-xs">{{ formatDate(transaction.created_at) }}</text>
+                <text class="text-fg text-sm block">{{ transaction.description }}</text>
+                <text class="text-fg-subtle text-xs">{{ formatDate(transaction.created_at) }}</text>
               </view>
               <view>
                 <text
                   class="font-medium"
-                  :class="transaction.type === 1 ? 'text-green-500' : 'text-red-500'"
+                  :class="transaction.type === 1 ? 'text-success' : 'text-danger'"
                 >
                   {{ String(transaction.points).startsWith('-') ? '' : transaction.type === 1 ? '+' : '-' }}{{ transaction.points }}
                 </text>
@@ -109,8 +114,8 @@
 
             <!-- 加载更多指示器 -->
             <view class="text-center py-4">
-              <text v-if="isLoading" class="text-gray-500 text-sm">加载中...</text>
-              <text v-else-if="!hasMore" class="text-gray-400 text-sm">已加载全部</text>
+              <text v-if="isLoading" class="text-fg-muted text-sm">加载中...</text>
+              <text v-else-if="!hasMore" class="text-fg-subtle text-sm">已加载全部</text>
             </view>
           </view>
         </scroll-view>
@@ -120,15 +125,15 @@
     <!-- 积分来源统计弹窗 -->
     <view
       v-if="showSourceStats"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      class="fixed inset-0 bg-overlay flex items-center justify-center z-50"
       @tap="showSourceStats = false"
     >
-      <view @tap.stop="" class="bg-white rounded-2xl mx-4 w-full max-w-md max-h-[80vh] flex flex-col">
-        <view class="px-4 py-2 flex-shrink-0 border-b border-gray-100">
+      <view @tap.stop="" class="bg-surface rounded-2xl mx-4 w-full max-w-md max-h-[80vh] flex flex-col">
+        <view class="px-4 py-2 flex-shrink-0 border-b border-line">
           <view class="flex items-center justify-between">
-            <text class="text-lg font-semibold text-gray-800">积分来源统计</text>
+            <text class="text-lg font-semibold text-fg">积分来源统计</text>
             <view @tap="showSourceStats = false" class="p-1">
-              <text class="i-lucide-x text-gray-400"></text>
+              <text class="i-lucide-x text-fg-subtle"></text>
             </view>
           </view>
         </view>
@@ -136,45 +141,45 @@
         <scroll-view :scroll-y="true" class="flex-1">
           <view class="p-4">
             <view v-if="!pointsStats.source_stats || Object.keys(pointsStats.source_stats).length === 0" class="py-8 text-center">
-              <text class="text-gray-400 text-sm">暂无统计数据</text>
+              <text class="text-fg-subtle text-sm">暂无统计数据</text>
             </view>
             <view v-else>
               <!-- 获得积分部分 -->
               <view class="mb-4">
-                <text class="text-base font-semibold text-gray-800 block mb-3">获得积分</text>
+                <text class="text-base font-semibold text-fg block mb-3">获得积分</text>
                 <view class="space-y-2">
                   <view
                     v-for="(stats, source) in earnedSources"
                     :key="source"
-                    class="bg-green-50 rounded-lg p-3 border border-green-200"
+                    class="bg-success-soft rounded-lg p-3 border border-success"
                   >
                     <view class="flex items-center justify-between gap-4">
-                      <text class="text-sm font-medium text-gray-800">{{ getSourceName(source) }}</text>
-                      <text class="text-sm font-semibold text-green-600">+{{ stats.earned || 0 }}</text>
+                      <text class="text-sm font-medium text-fg">{{ getSourceName(source) }}</text>
+                      <text class="text-sm font-semibold text-success">+{{ stats.earned || 0 }}</text>
                     </view>
                   </view>
                   <view v-if="Object.keys(earnedSources).length === 0" class="py-4 text-center">
-                    <text class="text-gray-400 text-sm">暂无获得记录</text>
+                    <text class="text-fg-subtle text-sm">暂无获得记录</text>
                   </view>
                 </view>
               </view>
 
               <!-- 消耗积分部分 -->
               <view>
-                <text class="text-base font-semibold text-gray-800 block mb-3">消耗积分</text>
+                <text class="text-base font-semibold text-fg block mb-3">消耗积分</text>
                 <view class="space-y-2">
                   <view
                     v-for="(stats, source) in spentSources"
                     :key="source"
-                    class="bg-red-50 rounded-lg p-3 border border-red-200"
+                    class="bg-danger-soft rounded-lg p-3 border border-danger"
                   >
                     <view class="flex items-center justify-between">
-                      <text class="text-sm font-medium text-gray-800">{{ getSourceName(source) }}</text>
-                      <text class="text-sm font-semibold text-red-600">-{{ Math.abs(stats.spent || 0) }}</text>
+                      <text class="text-sm font-medium text-fg">{{ getSourceName(source) }}</text>
+                      <text class="text-sm font-semibold text-danger">-{{ Math.abs(stats.spent || 0) }}</text>
                     </view>
                   </view>
                   <view v-if="Object.keys(spentSources).length === 0" class="py-4 text-center">
-                    <text class="text-gray-400 text-sm">暂无消耗记录</text>
+                    <text class="text-fg-subtle text-sm">暂无消耗记录</text>
                   </view>
                 </view>
               </view>
@@ -187,11 +192,14 @@
 </template>
 
 <script setup>
+import { useThemePage } from '../../composables/useThemePage'
 import { ref, computed, onMounted } from 'vue'
 import Taro from '@tarojs/taro'
 import { pointsAPI } from '../../api/index'
 import { useAuthStore } from '../../stores/auth'
 import { formatDateTime } from '../../utils/time'
+
+const themeStore = useThemePage()
 
 const authStore = useAuthStore()
 

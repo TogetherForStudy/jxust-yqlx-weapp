@@ -1,7 +1,7 @@
 <template>
-  <view class="min-h-screen bg-gray-50">
+  <view class="min-h-screen bg-page">
     <view class="p-4">
-      <view class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+      <view class="bg-surface rounded-xl p-4 shadow-sm border border-line">
         <!-- 标题骨架 -->
         <view class="mb-4">
           <view class="skeleton-box h-6 w-3/4 mb-3 rounded"></view>
@@ -21,7 +21,7 @@
         </view>
 
         <!-- 分割线 -->
-        <view class="border-t border-gray-100 my-4"></view>
+        <view class="border-t border-line my-4"></view>
 
         <!-- 内容骨架 -->
         <view class="mb-6 space-y-2">
@@ -51,7 +51,12 @@ defineProps({
 
 <style scoped>
 .skeleton-box {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background: linear-gradient(
+    90deg,
+    var(--theme-skeleton-from) 25%,
+    var(--theme-skeleton-via) 50%,
+    var(--theme-skeleton-to) 75%
+  );
   background-size: 200% 100%;
   animation: skeleton-loading 1.5s ease-in-out infinite;
 }
@@ -69,4 +74,3 @@ defineProps({
   margin-top: 0.5rem;
 }
 </style>
-

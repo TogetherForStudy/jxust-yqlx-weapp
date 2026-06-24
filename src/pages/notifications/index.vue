@@ -1,23 +1,28 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
-  <view class="h-screen bg-gray-50 flex flex-col">
+  <page-meta
+    :page-style="themeStore.pageStyle"
+    :background-color="themeStore.nativeTheme.pageBg"
+    :background-text-style="themeStore.nativeTheme.backgroundTextStyle"
+  />
+  <view class="h-screen bg-page flex flex-col text-fg" :class="[themeStore.rootClass]">
     <!-- 头部筛选栏 -->
-    <view class="bg-white px-4 py-3 border-b border-gray-100">
+    <view class="bg-surface px-4 py-3 border-b border-line">
       <view class="flex items-center justify-between">
         <!-- 分类筛选 -->
         <view class="flex items-center space-x-2 flex-1 w-[1px]">
           <scroll-view :scroll-x="true" class="w-full">
             <view class="flex space-x-2 pb-1 pr-4">
               <view class="px-3 py-1 rounded-full text-sm whitespace-nowrap transition-colors" :class="selectedCategories.length === 0
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-100 text-gray-600'
+                ? 'bg-brand text-white'
+                : 'bg-surface-muted text-fg-muted'
                 " @tap="clearCategoryFilter">
                 全部
               </view>
               <view v-for="category in categories" :key="category.id"
                 class="px-3 py-1 rounded-full text-sm whitespace-nowrap transition-colors" :class="selectedCategories.includes(category.id)
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-100 text-gray-600'
+                  ? 'bg-brand text-white'
+                  : 'bg-surface-muted text-fg-muted'
                   " @tap="toggleCategory(category.id)">
                 {{ category.name }}
               </view>
@@ -27,7 +32,7 @@
 
         <!-- 搜索图标 -->
         <view class="ml-3">
-          <text class="i-lucide-search text-gray-500 w-5 h-5" @tap="showSearchBar = !showSearchBar"></text>
+          <text class="i-lucide-search text-fg-muted w-5 h-5" @tap="showSearchBar = !showSearchBar"></text>
         </view>
       </view>
 
@@ -35,8 +40,8 @@
       <view v-if="showSearchBar" class="mt-3">
         <view class="relative">
           <input v-model="searchKeyword" placeholder="搜索信息标题..."
-            class="w-full px-3 h-10 pr-8 bg-gray-50 rounded-lg text-sm box-border" @input="onSearchInput" />
-          <text class="absolute right-2 top-1/2 transform -translate-y-1/2 i-lucide-x text-gray-400 w-4 h-4"
+            class="w-full px-3 h-10 pr-8 bg-page rounded-lg text-sm box-border" @input="onSearchInput" />
+          <text class="absolute right-2 top-1/2 transform -translate-y-1/2 i-lucide-x text-fg-subtle w-4 h-4"
             @tap="clearSearch"></text>
         </view>
       </view>
@@ -46,19 +51,19 @@
     <view class="p-4 flex-1 h-[1px]">
       <!-- 加载状态 -->
       <view v-if="isListLoading && displayedNotifications.length === 0">
-        <view class="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
+        <view class="bg-surface rounded-xl p-8 shadow-sm border border-line">
           <view class="flex items-center justify-center">
-            <text class="text-gray-500 text-sm">加载中...</text>
+            <text class="text-fg-muted text-sm">加载中...</text>
           </view>
         </view>
       </view>
 
       <!-- 空状态 -->
       <view v-else-if="displayedNotifications.length === 0">
-        <view class="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
+        <view class="bg-surface rounded-xl p-8 shadow-sm border border-line">
           <view class="flex flex-col items-center justify-center">
-            <text class="i-lucide-bell-off text-gray-300 text-4xl mb-2"></text>
-            <text class="text-gray-500 text-sm">暂无信息</text>
+            <text class="i-lucide-bell-off text-fg-subtle text-4xl mb-2"></text>
+            <text class="text-fg-muted text-sm">暂无信息</text>
           </view>
         </view>
       </view>
@@ -67,22 +72,22 @@
       <scroll-view v-else :scroll-y="true" class="h-full" @scrolltolower="loadMore" :lower-threshold="100">
         <view class="space-y-3">
           <view v-for="notification in displayedNotifications" :key="notification.id"
-            class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 active:scale-98 transition-transform"
+            class="bg-surface rounded-xl p-4 shadow-sm border border-line active:scale-98 transition-transform"
             @tap="goToNotificationDetail(notification)">
             <!-- 通知头部 -->
             <view class="flex justify-between items-start mb-2">
               <view class="flex-1 pr-2">
                 <view class="flex items-center">
                   <!-- 置顶标识 -->
-                  <view v-if="notification.is_pinned" class="flex items-center justify-center w-5 h-5 bg-white rounded-full mr-2 shrink-0">
-                    <text class="i-lucide-pin text-red-500 w-3.5 h-3.5"></text>
+                  <view v-if="notification.is_pinned" class="flex items-center justify-center w-5 h-5 bg-surface rounded-full mr-2 shrink-0">
+                    <text class="i-lucide-pin text-danger w-3.5 h-3.5"></text>
                   </view>
-                  <text class="text-gray-800 font-medium text-base leading-tight">
+                  <text class="text-fg font-medium text-base leading-tight">
                     {{ notification.title }}
                   </text>
                   <!-- 日程图标 -->
                   <text v-if="hasScheduleData(notification)"
-                    class="i-lucide-calendar text-blue-500 mx-2 shrink-0 text-sm"></text>
+                    class="i-lucide-calendar text-brand mx-2 shrink-0 text-sm"></text>
                 </view>
               </view>
             </view>
@@ -95,7 +100,7 @@
                   notification.categories.length > 0
                 " class="flex space-x-1">
                   <view v-for="category in notification.categories.slice(0, 2)" :key="category.id"
-                    class="px-2 py-1 bg-blue-50 text-blue-600 rounded text-xs">
+                    class="px-2 py-1 bg-brand-soft text-brand rounded text-xs">
                     {{ category.name }}
                   </view>
                 </view>
@@ -104,14 +109,14 @@
               <view class="flex items-center space-x-3">
                 <!-- 浏览量 -->
                 <view class="flex items-center">
-                  <text class="i-lucide-eye text-gray-400 w-3 h-3 mr-1"></text>
-                  <text class="text-gray-500 text-xs">{{
+                  <text class="i-lucide-eye text-fg-subtle w-3 h-3 mr-1"></text>
+                  <text class="text-fg-muted text-xs">{{
                     notification.view_count || 0
                   }}</text>
                 </view>
 
                 <!-- 发布时间 -->
-                <text class="text-gray-400 text-xs">
+                <text class="text-fg-subtle text-xs">
                   {{
                     formatDate(
                       notification.published_at || notification.created_at
@@ -125,9 +130,9 @@
 
         <!-- 加载更多指示器 -->
         <view v-if="isListLoading || hasMoreNotifications || displayedNotifications.length > 0" class="text-center py-4">
-          <text v-if="isListLoading" class="text-gray-500 text-sm">加载中...</text>
+          <text v-if="isListLoading" class="text-fg-muted text-sm">加载中...</text>
           <text v-else-if="!hasMoreNotifications && displayedNotifications.length > 0"
-            class="text-gray-400 text-sm">已加载全部</text>
+            class="text-fg-subtle text-sm">已加载全部</text>
         </view>
       </scroll-view>
     </view>
@@ -135,11 +140,14 @@
 </template>
 
 <script setup>
+import { useThemePage } from '../../composables/useThemePage'
 import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import Taro, { useDidShow, useDidHide } from "@tarojs/taro";
 import { useNotificationStore } from "../../stores/notifications";
 import { notificationAPI } from "../../api/notification";
 import { formatDateTime } from "../../utils/time";
+
+const themeStore = useThemePage()
 
 const notificationStore = useNotificationStore();
 const PAGE_SIZE = 10;

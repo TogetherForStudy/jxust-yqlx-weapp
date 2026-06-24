@@ -1,22 +1,27 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
-  <view class="min-h-screen bg-gray-50">
+  <page-meta
+    :page-style="themeStore.pageStyle"
+    :background-color="themeStore.nativeTheme.pageBg"
+    :background-text-style="themeStore.nativeTheme.backgroundTextStyle"
+  />
+  <view class="min-h-screen bg-page text-fg" :class="[themeStore.rootClass]">
     <!-- 骨架屏加载状态 -->
     <SkeletonDetail v-if="isLoading && !notification" :show-extra="true" />
 
     <!-- 通知详情 -->
     <view v-else-if="notification" class="p-4">
       <!-- 主要内容卡片 -->
-      <view class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+      <view class="bg-surface rounded-xl p-4 shadow-sm border border-line">
         <!-- 通知头部 -->
         <view class="mb-4">
           <!-- 标题 -->
-          <text class="font-bold text-base text-gray-800 leading-tight block mb-3" :user-select="true">
+          <text class="font-bold text-base text-fg leading-tight block mb-3" :user-select="true">
             {{ notification.title }}
           </text>
 
           <!-- 元信息 -->
-          <view class="flex flex-wrap items-center gap-3 text-gray-500 text-xs">
+          <view class="flex flex-wrap items-center gap-3 text-fg-muted text-xs">
             <!-- 发布者 -->
             <view v-if="notification.publisher" class="flex items-center">
               <text class="i-lucide-user w-4 h-4 mr-1"></text>
@@ -51,7 +56,7 @@
             <view
               v-for="category in notification.categories"
               :key="category.id"
-              class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-xs"
+              class="px-3 py-1 bg-brand-soft text-brand rounded-full text-xs"
             >
               {{ category.name }}
             </view>
@@ -59,26 +64,26 @@
         </view>
 
         <!-- 分割线 -->
-        <view class="border-t border-gray-100 my-4"></view>
+        <view class="border-t border-line my-4"></view>
 
         <!-- 通知内容 -->
         <view class="mb-6">
-          <view class="text-gray-700 leading-relaxed">
+          <view class="text-fg leading-relaxed">
             <text class="block whitespace-pre-wrap break-all" :user-select="true">{{ notification.content }}</text>
           </view>
         </view>
 
         <!-- 如果有关联日程信息 -->
         <view v-if="getScheduleTimeSlots().length > 0" class="mb-4">
-          <view class="bg-blue-50 rounded-lg p-3 border-l-4 border-blue-500">
+          <view class="bg-brand-soft rounded-lg p-3 border-l-4 border-brand">
             <view class="flex items-center mb-2">
-              <text class="i-lucide-calendar-check text-blue-600 w-4 h-4 mr-2"></text>
-              <text class="text-blue-800 text-sm font-medium">{{ notification.schedule.title }}</text>
+              <text class="i-lucide-calendar-check text-brand w-4 h-4 mr-2"></text>
+              <text class="text-brand text-sm font-medium">{{ notification.schedule.title }}</text>
             </view>
 
             <!-- 日程描述 -->
             <view v-if="notification.schedule?.description" class="mb-2">
-              <text class="text-blue-700 text-sm">{{ notification.schedule.description }}</text>
+              <text class="text-brand text-sm">{{ notification.schedule.description }}</text>
             </view>
 
             <!-- 多个时间段列表 -->
@@ -88,8 +93,8 @@
                 :key="index"
                 class="rounded p-2 border transition-colors"
                 :class="isTimeSlotActive(timeSlot)
-                  ? 'bg-green-50 border-green-200'
-                  : 'bg-white border-blue-100'"
+                  ? 'bg-success-soft border-success'
+                  : 'bg-surface border-line'"
               >
                 <view class="flex items-center justify-between">
                   <view class="flex-1">
@@ -97,17 +102,17 @@
                     <view v-if="timeSlot.name && timeSlot.name !== notification.schedule?.title"
                           class="flex items-center mb-1">
                       <text class="text-sm font-medium"
-                            :class="isTimeSlotActive(timeSlot) ? 'text-green-800' : 'text-blue-800'">
+                            :class="isTimeSlotActive(timeSlot) ? 'text-success' : 'text-brand'">
                         {{ timeSlot.name }}
                       </text>
-                      <view v-if="isTimeSlotActive(timeSlot)" class="ml-2 px-1 py-0.5 bg-green-100 text-green-700 rounded text-xs">
+                      <view v-if="isTimeSlotActive(timeSlot)" class="ml-2 px-1 py-0.5 bg-success-soft text-success rounded text-xs">
                         进行中
                       </view>
                     </view>
 
                     <!-- 时间信息 -->
                     <view class="flex items-center text-xs"
-                          :class="isTimeSlotActive(timeSlot) ? 'text-green-600' : 'text-blue-600'">
+                          :class="isTimeSlotActive(timeSlot) ? 'text-success' : 'text-brand'">
                       <text class="w-3 h-3 mr-1"
                             :class="isTimeSlotActive(timeSlot) ? 'i-lucide-play-circle' : 'i-lucide-clock'"></text>
                       <text v-if="timeSlot.is_all_day">
@@ -126,26 +131,26 @@
 
         <!-- 投稿信息（如果是从投稿转化来的） -->
         <view v-if="notification.publisher_type == 2" class="mb-4">
-          <view class="bg-green-50 rounded-lg p-4 border-l-4 border-green-500">
+          <view class="bg-success-soft rounded-lg p-4 border-l-4 border-success">
             <view class="flex items-center mb-2">
-              <text class="i-lucide-heart text-green-600 w-5 h-5 mr-2"></text>
-              <text class="text-green-800 text-sm">感谢投稿</text>
+              <text class="i-lucide-heart text-success w-5 h-5 mr-2"></text>
+              <text class="text-success text-sm">感谢投稿</text>
             </view>
-            <text class="text-green-700 text-sm">来自 {{ notification.contributor_id }} 的投稿</text>
+            <text class="text-success text-sm">来自 {{ notification.contributor_id }} 的投稿</text>
           </view>
         </view>
 
-        <text class="text-gray-500 text-xs">@江理一起来学小程序 · 信息海洋</text>
+        <text class="text-fg-muted text-xs">@江理一起来学小程序 · 信息海洋</text>
       </view>
     </view>
     <!-- 错误状态 -->
     <view v-else class="p-4">
-      <view class="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
+      <view class="bg-surface rounded-xl p-8 shadow-sm border border-line">
         <view class="flex flex-col items-center justify-center">
           <text class="i-lucide-alert-circle text-red-400 text-4xl mb-2"></text>
-          <text class="text-gray-500 text-sm">信息不存在或已被删除</text>
+          <text class="text-fg-muted text-sm">信息不存在或已被删除</text>
           <view
-            class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg active:bg-blue-600 transition-colors"
+            class="mt-4 px-4 py-2 bg-brand text-white rounded-lg active:bg-brand transition-colors"
             @tap="goBack"
           >
             <text class="text-sm">返回</text>
@@ -157,10 +162,13 @@
 </template>
 
 <script setup>
+import { useThemePage } from '../../../composables/useThemePage'
 import { ref, computed, onMounted } from 'vue'
 import Taro from '@tarojs/taro'
 import { useNotificationStore } from '../../../stores/notifications'
 import SkeletonDetail from '../../../components/SkeletonDetail.vue'
+
+const themeStore = useThemePage()
 
 const notificationStore = useNotificationStore()
 
@@ -274,11 +282,11 @@ const isTimeSlotActive = (timeSlot) => {
 // 工具函数
 const getStatusClass = (status) => {
   switch (status) {
-    case 1: return 'bg-gray-100 text-gray-600' // 草稿
-    case 2: return 'bg-yellow-100 text-yellow-700' // 处理中
-    case 3: return 'bg-green-100 text-green-700' // 已发布
-    case 4: return 'bg-red-100 text-red-700' // 已删除
-    default: return 'bg-gray-100 text-gray-600'
+    case 1: return 'bg-surface-muted text-fg-muted' // 草稿
+    case 2: return 'bg-warning-soft text-warning' // 处理中
+    case 3: return 'bg-success-soft text-success' // 已发布
+    case 4: return 'bg-danger-soft text-danger' // 已删除
+    default: return 'bg-surface-muted text-fg-muted'
   }
 }
 
@@ -321,4 +329,3 @@ Taro.useShareTimeline((res) => {
     }
   })
 </script>
-

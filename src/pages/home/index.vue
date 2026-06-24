@@ -1,22 +1,27 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
+  <page-meta
+    :page-style="themeStore.pageStyle"
+    :background-color="themeStore.nativeTheme.pageBg"
+    :background-text-style="themeStore.nativeTheme.backgroundTextStyle"
+  />
   <view
-    class="min-h-screen bg-gray-50 flex flex-col"
-    :class="{ 'h-screen overflow-hidden': isWordDetailVisible }"
+    class="min-h-screen bg-page flex flex-col text-fg"
+    :class="[themeStore.rootClass, { 'h-screen overflow-hidden': isWordDetailVisible }]"
   >
     <!-- 顶部栏 -->
-    <view v-if="authStore.isLoggedIn" class="flex items-center justify-between px-4 py-1 bg-white border-b border-gray-100">
+    <view v-if="authStore.isLoggedIn" class="flex items-center justify-between px-4 py-1 bg-surface border-b border-line">
       <view class="flex items-center gap-1.5 flex-1 min-w-0" @tap="showWordDetail">
-        <text class="i-lucide-book w-4 h-4 text-blue-500 flex-shrink-0"></text>
+        <text class="i-lucide-book w-4 h-4 text-brand flex-shrink-0"></text>
         <view v-if="dailyWord" class="flex-1 min-w-0 overflow-hidden">
-          <text class="text-sm text-gray-800 font-medium line-clamp-1">
+          <text class="text-sm text-fg font-medium line-clamp-1">
             {{ dailyWord.word }}
-            <text class="text-gray-600">{{ dailyWord.trans?.[0]?.cn || '暂无翻译' }}</text>
+            <text class="text-fg-muted">{{ dailyWord.trans?.[0]?.cn || '暂无翻译' }}</text>
           </text>
         </view>
-        <text v-else class="text-sm text-gray-400">加载中...</text>
+        <text v-else class="text-sm text-fg-subtle">加载中...</text>
       </view>
-      <view @tap="showSettingsModal" class="i-lucide-settings w-4.5 h-4.5 text-gray-500"></view>
+      <view @tap="showSettingsModal" class="i-lucide-settings w-4.5 h-4.5 text-fg-muted"></view>
     </view>
 
     <!-- 卡片区域 -->
@@ -30,89 +35,89 @@
 
     <!-- 每日一词详情弹窗 -->
     <view v-if="isWordDetailVisible" class="fixed inset-0 z-50 flex items-center justify-center" @tap.self="hideWordDetail">
-      <view class="absolute inset-0 bg-black opacity-50" @tap="hideWordDetail"></view>
+      <view class="absolute inset-0 bg-overlay" @tap="hideWordDetail"></view>
       <view
-        class="relative bg-white rounded-xl w-11/12 max-w-md max-h-[80vh] overflow-y-auto p-5 shadow-xl"
+        class="relative bg-surface rounded-xl w-11/12 max-w-md max-h-[80vh] overflow-y-auto p-5 shadow-xl"
         @touchstart="handleWordTouchStart"
         @touchmove.stop="handleWordTouchMove"
         @touchend="handleWordTouchEnd"
       >
         <view class="flex items-center justify-between mb-4">
           <view class="flex items-center gap-2">
-            <text class="i-lucide-book w-5 h-5 text-blue-500"></text>
-            <text class="text-lg font-semibold text-gray-800">{{ dailyWord.word }}</text>
+            <text class="i-lucide-book w-5 h-5 text-brand"></text>
+            <text class="text-lg font-semibold text-fg">{{ dailyWord.word }}</text>
           </view>
-          <text @tap="hideWordDetail" class="i-lucide-x w-5 h-5 text-gray-400"></text>
+          <text @tap="hideWordDetail" class="i-lucide-x w-5 h-5 text-fg-subtle"></text>
         </view>
 
-        <view class="flex items-center justify-between mb-4 text-xs text-gray-400">
+        <view class="flex items-center justify-between mb-4 text-xs text-fg-subtle">
           <text>左右滑动切换单词</text>
           <text>{{ isRefreshingWord ? '加载新词中...' : '' }}</text>
         </view>
 
         <view v-if="dailyWord" class="space-y-4">
           <!-- 单词 -->
-          <view class="border-b border-gray-100 pb-3">
+          <view class="border-b border-line pb-3">
             <view v-if="dailyWord.phonetic_uk" class="mt-1 flex items-center gap-2">
-              <text class="text-sm text-gray-500">英 /{{ dailyWord.phonetic_uk }}/</text>
-              <text v-if="dailyWord.phonetic_us" class="text-sm text-gray-500">美 /{{ dailyWord.phonetic_us }}/</text>
+              <text class="text-sm text-fg-muted">英 /{{ dailyWord.phonetic_uk }}/</text>
+              <text v-if="dailyWord.phonetic_us" class="text-sm text-fg-muted">美 /{{ dailyWord.phonetic_us }}/</text>
             </view>
           </view>
 
           <!-- 翻译 -->
           <view v-if="dailyWord.trans && dailyWord.trans.length > 0" class="space-y-2">
-            <text class="text-sm font-semibold text-gray-700">释义</text>
+            <text class="text-sm font-semibold text-fg">释义</text>
             <view v-for="(item, index) in dailyWord.trans" :key="index" class="text-sm">
-              <text v-if="item.pos" class="text-blue-600 font-medium">{{ item.pos }} </text>
-              <text class="text-gray-700">{{ item.cn }}</text>
+              <text v-if="item.pos" class="text-brand font-medium">{{ item.pos }} </text>
+              <text class="text-fg">{{ item.cn }}</text>
             </view>
           </view>
 
           <!-- 例句 -->
           <view v-if="dailyWord.sentences && dailyWord.sentences.length > 0" class="space-y-2">
-            <text class="text-sm font-semibold text-gray-700">例句</text>
+            <text class="text-sm font-semibold text-fg">例句</text>
             <view v-for="(item, index) in dailyWord.sentences" :key="index" class="space-y-1">
-              <text class="text-sm text-gray-800 block">{{ item.c }}</text>
-              <text class="text-sm text-gray-500 block">{{ item.cn }}</text>
+              <text class="text-sm text-fg block">{{ item.c }}</text>
+              <text class="text-sm text-fg-muted block">{{ item.cn }}</text>
             </view>
           </view>
 
           <!-- 短语 -->
           <view v-if="dailyWord.phrases && dailyWord.phrases.length > 0" class="space-y-2">
-            <text class="text-sm font-semibold text-gray-700">常用短语</text>
+            <text class="text-sm font-semibold text-fg">常用短语</text>
             <view v-for="(item, index) in dailyWord.phrases" :key="index" class="space-y-1">
-              <text class="text-sm text-gray-800 block">{{ item.c }}</text>
-              <text class="text-sm text-gray-500 block">{{ item.cn }}</text>
+              <text class="text-sm text-fg block">{{ item.c }}</text>
+              <text class="text-sm text-fg-muted block">{{ item.cn }}</text>
             </view>
           </view>
 
           <!-- 同义词 -->
           <view v-if="dailyWord.synos && dailyWord.synos.length > 0" class="space-y-2">
-            <text class="text-sm font-semibold text-gray-700">同义词</text>
+            <text class="text-sm font-semibold text-fg">同义词</text>
             <view v-for="(item, index) in dailyWord.synos" :key="index" class="space-y-1">
-              <text v-if="item.pos" class="text-sm text-blue-600 font-medium block">{{ item.pos }}</text>
-              <text class="text-sm text-gray-700 block">{{ item.cn }}</text>
-              <text v-if="item.ws" class="text-sm text-gray-500 block">{{ item.ws.join(', ') }}</text>
+              <text v-if="item.pos" class="text-sm text-brand font-medium block">{{ item.pos }}</text>
+              <text class="text-sm text-fg block">{{ item.cn }}</text>
+              <text v-if="item.ws" class="text-sm text-fg-muted block">{{ item.ws.join(', ') }}</text>
             </view>
           </view>
 
           <!-- 相关词 -->
           <view v-if="dailyWord.rel_words && dailyWord.rel_words.rels && dailyWord.rel_words.rels.length > 0" class="space-y-2">
-            <text class="text-sm font-semibold text-gray-700">相关词</text>
-            <view class="text-sm text-gray-600 mb-1">词根: {{ dailyWord.rel_words.root }}</view>
+            <text class="text-sm font-semibold text-fg">相关词</text>
+            <view class="text-sm text-fg-muted mb-1">词根: {{ dailyWord.rel_words.root }}</view>
             <view v-for="(rel, index) in dailyWord.rel_words.rels" :key="index" class="space-y-1">
-              <text v-if="rel.pos" class="text-sm text-blue-600 font-medium block">{{ rel.pos }}</text>
+              <text v-if="rel.pos" class="text-sm text-brand font-medium block">{{ rel.pos }}</text>
               <view v-if="rel.words" class="space-y-1">
                 <view v-for="(word, wIndex) in rel.words" :key="wIndex" class="pl-2">
-                  <text class="text-sm text-gray-800">{{ word.c }}</text>
-                  <text class="text-sm text-gray-500"> - {{ word.cn }}</text>
+                  <text class="text-sm text-fg">{{ word.c }}</text>
+                  <text class="text-sm text-fg-muted"> - {{ word.cn }}</text>
                 </view>
               </view>
             </view>
           </view>
         </view>
 
-        <view v-else class="text-center py-8 text-gray-400">
+        <view v-else class="text-center py-8 text-fg-subtle">
           加载中...
         </view>
       </view>
@@ -120,44 +125,44 @@
 
     <!-- 设置弹窗 -->
     <view v-if="isSettingsVisible" class="fixed inset-0 z-50 flex items-center justify-center" @tap.self="hideSettingsModal">
-      <view class="absolute inset-0 bg-black opacity-50"></view>
-      <view class="relative bg-white rounded-xl w-11/12 max-w-md p-5 shadow-xl">
+      <view class="absolute inset-0 bg-overlay"></view>
+      <view class="relative bg-surface rounded-xl w-11/12 max-w-md p-5 shadow-xl">
         <view class="flex items-center justify-between mb-3">
           <view class="flex items-center gap-2">
-            <text class="i-lucide-grip-vertical w-4 h-4 text-gray-400"></text>
-            <text class="text-base font-medium text-gray-800">卡片顺序</text>
+            <text class="i-lucide-grip-vertical w-4 h-4 text-fg-subtle"></text>
+            <text class="text-base font-medium text-fg">卡片顺序</text>
           </view>
-          <text @tap="hideSettingsModal" class="i-lucide-x w-5 h-5 text-gray-400"></text>
+          <text @tap="hideSettingsModal" class="i-lucide-x w-5 h-5 text-fg-subtle"></text>
         </view>
 
-        <view class="text-xs text-gray-400 mb-4">点击箭头调整顺序</view>
+        <view class="text-xs text-fg-subtle mb-4">点击箭头调整顺序</view>
 
         <!-- 卡片列表 -->
         <view class="space-y-2">
           <view
             v-for="(card, index) in sortableCards"
             :key="card.name"
-            class="bg-gray-50 rounded-lg px-3 py-1 flex items-center justify-between border border-gray-100"
+            class="bg-page rounded-lg px-3 py-1 flex items-center justify-between border border-line"
           >
             <view class="flex items-center gap-2.5">
               <text :class="card.iconClass + ' w-4 h-4'"></text>
-              <text class="text-gray-700">{{ card.label }}</text>
+              <text class="text-fg">{{ card.label }}</text>
             </view>
 
             <view class="flex items-center gap-1">
               <view
                 @tap="moveUp(index)"
-                class="p-1.5 rounded hover:bg-gray-200 transition-colors"
+                class="p-1.5 rounded hover:bg-line transition-colors"
                 :class="{ 'opacity-30': index === 0 }"
               >
-                <text class="i-lucide-chevron-up w-4 h-4 text-gray-500"></text>
+                <text class="i-lucide-chevron-up w-4 h-4 text-fg-muted"></text>
               </view>
               <view
                 @tap="moveDown(index)"
-                class="p-1.5 rounded hover:bg-gray-200 transition-colors"
+                class="p-1.5 rounded hover:bg-line transition-colors"
                 :class="{ 'opacity-30': index === sortableCards.length - 1 }"
               >
-                <text class="i-lucide-chevron-down w-4 h-4 text-gray-500"></text>
+                <text class="i-lucide-chevron-down w-4 h-4 text-fg-muted"></text>
               </view>
             </view>
           </view>
@@ -166,13 +171,13 @@
         <view class="flex gap-2.5 mt-5">
           <view
             @tap="resetOrder"
-            class="flex-1 py-2.5 bg-gray-100 rounded-lg text-center text-sm text-gray-600 font-medium"
+            class="flex-1 py-2.5 bg-surface-muted rounded-lg text-center text-sm text-fg-muted font-medium"
           >
             恢复默认
           </view>
           <view
             @tap="saveOrder"
-            class="flex-1 py-2.5 bg-blue-500 rounded-lg text-center text-sm text-white font-medium"
+            class="flex-1 py-2.5 bg-brand rounded-lg text-center text-sm text-white font-medium"
           >
             保存
           </view>
@@ -183,6 +188,7 @@
 </template>
 
 <script setup>
+import { useThemePage } from '../../composables/useThemePage'
 import { ref, computed, onMounted } from 'vue'
 import Taro from '@tarojs/taro'
 import TodayCourse from './components/TodayCourse.vue'
@@ -193,6 +199,8 @@ import PomodoroCard from './components/PomodoroCard.vue'
 import { useAuthStore } from '../../stores/auth'
 import { useShareAppMessage, useShareTimeline } from '@tarojs/taro'
 import { dictionaryAPI } from '../../api'
+
+const themeStore = useThemePage()
 
 const authStore = useAuthStore()
 
@@ -215,10 +223,10 @@ const wordTouchState = ref({
 
 // 默认卡片配置
 const defaultCards = [
-  { name: 'TodayCourse', label: '今日课程', iconClass: 'i-lucide-book-open text-blue-500', component: TodayCourse },
-  { name: 'NotificationCard', label: '通知公告', iconClass: 'i-lucide-bell text-orange-500', component: NotificationCard },
-  { name: 'StudyTaskCard', label: '学习任务', iconClass: 'i-lucide-clipboard-check text-green-500', component: StudyTaskCard },
-  { name: 'PomodoroCard', label: '番茄钟', iconClass: 'i-lucide-timer-reset text-red-500', component: PomodoroCard },
+  { name: 'TodayCourse', label: '今日课程', iconClass: 'i-lucide-book-open text-brand', component: TodayCourse },
+  { name: 'NotificationCard', label: '通知公告', iconClass: 'i-lucide-bell text-warning', component: NotificationCard },
+  { name: 'StudyTaskCard', label: '学习任务', iconClass: 'i-lucide-clipboard-check text-success', component: StudyTaskCard },
+  { name: 'PomodoroCard', label: '番茄钟', iconClass: 'i-lucide-timer-reset text-danger', component: PomodoroCard },
   { name: 'CountdownCard', label: '倒数日', iconClass: 'i-lucide-timer text-purple-500', component: CountdownCard }
 ]
 
