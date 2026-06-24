@@ -2,7 +2,7 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { useAuthStore } from './stores/auth'
 
-import './app.scss'
+import './app.css'
 
 const pinia = createPinia()
 
