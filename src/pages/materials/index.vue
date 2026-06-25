@@ -1,10 +1,15 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
-  <view class="h-screen bg-gray-50 flex flex-col">
+  <page-meta
+    :page-style="themeStore.pageStyle"
+    :background-color="themeStore.nativeTheme.pageBg"
+    :background-text-style="themeStore.nativeTheme.backgroundTextStyle"
+  />
+  <view class="h-screen bg-page flex flex-col text-fg" :class="[themeStore.rootClass]">
     <!-- 搜索框 -->
-    <view class="bg-white p-4 z-10 shadow-sm">
-      <view class="flex items-center bg-gray-100 rounded-lg px-3 py-2 h-10">
-        <text class="i-lucide-search text-gray-400 w-4 h-4 mr-2"></text>
+    <view class="bg-surface p-4 z-10 shadow-sm">
+      <view class="flex items-center bg-surface-muted rounded-lg px-3 py-2 h-10">
+        <text class="i-lucide-search text-fg-subtle w-4 h-4 mr-2"></text>
         <input
           v-model="searchKeywords"
           class="flex-1 bg-transparent text-sm outline-none h-full"
@@ -17,14 +22,14 @@
         <!-- 搜索/返回按钮 -->
         <view
           v-if="searchKeywords === '' && searchFocused"
-          class="text-blue-500 text-sm"
+          class="text-brand text-sm"
           @tap="exitSearchMode"
         >
           关闭
         </view>
         <view
           v-else-if="searchKeywords !== ''"
-          class="text-blue-500 text-sm"
+          class="text-brand text-sm"
           @tap="handleSearch"
         >
           搜索
@@ -36,16 +41,16 @@
     <scroll-view
       v-if="searchFocused"
       :scroll-y="true"
-      class="flex-1 bg-gray-50"
+      class="flex-1 bg-page"
     >
 
       <!-- 历史搜索 -->
-      <view class="bg-white p-4 mb-2">
+      <view class="bg-surface p-4 mb-2">
         <view class="flex items-center justify-between mb-3">
-          <text class="text-gray-800 font-medium">搜索记录</text>
+          <text class="text-fg font-medium">搜索记录</text>
           <text
             v-if="searchHistory.length"
-            class="text-xs text-gray-400 active:text-gray-600"
+            class="text-xs text-fg-subtle active:text-fg-muted"
             @tap="clearSearchHistory"
           >
             清空
@@ -56,29 +61,29 @@
           <view
             v-for="(keyword, index) in searchHistory"
             :key="index"
-            class="flex items-center text-sm px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full active:bg-gray-200"
+            class="flex items-center text-sm px-3 py-1.5 bg-surface-muted text-fg rounded-full active:bg-line"
             @tap="quickSearch(keyword)"
           >
-            <text class="i-lucide-clock w-3 h-3 mr-1.5 text-gray-400"></text>
+            <text class="i-lucide-clock w-3 h-3 mr-1.5 text-fg-subtle"></text>
             <text>{{ keyword }}</text>
           </view>
         </view>
 
         <view v-else class="text-center">
-          <text class="text-gray-400 text-sm">暂无搜索历史</text>
+          <text class="text-fg-subtle text-sm">暂无搜索历史</text>
         </view>
       </view>
 
 
       <!-- 资料热榜（带Tab切换） -->
-      <view class="bg-white mb-2">
+      <view class="bg-surface mb-2">
         <!-- Tab切换 -->
         <view class="flex">
           <view
             :class="
               hotRankType === 0
-                ? 'text-blue-500 border-b-2 border-blue-500'
-                : 'text-gray-500'
+                ? 'text-brand border-b-2 border-brand'
+                : 'text-fg-muted'
             "
             class="flex-1 text-center py-3 font-medium text-sm"
             @tap="switchHotRankType(0)"
@@ -88,8 +93,8 @@
           <view
             :class="
               hotRankType === 7
-                ? 'text-blue-500 border-b-2 border-blue-500'
-                : 'text-gray-500'
+                ? 'text-brand border-b-2 border-brand'
+                : 'text-fg-muted'
             "
             class="flex-1 text-center py-3 font-medium text-sm"
             @tap="switchHotRankType(7)"
@@ -103,23 +108,23 @@
           <view
             v-for="(item, index) in hotRankMaterials"
             :key="item.md5"
-            class="px-4 py-3 border-b border-gray-100 active:bg-gray-50"
+            class="px-4 py-3 border-b border-line active:bg-page"
             @tap="enterMaterial(item)"
           >
             <view class="flex items-start">
               <view
                 :class="[
-                  'w-6 h-6 flex items-center justify-center text-xs font-bold mr-3 flex-shrink-0',
-                  index < 3 ? 'bg-red-500 text-white rounded' : 'text-gray-400',
+                  'w-6 h-6 flex items-center justify-center text-xs font-bold mr-3 shrink-0',
+                  index < 3 ? 'bg-danger text-white rounded' : 'text-fg-subtle',
                 ]"
               >
                 {{ index + 1 }}
               </view>
               <view class="flex-1 min-w-0">
-                <text class="text-gray-800 font-medium text-sm break-all">{{
+                <text class="text-fg font-medium text-sm break-all">{{
                   item.file_name
                 }}</text>
-                <view class="flex items-center mt-1 text-xs text-gray-400">
+                <view class="flex items-center mt-1 text-xs text-fg-subtle">
                   <text class="i-lucide-trending-up w-3 h-3 mr-1"></text>
                   <text>热度 {{ hotRankType === 0 ? item.total_hotness : item.period_hotness || 0 }}</text>
                   <text class="mx-2">·</text>
@@ -129,7 +134,7 @@
                   <text
                     v-for="tag in item.tags.split(',').slice(0, 3)"
                     :key="tag"
-                    class="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded"
+                    class="text-xs px-2 py-0.5 bg-surface-muted text-fg-muted rounded"
                   >
                     {{ tag.trim() }}
                   </text>
@@ -139,13 +144,13 @@
           </view>
         </view>
         <view v-else class="text-center py-10">
-          <text class="text-gray-400 text-sm">暂无热榜数据</text>
+          <text class="text-fg-subtle text-sm">暂无热榜数据</text>
         </view>
       </view>
     </scroll-view>
 
     <!-- 面包屑 -->
-    <view v-if="!isSearchMode && !searchFocused" class="bg-white px-4 py-3 flex items-center">
+    <view v-if="!isSearchMode && !searchFocused" class="bg-surface px-4 py-3 flex items-center">
       <view class="flex-1 min-w-0 overflow-hidden">
         <scroll-view
           ref="breadcrumbScrollView"
@@ -155,18 +160,18 @@
           class="text-sm"
         >
           <view class="flex items-center space-x-2 whitespace-nowrap">
-            <text class="text-blue-500 flex-shrink-0" @tap="navigateToRoot">
+            <text class="text-brand shrink-0" @tap="navigateToRoot">
               江理一起来学
             </text>
             <template v-for="(item, index) in breadcrumb" :key="item.id">
-              <text class="text-gray-400 flex-shrink-0">/</text>
+              <text class="text-fg-subtle shrink-0">/</text>
               <text
                 :class="
                   index === breadcrumb.length - 1
-                    ? 'text-gray-800 font-medium'
-                    : 'text-blue-500'
+                    ? 'text-fg font-medium'
+                    : 'text-brand'
                 "
-                class="flex-shrink-0"
+                class="shrink-0"
                 @tap="navigateToBreadcrumb(index)"
               >
                 {{ item.name }}
@@ -176,30 +181,30 @@
         </scroll-view>
       </view>
       <view
-        class="flex items-center ml-3 px-2 py-1 rounded-md text-xs flex-shrink-0 active:bg-gray-100"
+        class="flex items-center ml-3 px-2 py-1 rounded-md text-xs shrink-0 active:bg-surface-muted"
         @tap="toggleSort"
       >
-        <text class="i-lucide-arrow-up-down w-3.5 h-3.5 mr-1 text-gray-500"></text>
-        <text class="text-gray-600">{{ sortBy === 'hotness' ? '热度' : '时间' }}</text>
+        <text class="i-lucide-arrow-up-down w-3.5 h-3.5 mr-1 text-fg-muted"></text>
+        <text class="text-fg-muted">{{ sortBy === 'hotness' ? '热度' : '时间' }}</text>
       </view>
     </view>
 
     <!-- 搜索结果提示 -->
     <view
       v-if="isSearchMode && !searchFocused"
-      class="bg-white px-4 py-3"
+      class="bg-surface px-4 py-3"
     >
-      <text class="text-sm text-gray-600">
+      <text class="text-sm text-fg-muted">
         搜索 "{{ currentSearchKeywords }}" 的结果 (共 {{ searchTotal }} 条)
       </text>
-      <text class="text-blue-500 text-sm ml-4" @tap="clearSearch"
+      <text class="text-brand text-sm ml-4" @tap="clearSearch"
         >清除搜索</text
       >
     </view>
 
     <!-- 加载状态 -->
     <view v-if="loading && !searchFocused" class="flex justify-center items-center py-20">
-      <text class="text-gray-400">加载中...</text>
+      <text class="text-fg-subtle">加载中...</text>
     </view>
 
     <!-- 内容区域 -->
@@ -214,21 +219,21 @@
       <view
         v-for="category in categories"
         :key="category.id"
-        class="bg-white p-4 active:bg-gray-50"
+        class="bg-surface p-4 active:bg-page"
         @tap="enterCategory(category)"
       >
         <view class="flex items-center justify-between gap-3">
           <view class="flex items-center gap-3 flex-1 min-w-0">
             <view
-              class="w-6 h-6 bg-gradient-to-br from-orange-300 to-orange-400 rounded flex items-center justify-center flex-shrink-0"
+              class="w-6 h-6 bg-gradient-to-br from-orange-300 to-orange-400 rounded flex items-center justify-center shrink-0"
             >
               <text class="i-lucide-folder text-white w-4 h-4"></text>
             </view>
             <view class="flex-1 min-w-0">
-              <text class="text-gray-800 font-medium line-clamp-2 break-all">{{ category.name }}</text>
+              <text class="text-fg font-medium line-clamp-2 break-all">{{ category.name }}</text>
             </view>
           </view>
-          <text class="i-lucide-chevron-right text-gray-400 w-5 h-5 flex-shrink-0"></text>
+          <text class="i-lucide-chevron-right text-fg-subtle w-5 h-5 shrink-0"></text>
         </view>
       </view>
 
@@ -236,18 +241,18 @@
       <view
         v-for="material in materials"
         :key="material.md5"
-        class="bg-white p-4 active:bg-gray-50"
+        class="bg-surface p-4 active:bg-page"
         @tap="enterMaterial(material)"
       >
         <view class="flex items-start space-x-3">
           <view
-            class="w-6 h-6 bg-gradient-to-br from-green-400 to-green-600 rounded flex items-center justify-center flex-shrink-0"
+            class="w-6 h-6 bg-gradient-to-br from-green-400 to-green-600 rounded flex items-center justify-center shrink-0"
           >
             <text class="i-lucide-file-text text-white w-4 h-4"></text>
           </view>
           <view class="flex-1 min-w-0">
             <view class="flex items-start justify-between">
-              <text class="text-gray-800 font-medium break-all">
+              <text class="text-fg font-medium break-all">
                 {{ material.file_name }}
               </text>
             </view>
@@ -255,13 +260,13 @@
               <text
                 v-for="tag in material.tags.split(',')"
                 :key="tag"
-                class="text-xs px-2 py-0.5 bg-orange-500 text-white rounded"
+                class="text-xs px-2 py-0.5 bg-warning text-white rounded"
               >
                 {{ tag.trim() }}
               </text>
             </view>
             <view
-              class="flex items-center space-x-3 mt-2 text-xs text-gray-400"
+              class="flex items-center space-x-3 mt-2 text-xs text-fg-subtle"
             >
               <text>{{ formatFileSize(material.file_size) }}</text>
             </view>
@@ -275,9 +280,9 @@
         class="text-center py-20"
       >
         <text
-          class="i-lucide-inbox text-gray-300 w-16 h-16 block mx-auto mb-2"
+          class="i-lucide-inbox text-fg-subtle w-16 h-16 block mx-auto mb-2"
         ></text>
-        <text class="text-gray-400 text-sm">暂无内容</text>
+        <text class="text-fg-subtle text-sm">暂无内容</text>
       </view>
 
       <!-- 加载更多 -->
@@ -285,7 +290,7 @@
         v-if="loadingMore"
         class="text-center py-4"
       >
-        <text class="text-gray-500 text-sm">加载更多...</text>
+        <text class="text-fg-muted text-sm">加载更多...</text>
       </view>
 
       <!-- 没有更多数据 -->
@@ -293,17 +298,20 @@
         v-else-if="!hasMore && materials.length > 0"
         class="text-center py-4"
       >
-        <text class="text-gray-400 text-sm">没有更多数据了</text>
+        <text class="text-fg-subtle text-sm">没有更多数据了</text>
       </view>
     </scroll-view>
   </view>
 </template>
 
 <script setup>
+import { useThemePage } from '../../composables/useThemePage'
 import { ref, onMounted, onUnmounted, nextTick } from "vue";
 import Taro from "@tarojs/taro";
 import { materialAPI } from "../../api";
 import { useAuthStore } from "../../stores/auth";
+
+const themeStore = useThemePage()
 
 const authStore = useAuthStore();
 

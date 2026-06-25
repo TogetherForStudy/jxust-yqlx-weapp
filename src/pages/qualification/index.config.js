@@ -1,6 +1,7 @@
 export default {
+  enablePageMeta: true,
   navigationBarTitleText: '考级考证',
-  backgroundColor: '#f8fafc',
+  backgroundColor: '@pageBgColor',
   enableShareAppMessage: true,
   enableShareTimeline: true,
 }

@@ -1,16 +1,16 @@
 <template>
-  <view class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" @tap="handleOverlayClick">
-    <view class="bg-white rounded-xl shadow-xl max-w-sm w-full max-h-[85vh] flex flex-col overflow-hidden" @tap.stop style="animation: modal-enter 0.3s ease-out;">
+  <view class="fixed inset-0 bg-overlay flex items-center justify-center z-50 p-4" @tap="handleOverlayClick">
+    <view class="bg-surface rounded-xl shadow-xl max-w-sm w-full max-h-[85vh] flex flex-col overflow-hidden" @tap.stop style="animation: modal-enter 0.3s ease-out;">
              <!-- 头部 -->
-       <view class="flex items-center justify-between px-4 py-2 border-b border-gray-200">
-         <view class="font-semibold text-gray-900 flex-1 pr-4" style="display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+       <view class="flex items-center justify-between px-4 py-2 border-b border-line">
+         <view class="font-semibold text-fg flex-1 pr-4" style="display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
            {{ course.hasMultipleCourses ? `${course.totalCourses}门课程` : course.course }}
          </view>
-         <view @tap="copyInfo" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
-           <view class="i-lucide-copy text-xl text-gray-500"></view>
+         <view @tap="copyInfo" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-muted transition-colors">
+           <view class="i-lucide-copy text-xl text-fg-muted"></view>
          </view>
-         <view @tap="$emit('close')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
-           <view class="i-lucide-x-circle text-xl text-gray-500"></view>
+         <view @tap="$emit('close')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-muted transition-colors">
+           <view class="i-lucide-x-circle text-xl text-fg-muted"></view>
          </view>
        </view>
 
@@ -24,10 +24,10 @@
              class="px-3 py-1 rounded-full text-xs border transition-colors relative"
              :class="[
                currentCourseIndex === index
-                 ? 'bg-blue-500 text-white border-blue-500'
+                 ? 'bg-brand text-white border-brand'
                  : scheduleStore.isCourseInCurrentWeek(courseItem.week)
-                   ? 'border-gray-300 text-gray-700 bg-white'
-                   : 'border-gray-200 text-gray-400 bg-gray-50'
+                   ? 'border-line text-fg bg-surface'
+                   : 'border-line text-fg-subtle bg-page'
              ]"
              @tap="currentCourseIndex = index"
            >
@@ -35,7 +35,7 @@
              <!-- 本周课程标识 -->
              <view
                v-if="scheduleStore.isCourseInCurrentWeek(courseItem.week)"
-               class="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 rounded-full"
+               class="absolute -top-1 -right-1 w-2 h-2 bg-brand rounded-full"
              ></view>
            </view>
          </view>
@@ -43,42 +43,42 @@
          <!-- 基本信息 -->
          <view class="space-y-3">
            <view class="flex flex-col">
-             <view class="text-sm font-medium text-gray-500 mb-1">时间</view>
-             <view class="text-base text-gray-900">
+             <view class="text-sm font-medium text-fg-muted mb-1">时间</view>
+             <view class="text-base text-fg">
                {{ course.dayName }} 第{{ course.period }}节
              </view>
-             <view class="text-sm text-gray-600 mt-1">{{ course.time }}</view>
+             <view class="text-sm text-fg-muted mt-1">{{ course.time }}</view>
            </view>
 
            <view class="flex flex-col">
-             <view class="text-sm font-medium text-gray-500 mb-1">课程名称</view>
-             <view class="text-base text-gray-900">{{ currentCourse.course }}</view>
+             <view class="text-sm font-medium text-fg-muted mb-1">课程名称</view>
+             <view class="text-base text-fg">{{ currentCourse.course }}</view>
            </view>
 
            <view class="flex flex-col">
-             <view class="text-sm font-medium text-gray-500 mb-1">教室</view>
-             <view class="text-base text-gray-900">{{ currentCourse.classroom }}</view>
+             <view class="text-sm font-medium text-fg-muted mb-1">教室</view>
+             <view class="text-base text-fg">{{ currentCourse.classroom }}</view>
            </view>
 
            <view class="flex flex-col">
-             <view class="text-sm font-medium text-gray-500 mb-1">教师</view>
-             <view class="text-base text-gray-900">{{ currentCourse.teacher }}</view>
+             <view class="text-sm font-medium text-fg-muted mb-1">教师</view>
+             <view class="text-base text-fg">{{ currentCourse.teacher }}</view>
            </view>
 
            <view v-if="currentCourse.class" class="flex flex-col">
-             <view class="text-sm font-medium text-gray-500 mb-1">班级</view>
-             <view class="text-base text-gray-900">{{ currentCourse.class }}</view>
+             <view class="text-sm font-medium text-fg-muted mb-1">班级</view>
+             <view class="text-base text-fg">{{ currentCourse.class }}</view>
            </view>
 
            <view class="flex flex-col">
-             <view class="text-sm font-medium text-gray-500 mb-1">上课周次</view>
+             <view class="text-sm font-medium text-fg-muted mb-1">上课周次</view>
              <view class="flex items-center justify-between">
-               <view class="text-base text-gray-900">{{ currentCourse.week }}</view>
+               <view class="text-base text-fg">{{ currentCourse.week }}</view>
                <view
                  class="px-2 py-1 rounded-full text-xs font-medium"
                  :class="scheduleStore.isCourseInCurrentWeek(currentCourse.week)
-                   ? 'bg-green-100 text-green-700'
-                   : 'bg-gray-100 text-gray-500'"
+                   ? 'bg-success-soft text-success'
+                   : 'bg-surface-muted text-fg-muted'"
                >
                  {{ scheduleStore.isCourseInCurrentWeek(currentCourse.week) ? '本周有课' : '本周无课' }}
                </view>
@@ -88,23 +88,23 @@
       </view>
 
       <!-- 底部操作按钮 -->
-      <view class="flex-shrink-0 px-4 pb-4 pt-2 border-t border-gray-100">
+      <view class="shrink-0 px-4 pb-4 pt-2 border-t border-line">
         <view class="flex gap-2">
           <view
             @tap="handleAddNew"
-            class="flex-1 bg-gray-100 text-gray-700 text-center py-3 rounded-lg active:bg-gray-200 transition-colors"
+            class="flex-1 bg-surface-muted text-fg text-center py-3 rounded-lg active:bg-line transition-colors"
           >
             新增
           </view>
           <view
             @tap="handleEdit"
-            class="flex-1 bg-blue-100 text-blue-700 text-center py-3 rounded-lg active:bg-blue-200 transition-colors"
+            class="flex-1 bg-brand-soft text-brand text-center py-3 rounded-lg active:bg-brand-soft transition-colors"
           >
             编辑
           </view>
           <view
             @tap="handleDelete"
-            class="flex-1 bg-red-100 text-red-700 text-center py-3 rounded-lg active:bg-red-200 transition-colors"
+            class="flex-1 bg-danger-soft text-danger text-center py-3 rounded-lg active:bg-danger-soft transition-colors"
           >
             删除
           </view>

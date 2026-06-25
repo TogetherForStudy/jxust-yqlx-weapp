@@ -1,13 +1,13 @@
 <template>
-  <view class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" @tap="handleOverlayClick">
-    <view class="bg-white rounded-xl shadow-xl max-w-sm w-full max-h-[85vh] flex flex-col overflow-hidden" @tap.stop style="animation: modal-enter 0.3s ease-out;">
+  <view class="fixed inset-0 bg-overlay flex items-center justify-center z-50 p-4" @tap="handleOverlayClick">
+    <view class="bg-surface rounded-xl shadow-xl max-w-sm w-full max-h-[85vh] flex flex-col overflow-hidden" @tap.stop style="animation: modal-enter 0.3s ease-out;">
       <!-- 头部 -->
-      <view class="flex items-center justify-between px-4 py-2 border-b border-gray-200">
-        <view class="font-semibold text-gray-900">
+      <view class="flex items-center justify-between px-4 py-2 border-b border-line">
+        <view class="font-semibold text-fg">
           {{ isEditMode ? '编辑课程' : '添加课程' }}
         </view>
-        <view @tap="$emit('close')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
-          <view class="i-lucide-x-circle text-xl text-gray-500"></view>
+        <view @tap="$emit('close')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-muted transition-colors">
+          <view class="i-lucide-x-circle text-xl text-fg-muted"></view>
         </view>
       </view>
 
@@ -16,18 +16,18 @@
         <view class="space-y-4">
           <!-- 时间显示（只读） -->
           <view class="flex flex-col">
-            <view class="text-sm font-medium text-gray-500 mb-2">时间</view>
-            <view class="text-base text-gray-700 bg-gray-50 px-3 py-2 rounded-lg">
+            <view class="text-sm font-medium text-fg-muted mb-2">时间</view>
+            <view class="text-base text-fg bg-page px-3 py-2 rounded-lg">
               {{ timeInfo.dayName }} 第{{ timeInfo.period }}节 ({{ timeInfo.time }})
             </view>
           </view>
 
           <!-- 课程名称 -->
           <view class="flex flex-col">
-            <view class="text-sm font-medium text-gray-500 mb-2">课程名称 *</view>
+            <view class="text-sm font-medium text-fg-muted mb-2">课程名称 *</view>
             <input
               v-model="formData.course"
-              class="border-solid border-[1px] border-gray-300 rounded-lg px-3 py-2 text-base focus:border-blue-500 focus:outline-none"
+              class="border-solid border-[1px] border-line rounded-lg px-3 py-2 text-base focus:border-brand focus:outline-none"
               placeholder="请输入课程名称"
               maxlength="50"
             />
@@ -35,10 +35,10 @@
 
           <!-- 教室 -->
           <view class="flex flex-col">
-            <view class="text-sm font-medium text-gray-500 mb-2">教室</view>
+            <view class="text-sm font-medium text-fg-muted mb-2">教室</view>
             <input
               v-model="formData.classroom"
-              class="border-solid border-[1px] border-gray-300 rounded-lg px-3 py-2 text-base focus:border-blue-500 focus:outline-none"
+              class="border-solid border-[1px] border-line rounded-lg px-3 py-2 text-base focus:border-brand focus:outline-none"
               placeholder="请输入教室"
               maxlength="30"
             />
@@ -46,10 +46,10 @@
 
           <!-- 教师 -->
           <view class="flex flex-col">
-            <view class="text-sm font-medium text-gray-500 mb-2">教师</view>
+            <view class="text-sm font-medium text-fg-muted mb-2">教师</view>
             <input
               v-model="formData.teacher"
-              class="border-solid border-[1px] border-gray-300 rounded-lg px-3 py-2 text-base focus:border-blue-500 focus:outline-none"
+              class="border-solid border-[1px] border-line rounded-lg px-3 py-2 text-base focus:border-brand focus:outline-none"
               placeholder="请输入教师姓名"
               maxlength="30"
             />
@@ -57,38 +57,38 @@
 
           <!-- 上课周次 -->
           <view class="flex flex-col">
-            <view class="text-sm font-medium text-gray-500 mb-2">上课周次 *</view>
+            <view class="text-sm font-medium text-fg-muted mb-2">上课周次 *</view>
             <input
               v-model="formData.week"
               class="border-solid border-[1px] rounded-lg px-3 py-2 text-base focus:outline-none transition-colors"
-              :class="errors.week ? 'border-red-400 focus:border-red-500' : 'border-gray-300 focus:border-blue-500'"
+              :class="errors.week ? 'border-danger focus:border-danger' : 'border-line focus:border-brand'"
               placeholder="例如：1-18周、1-8,10-18周"
               maxlength="50"
               @blur="validateWeek"
               @input="errors.week && validateWeek()"
             />
             <!-- 错误提示 -->
-            <view v-if="errors.week" class="text-xs text-red-500 mt-1">
+            <view v-if="errors.week" class="text-xs text-danger mt-1">
               {{ errors.week }}
             </view>
             <!-- 格式说明 -->
-            <view v-else class="text-xs text-gray-400 mt-1">支持格式：1-18周、1-8,10-18周、1-18单周、2-18双周</view>
+            <view v-else class="text-xs text-fg-subtle mt-1">支持格式：1-18周、1-8,10-18周、1-18单周、2-18双周</view>
           </view>
         </view>
       </view>
 
       <!-- 底部按钮 -->
-      <view class="flex-shrink-0 px-4 pb-4 pt-2 border-t border-gray-100">
+      <view class="shrink-0 px-4 pb-4 pt-2 border-t border-line">
         <view class="flex gap-2">
           <view
             @tap="handleCancel"
-            class="flex-1 bg-gray-100 text-gray-600 text-center py-3 rounded-lg active:bg-gray-200 transition-colors"
+            class="flex-1 bg-surface-muted text-fg-muted text-center py-3 rounded-lg active:bg-line transition-colors"
           >
             取消
           </view>
           <view
             @tap="handleSubmit"
-            class="flex-1 bg-blue-100 text-blue-700 text-center py-3 rounded-lg active:bg-blue-200 transition-colors"
+            class="flex-1 bg-brand-soft text-brand text-center py-3 rounded-lg active:bg-brand-soft transition-colors"
             :class="{ 'opacity-50': !canSubmit }"
           >
             {{ isEditMode ? '保存' : '添加' }}

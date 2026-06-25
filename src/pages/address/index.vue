@@ -1,20 +1,25 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
-  <scroll-view class="h-screen bg-gray-50"
+  <page-meta
+    :page-style="themeStore.pageStyle"
+    :background-color="themeStore.nativeTheme.pageBg"
+    :background-text-style="themeStore.nativeTheme.backgroundTextStyle"
+  />
+  <scroll-view class="h-screen bg-page text-fg"
   :scroll-y="true"
-  >
+   :class="[themeStore.rootClass]">
     <!-- 地址列表 -->
     <view class="p-4 space-y-4">
       <view
         v-for="(campus, index) in campusList"
         :key="index"
-        class="bg-white rounded-lg shadow-sm"
+        class="bg-surface rounded-lg shadow-sm overflow-hidden"
       >
         <!-- 校区名称 -->
-        <view class="bg-blue-50 px-4 py-3 border-b border-gray-100">
+        <view class="bg-brand-soft px-4 py-3 border-b border-line">
           <view class="flex items-center">
-            <text class="i-lucide-map-pin w-4 h-4 text-blue-500 mr-2"></text>
-            <text class="text-base font-medium text-gray-800">{{ campus.name }}</text>
+            <text class="i-lucide-map-pin w-4 h-4 text-brand mr-2"></text>
+            <text class="text-base font-medium text-fg">{{ campus.name }}</text>
           </view>
         </view>
 
@@ -23,31 +28,31 @@
           <!-- 详细地址 -->
           <view class="space-y-2">
             <view class="flex items-center justify-between">
-              <text class="text-sm text-gray-500">详细地址</text>
+              <text class="text-sm text-fg-muted">详细地址</text>
               <view
                 @tap="copyText(campus.address, '地址')"
-                class="flex items-center px-2 py-1 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+                class="flex items-center px-2 py-1 bg-surface-muted rounded-md hover:bg-line transition-colors"
               >
-                <text class="i-lucide-copy w-3 h-3 text-gray-500 mr-1"></text>
-                <text class="text-xs text-gray-600">复制</text>
+                <text class="i-lucide-copy w-3 h-3 text-fg-muted mr-1"></text>
+                <text class="text-xs text-fg-muted">复制</text>
               </view>
             </view>
-            <text class="text-gray-800 leading-relaxed">{{ campus.address }}</text>
+            <text class="text-fg leading-relaxed">{{ campus.address }}</text>
           </view>
 
           <!-- 邮编 -->
           <view class="space-y-2">
             <view class="flex items-center justify-between">
-              <text class="text-sm text-gray-500">邮编</text>
+              <text class="text-sm text-fg-muted">邮编</text>
               <view
                 @tap="copyText(campus.zipCode, '邮编')"
-                class="flex items-center px-2 py-1 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+                class="flex items-center px-2 py-1 bg-surface-muted rounded-md hover:bg-line transition-colors"
               >
-                <text class="i-lucide-copy w-3 h-3 text-gray-500 mr-1"></text>
-                <text class="text-xs text-gray-600">复制</text>
+                <text class="i-lucide-copy w-3 h-3 text-fg-muted mr-1"></text>
+                <text class="text-xs text-fg-muted">复制</text>
               </view>
             </view>
-            <text class="text-gray-800 font-mono text-lg">{{ campus.zipCode }}</text>
+            <text class="text-fg font-mono text-lg">{{ campus.zipCode }}</text>
           </view>
         </view>
       </view>
@@ -57,8 +62,11 @@
 </template>
 
 <script setup>
+import { useThemePage } from '../../composables/useThemePage'
 import { ref } from "vue";
 import Taro from "@tarojs/taro";
+
+const themeStore = useThemePage()
 
 // 校区地址数据
 const campusList = ref([

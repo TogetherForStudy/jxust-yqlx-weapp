@@ -1,6 +1,7 @@
 export default {
+  enablePageMeta: true,
   navigationBarTitleText: '江理一起来学',
-  backgroundColor: '#f5f5f5',
+  backgroundColor: '@pageBgColor',
   enableShareAppMessage: true,
   enableShareTimeline: true
 }

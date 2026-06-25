@@ -1,10 +1,15 @@
 <template>
-  <view class="min-h-screen flex flex-col">
+  <page-meta
+    :page-style="themeStore.pageStyle"
+    :background-color="themeStore.nativeTheme.pageBg"
+    :background-text-style="themeStore.nativeTheme.backgroundTextStyle"
+  />
+  <view class="min-h-screen flex flex-col bg-page text-fg" :class="[themeStore.rootClass]">
     <!-- 主要内容 -->
     <view class="flex-1 flex flex-col">
       <!-- Logo和标题 -->
       <view class="flex flex-col items-center mb-8 mt-24">
-        <image :src="LogoJPG" class="w-[539px] h-[155px]" mode="aspectFit"></image>
+        <image :src="logoSrc" class="w-[539px] h-[155px]" mode="aspectFit"></image>
       </view>
 
       <!-- 登录按钮 -->
@@ -12,7 +17,7 @@
           class="mx-10 py-3 px-4 rounded-xl transition-all duration-200 text-center"
           :class="[
             isLoading ? 'opacity-50' : '',
-            canLogin ? 'bg-blue-500 text-white active:scale-95' : 'bg-gray-300 text-gray-500'
+            canLogin ? 'bg-brand text-white active:scale-95' : 'bg-line text-fg-muted'
           ]"
           @tap="handleWechatLogin"
         >
@@ -26,20 +31,20 @@
 
         <view class="flex items-center justify-center my-6">
           <view
-            class="flex-shrink-0 w-5 h-5 border-2 rounded flex items-center justify-center mr-2"
-            :class="isTermsAgreed ? 'bg-blue-500 border-blue-500' : 'border-gray-300'"
+            class="shrink-0 w-5 h-5 border-2 rounded flex items-center justify-center mr-2"
+            :class="isTermsAgreed ? 'bg-brand border-brand' : 'border-line'"
             @tap="toggleTermsAgreement"
           >
             <text v-if="isTermsAgreed" class="text-white text-xs">✓</text>
           </view>
           <view class="flex">
-            <text class="text-sm text-gray-600">
+            <text class="text-sm text-fg-muted">
               我已阅读并同意《
             </text>
-            <text @tap="goToTermsOfService" class="text-sm text-blue-500 underline underline-offset-4">
+            <text @tap="goToTermsOfService" class="text-sm text-brand underline underline-offset-4">
               用户协议与隐私政策
             </text>
-            <text class="text-sm text-gray-600">
+            <text class="text-sm text-fg-muted">
               》
             </text>
           </view>
@@ -47,25 +52,31 @@
 
       <!-- 版权信息 -->
       <view class="text-center pb-6">
-        <text class="text-xs text-gray-400">© 2026 江理一起来学 版权所有</text>
+        <text class="text-xs text-fg-subtle">© 2026 江理一起来学 版权所有</text>
       </view>
     </view>
 
     <!-- 加载提示 -->
-    <view v-if="isLoading" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <view class="bg-white rounded-lg p-6 flex flex-col items-center">
-        <view class="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></view>
-        <text class="text-gray-700">正在登录...</text>
+    <view v-if="isLoading" class="fixed inset-0 bg-overlay flex items-center justify-center z-50">
+      <view class="bg-surface rounded-lg p-6 flex flex-col items-center">
+        <view class="w-8 h-8 border-4 border-brand border-t-transparent rounded-full animate-spin mb-4"></view>
+        <text class="text-fg">正在登录...</text>
       </view>
     </view>
   </view>
 </template>
 
 <script setup>
+import { useThemePage } from '../../composables/useThemePage'
 import { ref, computed } from 'vue'
 import { useAuthStore } from '../../stores/auth'
 import Taro from '@tarojs/taro'
-import LogoJPG from './logo.jpg'
+import LogoLight from './logolight.png'
+import LogoDark from './logodark.png'
+
+const themeStore = useThemePage()
+
+const logoSrc = computed(() => themeStore.isDark ? LogoDark : LogoLight)
 
 const authStore = useAuthStore()
 const isLoading = ref(false)

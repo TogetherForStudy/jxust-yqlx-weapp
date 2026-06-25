@@ -3,9 +3,9 @@
     <!-- 头部标题 -->
     <view class="pt-8 pb-8">
       <view class="absolute left-0 top-0 z-10 flex flex-col">
-          <text class="font-serif text-white text-opacity-20 text-4xl font-bold">TOGETHER FOR</text>
-          <text class="font-serif text-white text-opacity-20 text-4xl font-bold">STUDY</text>
-          <text class="font-serif text-white text-opacity-20 text-4xl font-bold">HERO</text>
+          <text class="font-serif text-white/20 text-4xl font-bold">TOGETHER FOR</text>
+          <text class="font-serif text-white/20 text-4xl font-bold">STUDY</text>
+          <text class="font-serif text-white/20 text-4xl font-bold">HERO</text>
       </view>
       <text class="block text-2xl font-normal mb-2 text-center">江理一起来学</text>
       <text class="block text-3xl font-bold text-center">英雄榜</text>
@@ -20,7 +20,7 @@
 
     <!-- 加载状态 -->
     <view v-if="loading" class="flex flex-col items-center py-20">
-      <view class="w-15 h-15 mb-5 rounded-full border-2 border-[#fff5d3] border-opacity-30 border-t-[#fff5d3] animate-spin"></view>
+      <view class="w-15 h-15 mb-5 rounded-full border-2 border-[#fff5d3]/30 border-t-[#fff5d3] animate-spin"></view>
       <text class="text-[#fff5d3] text-sm opacity-80">正在加载英雄名单...</text>
     </view>
 
@@ -30,7 +30,7 @@
         <view
           v-for="(hero, index) in heroes"
           :key="index"
-          class="border border-[#fff5d3] border-opacity-30 p-1 text-center"
+          class="border border-[#fff5d3]/30 p-1 text-center"
         >
           <text class="text-sm text-[#fff5d3]">{{ hero }}</text>
         </view>

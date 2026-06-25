@@ -1,19 +1,24 @@
 <template>
-  <view class="min-h-screen bg-gray-50 p-4">
+  <page-meta
+    :page-style="themeStore.pageStyle"
+    :background-color="themeStore.nativeTheme.pageBg"
+    :background-text-style="themeStore.nativeTheme.backgroundTextStyle"
+  />
+  <view class="min-h-screen bg-page p-4 text-fg" :class="[themeStore.rootClass]">
     <!-- 加载状态 -->
     <view v-if="loading" class="flex items-center justify-center mt-20">
       <view class="text-center">
-        <text class="text-gray-600">正在加载图片...</text>
+        <text class="text-fg-muted">正在加载图片...</text>
       </view>
     </view>
 
     <!-- 错误状态 -->
     <view v-else-if="error" class="flex items-center justify-center mt-20">
       <view class="text-center">
-        <text class="text-red-500 mb-2 block">{{ error }}</text>
+        <text class="text-danger mb-2 block">{{ error }}</text>
         <button
           @tap="loadImage"
-          class="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm"
+          class="bg-brand text-white px-4 py-2 rounded-lg text-sm"
         >
           重新加载
         </button>
@@ -31,24 +36,27 @@
           @load="onImageLoad"
           @tap="previewImage"
         />
-        <text class="text-xs text-gray-500 text-center mt-2 block">点击图片预览</text>
+        <text class="text-xs text-fg-muted text-center mt-2 block">点击图片预览</text>
       </view>
     </view>
 
     <!-- 无数据状态 -->
     <view v-else class="flex items-center justify-center mt-20">
       <view class="text-center">
-        <text class="text-gray-600">暂无图片数据</text>
+        <text class="text-fg-muted">暂无图片数据</text>
       </view>
     </view>
   </view>
 </template>
 
 <script setup>
+import { useThemePage } from '../../composables/useThemePage'
 import { ref, onMounted } from 'vue'
 import Taro from '@tarojs/taro'
 import { configAPI } from '../../api/index.js'
 import { getSignedImageUrl } from '../../utils/index.js'
+
+const themeStore = useThemePage()
 
 const loading = ref(true)
 const error = ref('')

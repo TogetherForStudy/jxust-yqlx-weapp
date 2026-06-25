@@ -1,39 +1,44 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
-  <view class="h-screen bg-gray-50 flex flex-col">
-    <view class="px-4 pt-4 flex-shrink-0">
+  <page-meta
+    :page-style="themeStore.pageStyle"
+    :background-color="themeStore.nativeTheme.pageBg"
+    :background-text-style="themeStore.nativeTheme.backgroundTextStyle"
+  />
+  <view class="h-screen bg-page flex flex-col text-fg" :class="[themeStore.rootClass]">
+    <view class="px-4 pt-4 shrink-0">
       <!-- 绩点结果显示区域 -->
-      <view class="bg-white rounded-xl shadow-sm px-6 py-3 mb-4">
+      <view class="bg-surface rounded-xl shadow-sm px-6 py-3 mb-4">
         <view class="text-center">
           <view class="grid grid-cols-3 gap-4">
             <!-- 五分制 -->
             <view class="flex flex-col items-center">
-              <text class="text-gray-400 text-xs mb-1">五分制</text>
+              <text class="text-fg-subtle text-xs mb-1">五分制</text>
               <text class="text-2xl font-bold" :user-select="true">
                 {{ gpaResults.fivePoint.toFixed(2) }}
               </text>
             </view>
             <!-- 百分制 -->
             <view class="flex flex-col items-center">
-              <text class="text-gray-400 text-xs mb-1">百分制</text>
-              <text class="text-2xl font-bold text-blue-600" :user-select="true">
+              <text class="text-fg-subtle text-xs mb-1">百分制</text>
+              <text class="text-2xl font-bold text-brand" :user-select="true">
                 {{ gpaResults.percentage.toFixed(2) }}
               </text>
             </view>
             <!-- 四分制 -->
             <view class="flex flex-col items-center">
-              <text class="text-gray-400 text-xs mb-1">四分制</text>
+              <text class="text-fg-subtle text-xs mb-1">四分制</text>
               <text class="text-2xl font-bold" :user-select="true">
                 {{ gpaResults.fourPoint.toFixed(2) }}
               </text>
             </view>
           </view>
           <!-- 总学分显示 -->
-          <view class="mt-2 pt-2 border-t border-gray-100">
-            <text class="text-gray-500 text-xs">总学分：</text>
-            <text class="text-blue-600 text-sm font-medium">{{ totalSelectedCredits.toFixed(1) }}</text>
-            <text class="text-gray-400 text-xs"> / </text>
-            <text class="text-gray-600 text-sm font-medium">{{ totalCredits.toFixed(1) }}</text>
+          <view class="mt-2 pt-2 border-t border-line">
+            <text class="text-fg-muted text-xs">总学分：</text>
+            <text class="text-brand text-sm font-medium">{{ totalSelectedCredits.toFixed(1) }}</text>
+            <text class="text-fg-subtle text-xs"> / </text>
+            <text class="text-fg-muted text-sm font-medium">{{ totalCredits.toFixed(1) }}</text>
           </view>
         </view>
       </view>
@@ -43,7 +48,7 @@
         <!-- 反向计算 -->
         <view
           @tap="openReverseCalcModal"
-          class="bg-blue-400 rounded-xl p-2 active:opacity-90 transition-opacity"
+          class="bg-brand rounded-xl p-2 active:opacity-90 transition-opacity"
         >
           <view class="flex flex-col items-center justify-center">
             <text class="i-lucide-calculator w-5 h-5 text-white mb-1"></text>
@@ -54,7 +59,7 @@
         <!-- 保研均分 -->
         <view
           @tap="openGraduateModal"
-          class="bg-blue-400 rounded-xl p-2 active:opacity-90 transition-opacity"
+          class="bg-brand rounded-xl p-2 active:opacity-90 transition-opacity"
         >
           <view class="flex flex-col items-center justify-center">
             <text class="i-lucide-graduation-cap w-5 h-5 text-white mb-1"></text>
@@ -65,7 +70,7 @@
         <!-- 添加课程 -->
         <view
           @tap="openAddModal"
-          class="bg-blue-400 rounded-xl p-2 active:opacity-90 transition-opacity"
+          class="bg-brand rounded-xl p-2 active:opacity-90 transition-opacity"
         >
           <view class="flex flex-col items-center justify-center">
             <text class="i-lucide-plus w-5 h-5 text-white mb-1"></text>
@@ -76,7 +81,7 @@
         <!-- 备份恢复 -->
         <view
           @tap="openBackupModal"
-          class="bg-blue-400 rounded-xl p-2 active:opacity-90 transition-opacity"
+          class="bg-brand rounded-xl p-2 active:opacity-90 transition-opacity"
         >
           <view class="flex flex-col items-center justify-center">
             <text class="i-lucide-database w-5 h-5 text-white mb-1"></text>
@@ -87,17 +92,20 @@
 
       <view
         v-if="!isLocalDataView"
-        class="mb-4 bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 flex items-center justify-between"
+        class="mb-4 bg-surface-muted rounded-xl px-4 py-3 flex items-center justify-between"
       >
-        <view class="pr-3">
-          <text class="text-amber-700 text-sm font-medium block">
-            {{ activeBackupTitle || `云端存档 ${activeBackupId}` }}
-          </text>
-          <text class="text-amber-600 text-xs block mt-1">当前操作不会影响本地数据</text>
+        <view class="flex items-center pr-3 min-w-0">
+          <text class="i-lucide-eye text-fg-muted w-4 h-4 mr-2 shrink-0"></text>
+          <view class="min-w-0">
+            <text class="text-fg text-sm font-medium block truncate">
+              正在预览：{{ activeBackupTitle || `云端存档 ${activeBackupId}` }}
+            </text>
+            <text class="text-fg-subtle text-xs block mt-0.5">当前操作不会影响本地数据</text>
+          </view>
         </view>
         <view
           @tap="switchToLocalData"
-          class="shrink-0 bg-white text-amber-700 text-xs px-3 py-2 rounded-lg border border-amber-200 active:bg-amber-100"
+          class="shrink-0 bg-surface text-fg text-xs px-3 py-2 rounded-lg border border-line active:bg-surface-muted"
         >
           <text>切回本地</text>
         </view>
@@ -106,45 +114,45 @@
 
     <!-- 历史数据列表 -->
     <view class="px-4 flex-1 h-[1px] flex flex-col">
-      <view v-if="courses.length > 0" class="bg-white rounded-xl shadow-sm overflow-hidden flex-1 flex flex-col h-full">
-        <view class="px-4 py-3 border-b border-gray-100 flex-shrink-0 flex items-center justify-between">
+      <view v-if="courses.length > 0" class="bg-surface rounded-xl shadow-sm overflow-hidden flex-1 flex flex-col h-full">
+        <view class="px-4 py-3 border-b border-line shrink-0 flex items-center justify-between">
           <view>
-            <text class="text-gray-700 font-medium text-sm block">
+            <text class="text-fg font-medium text-sm block">
               {{ isLocalDataView ? '已添加课程' : '备份预览课程' }}
             </text>
-            <text v-if="!isLocalDataView && activeBackupUpdatedAt" class="text-gray-400 text-xs block mt-1">
+            <text v-if="!isLocalDataView && activeBackupUpdatedAt" class="text-fg-subtle text-xs block mt-1">
               更新时间：{{ activeBackupUpdatedAt }}
             </text>
           </view>
-          <view class="flex items-center flex-shrink-0">
+          <view class="flex items-center shrink-0">
             <view
               @tap="selectAll"
-              class="mx-2 active:bg-gray-100 rounded"
+              class="mx-2 active:bg-surface-muted rounded"
             >
-              <text class="text-blue-500 text-xs">全选</text>
+              <text class="text-brand text-xs">全选</text>
             </view>
             <view
               @tap="toggleAll"
-              class="mx-2 active:bg-gray-100 rounded"
+              class="mx-2 active:bg-surface-muted rounded"
             >
-              <text class="text-blue-500 text-xs">不选</text>
+              <text class="text-brand text-xs">不选</text>
             </view>
           </view>
         </view>
         <scroll-view :scroll-y="true" class="flex-1 h-[0px]">
-          <view class="divide-y divide-gray-100">
+          <view class="divide-y divide-line">
             <view
               v-for="(course, index) in courses"
               :key="`${course.courseName}-${index}`"
               class="px-4 py-3 flex items-center"
             >
               <!-- 左侧勾选框 -->
-              <view class="mr-3 flex-shrink-0" @tap.stop="toggleCourseSelection(index)">
+              <view class="mr-3 shrink-0" @tap.stop="toggleCourseSelection(index)">
                 <view
                   class="w-5 h-5 rounded border-2 flex items-center justify-center transition-colors"
                   :class="course.selected
-                    ? 'bg-blue-500 border-blue-500'
-                    : 'bg-white border-gray-300'"
+                    ? 'bg-brand border-brand'
+                    : 'bg-surface border-line'"
                 >
                   <text
                     v-if="course.selected"
@@ -155,34 +163,34 @@
 
               <!-- 课程信息 -->
               <view class="flex-1" @tap="toggleCourseSelection(index)">
-                <text class="text-gray-800 font-medium text-sm mb-1 line-clamp-1">
+                <text class="text-fg font-medium text-sm mb-1 line-clamp-1">
                   {{ course.courseName }}
                 </text>
-                <view class="flex items-center space-x-4 text-xs text-gray-500">
+                <view class="flex items-center space-x-4 text-xs text-fg-muted">
                   <text>学分: {{ course.credits }}</text>
                   <text>成绩: {{ course.score }}</text>
                 </view>
               </view>
 
               <!-- 右侧操作按钮 -->
-              <view class="flex items-center flex-shrink-0">
+              <view class="flex items-center shrink-0">
                 <view
                   @tap.stop="editCourse(index)"
                   :class="[
                     'ml-3 p-2 rounded',
-                    isLocalDataView ? 'active:bg-gray-100' : 'opacity-40'
+                    isLocalDataView ? 'active:bg-surface-muted' : 'opacity-40'
                   ]"
                 >
-                  <text class="i-lucide-edit text-blue-500 w-5 h-5"></text>
+                  <text class="i-lucide-edit text-brand w-5 h-5"></text>
                 </view>
                 <view
                   @tap.stop="removeCourse(index)"
                   :class="[
                     'ml-2 p-2 rounded',
-                    isLocalDataView ? 'active:bg-gray-100' : 'opacity-40'
+                    isLocalDataView ? 'active:bg-surface-muted' : 'opacity-40'
                   ]"
                 >
-                  <text class="i-lucide-trash-2 text-red-500 w-5 h-5"></text>
+                  <text class="i-lucide-trash-2 text-danger w-5 h-5"></text>
                 </view>
               </view>
             </view>
@@ -191,11 +199,11 @@
       </view>
 
       <!-- 空状态 -->
-      <view v-else class="bg-white rounded-xl shadow-sm p-8">
+      <view v-else class="bg-surface rounded-xl shadow-sm p-8">
         <view class="text-center">
-          <text class="i-lucide-book-open w-12 h-12 text-gray-300 block mx-auto mb-3"></text>
-          <text class="text-gray-500 text-sm block">暂无课程数据</text>
-          <text class="text-gray-400 text-xs mt-1 block">
+          <text class="i-lucide-book-open w-12 h-12 text-fg-subtle block mx-auto mb-3"></text>
+          <text class="text-fg-muted text-sm block">暂无课程数据</text>
+          <text class="text-fg-subtle text-xs mt-1 block">
             {{ isLocalDataView ? '请在上方添加课程信息' : '当前备份中没有可恢复的课程' }}
           </text>
         </view>
@@ -203,21 +211,21 @@
     </view>
 
     <!-- 底部提示 -->
-    <view class="p-4 flex-shrink-0">
-      <text class="text-gray-400 text-xs text-center block">
+    <view class="p-4 shrink-0">
+      <text class="text-fg-subtle text-xs text-center block">
         默认仅保存在本地，点击“备份恢复”后才会上传到服务器
       </text>
     </view>
 
     <!-- 添加课程弹窗 -->
-    <view v-if="showAddModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" @tap="closeAddModal">
-      <view class="bg-white rounded-xl p-6 w-full max-w-sm mx-4" @tap.stop>
-        <view class="text-gray-800 font-medium text-lg mb-4">添加课程</view>
+    <view v-if="showAddModal" class="fixed inset-0 bg-overlay flex items-center justify-center z-50" @tap="closeAddModal">
+      <view class="bg-surface rounded-xl p-6 w-full max-w-sm mx-4" @tap.stop>
+        <view class="text-fg font-medium text-lg mb-4">添加课程</view>
 
         <!-- 课程名称 -->
         <view class="mb-3">
-          <text class="text-gray-700 text-sm mb-2 block">课程名称</text>
-          <view class="flex items-center bg-gray-100 rounded-lg px-3 py-2 h-10">
+          <text class="text-fg text-sm mb-2 block">课程名称</text>
+          <view class="flex items-center bg-surface-muted rounded-lg px-3 py-2 h-10">
             <input
               v-model="currentCourse.courseName"
               placeholder="请输入课程名称"
@@ -229,8 +237,8 @@
         <!-- 学分和成绩 -->
         <view class="grid grid-cols-2 gap-3 mb-4">
           <view>
-            <text class="text-gray-700 text-sm mb-2 block">学分</text>
-            <view class="flex items-center bg-gray-100 rounded-lg px-3 py-2 h-10">
+            <text class="text-fg text-sm mb-2 block">学分</text>
+            <view class="flex items-center bg-surface-muted rounded-lg px-3 py-2 h-10">
               <input
                 v-model.number="currentCourse.credits"
                 type="digit"
@@ -240,8 +248,8 @@
             </view>
           </view>
           <view>
-            <text class="text-gray-700 text-sm mb-2 block">成绩</text>
-            <view class="flex items-center bg-gray-100 rounded-lg px-3 py-2 h-10">
+            <text class="text-fg text-sm mb-2 block">成绩</text>
+            <view class="flex items-center bg-surface-muted rounded-lg px-3 py-2 h-10">
               <input
                 v-model.number="currentCourse.score"
                 type="digit"
@@ -256,7 +264,7 @@
         <view class="flex gap-2 pt-2">
           <view
             @tap="closeAddModal"
-            class="flex-1 bg-gray-100 text-gray-600 text-center py-3 rounded-lg active:bg-gray-200 transition-colors"
+            class="flex-1 bg-surface-muted text-fg-muted text-center py-3 rounded-lg active:bg-line transition-colors"
           >
             <text class="text-sm">取消</text>
           </view>
@@ -264,7 +272,7 @@
             @tap="addCourse"
             :class="[
               'flex-1 text-center py-3 rounded-lg transition-colors',
-              canAdd ? 'bg-blue-500 text-white active:bg-blue-600' : 'bg-gray-100 text-gray-400 opacity-50'
+              canAdd ? 'bg-brand text-white active:bg-brand' : 'bg-surface-muted text-fg-subtle opacity-50'
             ]"
           >
             <text class="text-sm">添加</text>
@@ -274,21 +282,21 @@
     </view>
 
     <!-- 反向计算弹窗 -->
-    <view v-if="showReverseCalcModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" @tap="closeReverseCalcModal">
-      <view class="bg-white rounded-xl p-6 w-full max-w-sm mx-4" @tap.stop>
-        <view class="text-gray-800 font-medium text-lg mb-4">反向计算</view>
+    <view v-if="showReverseCalcModal" class="fixed inset-0 bg-overlay flex items-center justify-center z-50" @tap="closeReverseCalcModal">
+      <view class="bg-surface rounded-xl p-6 w-full max-w-sm mx-4" @tap.stop>
+        <view class="text-fg font-medium text-lg mb-4">反向计算</view>
 
         <!-- 说明文本 -->
-        <view class="bg-blue-50 rounded-lg p-3 mb-4">
-          <text class="text-blue-700 text-xs leading-relaxed">
+        <view class="bg-brand-soft rounded-lg p-3 mb-4">
+          <text class="text-brand text-xs leading-relaxed">
             输入目标绩点，计算剩余课程需要达到的平均分数
           </text>
         </view>
 
         <!-- 目标绩点 -->
         <view class="mb-3">
-          <text class="text-gray-700 text-sm mb-2 block">目标绩点（百分制）</text>
-          <view class="flex items-center bg-gray-100 rounded-lg px-3 py-2 h-10">
+          <text class="text-fg text-sm mb-2 block">目标绩点（百分制）</text>
+          <view class="flex items-center bg-surface-muted rounded-lg px-3 py-2 h-10">
             <input
               v-model.number="reverseCalc.targetGPA"
               type="digit"
@@ -300,8 +308,8 @@
 
         <!-- 剩余学分 -->
         <view class="mb-4">
-          <text class="text-gray-700 text-sm mb-2 block">剩余学分</text>
-          <view class="flex items-center bg-gray-100 rounded-lg px-3 py-2 h-10">
+          <text class="text-fg text-sm mb-2 block">剩余学分</text>
+          <view class="flex items-center bg-surface-muted rounded-lg px-3 py-2 h-10">
             <input
               v-model.number="reverseCalc.remainingCredits"
               type="digit"
@@ -314,9 +322,9 @@
         <!-- 计算结果 -->
         <view v-if="reverseCalcResult" class="bg-gradient-to-r from-blue-50 to-pink-50 rounded-lg p-4 mb-4">
           <view class="text-center">
-            <text class="text-gray-600 text-xs block mb-1">所需平均分</text>
-            <text class="text-3xl font-bold text-blue-600 block">{{ reverseCalcResult.requiredScore }}</text>
-            <text class="text-gray-500 text-xs mt-2 block">各科平均需要达到此分数以上</text>
+            <text class="text-fg-muted text-xs block mb-1">所需平均分</text>
+            <text class="text-3xl font-bold text-brand block">{{ reverseCalcResult.requiredScore }}</text>
+            <text class="text-fg-muted text-xs mt-2 block">各科平均需要达到此分数以上</text>
           </view>
         </view>
 
@@ -324,7 +332,7 @@
         <view class="flex gap-2 pt-2">
           <view
             @tap="closeReverseCalcModal"
-            class="flex-1 bg-gray-100 text-gray-600 text-center py-3 rounded-lg active:bg-gray-200 transition-colors"
+            class="flex-1 bg-surface-muted text-fg-muted text-center py-3 rounded-lg active:bg-line transition-colors"
           >
             <text class="text-sm">关闭</text>
           </view>
@@ -332,7 +340,7 @@
             @tap="calculateReverse"
             :class="[
               'flex-1 text-center py-3 rounded-lg transition-colors',
-              canReverseCalc ? 'bg-blue-500 text-white active:bg-blue-600' : 'bg-gray-100 text-gray-400 opacity-50'
+              canReverseCalc ? 'bg-brand text-white active:bg-brand' : 'bg-surface-muted text-fg-subtle opacity-50'
             ]"
           >
             <text class="text-sm">计算</text>
@@ -342,22 +350,22 @@
     </view>
 
     <!-- 保研均分查询弹窗 -->
-    <view v-if="showGraduateModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" @tap="closeGraduateModal">
-      <view class="bg-white rounded-xl p-6 w-full max-w-sm mx-4" @tap.stop>
-        <view class="text-gray-800 font-medium text-lg mb-3">保研均分查询</view>
+    <view v-if="showGraduateModal" class="fixed inset-0 bg-overlay flex items-center justify-center z-50" @tap="closeGraduateModal">
+      <view class="bg-surface rounded-xl p-6 w-full max-w-sm mx-4" @tap.stop>
+        <view class="text-fg font-medium text-lg mb-3">保研均分查询</view>
 
         <!-- 说明文本 -->
-        <view class="bg-blue-50 rounded-lg p-3 mb-3">
-          <text class="text-blue-700 text-xs leading-relaxed">
+        <view class="bg-brand-soft rounded-lg p-3 mb-3">
+          <text class="text-brand text-xs leading-relaxed">
             {{ graduateYear }}届保研各专业绩点平均及加分平均数据
           </text>
         </view>
 
         <!-- 表头 -->
-        <view class="grid grid-cols-[2fr,1fr,1fr] gap-2 pb-2 border-b border-gray-200 mb-1">
-          <text class="text-gray-600 text-xs font-medium">专业</text>
-          <text class="text-gray-600 text-xs font-medium text-center">平均绩点</text>
-          <text class="text-gray-600 text-xs font-medium text-center">平均附加</text>
+        <view class="grid grid-cols-[2fr_1fr_1fr] gap-2 pb-2 border-b border-line mb-1">
+          <text class="text-fg-muted text-xs font-medium">专业</text>
+          <text class="text-fg-muted text-xs font-medium text-center">平均绩点</text>
+          <text class="text-fg-muted text-xs font-medium text-center">平均附加</text>
         </view>
 
         <!-- 数据列表 -->
@@ -365,11 +373,11 @@
           <view
             v-for="(major, index) in graduateMajorData"
             :key="index"
-            class="grid grid-cols-[2fr,1fr,1fr] gap-2 py-2 border-b border-gray-100"
+            class="grid grid-cols-[2fr_1fr_1fr] gap-2 py-2 border-b border-line"
           >
-            <text class="text-gray-800 text-xs leading-tight">{{ major.name }}</text>
-            <text class="text-blue-600 text-xs font-medium text-center">{{ major.gpa }}</text>
-            <text class="text-gray-500 text-xs text-center">{{ major.bonus }}</text>
+            <text class="text-fg text-xs leading-tight">{{ major.name }}</text>
+            <text class="text-brand text-xs font-medium text-center">{{ major.gpa }}</text>
+            <text class="text-fg-muted text-xs text-center">{{ major.bonus }}</text>
           </view>
         </scroll-view>
 
@@ -377,7 +385,7 @@
         <view>
           <view
             @tap="closeGraduateModal"
-            class="w-full bg-gray-100 text-gray-600 text-center py-3 rounded-lg active:bg-gray-200 transition-colors"
+            class="w-full bg-surface-muted text-fg-muted text-center py-3 rounded-lg active:bg-line transition-colors"
           >
             <text class="text-sm">关闭</text>
           </view>
@@ -386,117 +394,137 @@
     </view>
 
     <!-- 备份恢复弹窗 -->
-    <view v-if="showBackupModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" @tap="closeBackupModal">
-      <view class="bg-white rounded-xl p-6 w-full max-w-sm mx-4" @tap.stop>
-        <view class="flex items-center justify-between mb-3">
+    <view v-if="showBackupModal" class="fixed inset-0 bg-overlay flex items-center justify-center z-50" @tap="closeBackupModal">
+      <view class="bg-surface rounded-xl p-6 w-full max-w-sm mx-4" @tap.stop>
+        <!-- 头部 -->
+        <view class="flex items-center justify-between mb-4">
           <view>
-            <text class="text-gray-800 font-medium text-lg block">备份恢复</text>
-            <text class="text-gray-400 text-xs block mt-1">最多可上传 6 份数据</text>
+            <text class="text-fg font-semibold text-lg block leading-tight">备份恢复</text>
+            <text class="text-fg-subtle text-xs block mt-1">数据存云端，可跨设备同步</text>
           </view>
           <view
-            @tap="loadBackupList"
-            class="text-blue-500 text-xs px-2 py-1 rounded active:bg-blue-50"
+            @tap="closeBackupModal"
+            class="w-8 h-8 rounded-full bg-surface-muted flex items-center justify-center active:bg-line"
           >
-            <text>刷新</text>
+            <text class="i-lucide-x text-fg-muted w-4 h-4"></text>
           </view>
         </view>
 
-        <view class="grid grid-cols-2 gap-3 mb-4">
+        <!-- 本地数据区 -->
+        <view class="bg-page rounded-xl p-3 mb-4">
+          <view class="flex items-center justify-between mb-3">
+            <text class="text-fg text-sm font-medium">本地数据</text>
+            <text class="text-fg-subtle text-xs">{{ localCoursesSnapshot.length }} 门课程</text>
+          </view>
           <view
             @tap="uploadCurrentLocalBackup"
             :class="[
-              'rounded-xl px-3 py-3 text-center transition-colors border',
-              canUploadLocalBackup ? 'bg-blue-500 text-white border-blue-500 active:bg-blue-600' : 'bg-gray-100 text-gray-400 border-gray-100'
+              'rounded-lg py-3 text-center transition-colors',
+              canUploadLocalBackup ? 'bg-brand active:opacity-90' : 'bg-surface-muted'
             ]"
           >
-            <text class="text-sm font-medium block">上传本地数据</text>
-            <text class="text-xs opacity-90 block mt-1">当前 {{ localCoursesSnapshot.length }} 门课程</text>
+            <text
+              class="text-sm font-medium"
+              :class="canUploadLocalBackup ? 'text-white' : 'text-fg-subtle'"
+            >备份到云端</text>
           </view>
-
           <view
+            v-if="!isLocalDataView"
             @tap="switchToLocalData"
-            :class="[
-              'rounded-xl px-3 py-3 text-center transition-colors border',
-              isLocalDataView
-                ? 'bg-gray-100 text-gray-400 border-gray-100'
-                : 'bg-white text-amber-700 border-amber-200 active:bg-amber-50'
-            ]"
+            class="mt-2 rounded-lg py-2.5 text-center border border-line active:bg-surface-muted"
           >
-            <text class="text-sm font-medium block">切回本地</text>
-            <text class="text-xs block mt-1">恢复本地展示</text>
+            <text class="text-fg text-sm font-medium">切回本地数据</text>
           </view>
         </view>
 
-        <view class="mb-2 flex items-center justify-between">
-          <text class="text-gray-700 text-sm font-medium">云端备份列表</text>
-          <text v-if="isBackupLoading" class="text-gray-400 text-xs">加载中...</text>
+        <!-- 云端备份区 -->
+        <view class="flex items-center justify-between mb-3">
+          <view class="flex items-center">
+            <text class="text-fg text-sm font-medium">云端备份</text>
+            <text class="text-fg-subtle text-xs ml-2">{{ displayedBackupList.length }} / {{ BACKUP_LIMIT }}</text>
+          </view>
+          <view
+            @tap="loadBackupList"
+            class="px-2 py-1 rounded-lg active:bg-brand-soft"
+          >
+            <text class="text-brand text-xs">{{ isBackupLoading ? '加载中' : '刷新' }}</text>
+          </view>
         </view>
 
-        <scroll-view :scroll-y="true" class="mb-4" style="max-height: 320px;">
+        <scroll-view :scroll-y="true" class="mb-4" style="max-height: 300px;">
           <view v-if="displayedBackupList.length > 0" class="space-y-3">
             <view
               v-for="backup in displayedBackupList"
               :key="backup.id"
-              class="border rounded-xl px-4 py-3"
-              :class="isActiveBackup(backup.id) ? 'border-blue-200 bg-blue-50' : 'border-gray-100 bg-gray-50'"
+              class="rounded-xl border overflow-hidden"
+              :class="isActiveBackup(backup.id) ? 'border-line bg-surface-muted' : 'border-line bg-page'"
             >
-              <view class="flex items-start justify-between gap-3">
-                <view class="flex-1 min-w-0">
-                  <text class="text-gray-800 text-sm font-medium block">
+              <!-- 信息行 -->
+              <view class="px-3 pt-3 pb-2.5">
+                <view class="flex items-center justify-between mb-1.5">
+                  <text class="text-fg text-sm font-semibold truncate flex-1 mr-2">
                     {{ backup.title || `云端存档 ${backup.id}` }}
                   </text>
-                  <text class="text-gray-500 text-xs block mt-1">
-                    更新时间：{{ formatBackupTime(backup.updated_at || backup.created_at) }}
-                  </text>
-                  <text class="text-gray-400 text-xs block mt-1">
-                    课程数：{{ getBackupCourseCount(backup) }}
-                  </text>
+                  <text
+                    v-if="isActiveBackup(backup.id)"
+                    class="shrink-0 text-fg-muted text-xs bg-surface rounded-full px-2 py-0.5"
+                  >查看中</text>
                 </view>
-                <view class="shrink-0 flex flex-col gap-2">
-                  <view
-                    @tap="handleRestoreBackup(backup.id)"
-                    class="w-8 h-8 rounded-lg flex items-center justify-center"
-                    :class="isActiveBackup(backup.id) ? 'bg-white text-blue-600 border border-blue-200' : 'bg-blue-500 text-white active:bg-blue-600'"
-                  >
-                    <text class="i-lucide-rotate-ccw w-3.5 h-3.5"></text>
-                  </view>
-                  <view
-                    @tap="deleteBackupItem(backup.id)"
-                    class="w-8 h-8 rounded-lg flex items-center justify-center bg-white text-red-500 border border-red-100 active:bg-red-50"
-                  >
-                    <text class="i-lucide-trash-2 w-3.5 h-3.5"></text>
-                  </view>
+                <text class="text-fg-muted text-xs block">
+                  {{ getBackupCourseCount(backup) }} 门课程 · {{ formatBackupTime(backup.updated_at || backup.created_at) }}
+                </text>
+              </view>
+              <!-- 操作行 -->
+              <view class="flex border-t border-line">
+                <view
+                  @tap="previewBackup(backup.id)"
+                  class="flex-1 py-2.5 text-center active:bg-surface-muted"
+                >
+                  <text class="text-brand text-xs font-medium">预览</text>
+                </view>
+                <view
+                  @tap="overwriteBackup(backup.id)"
+                  class="flex-1 py-2.5 text-center border-l border-line active:bg-surface-muted"
+                >
+                  <text class="text-brand text-xs font-medium">恢复</text>
+                </view>
+                <view
+                  @tap="deleteBackupItem(backup.id)"
+                  class="flex-1 py-2.5 text-center border-l border-line active:bg-danger-soft"
+                >
+                  <text class="text-danger text-xs font-medium">删除</text>
                 </view>
               </view>
             </view>
           </view>
 
-          <view v-else class="bg-gray-50 rounded-xl px-4 py-6 text-center">
-            <text class="text-gray-500 text-sm block">
+          <!-- 空状态 -->
+          <view v-else class="bg-page rounded-xl px-4 py-8 text-center">
+            <text class="text-fg-muted text-sm block">
               {{ isBackupListLoadFailed ? '备份加载失败' : '暂无云端备份' }}
             </text>
-            <text v-if="isBackupListLoadFailed" class="text-gray-400 text-xs block mt-1">请点击右上角刷新重试</text>
+            <text class="text-fg-subtle text-xs block mt-1">
+              {{ isBackupListLoadFailed ? '请点击上方刷新重试' : '点击上方按钮备份当前数据' }}
+            </text>
           </view>
         </scroll-view>
 
-        <view
-          @tap="closeBackupModal"
-          class="w-full bg-gray-100 text-gray-600 text-center py-3 rounded-lg active:bg-gray-200 transition-colors"
-        >
-          <text class="text-sm">关闭</text>
-        </view>
+        <!-- 底部说明 -->
+        <text class="text-fg-subtle text-xs text-center block leading-relaxed">
+          预览仅临时查看不影响本地，恢复会覆盖当前数据
+        </text>
       </view>
     </view>
 
     <!-- 编辑弹窗 -->
-    <view v-if="showEditModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" @tap="closeEditModal">
-      <view class="bg-white rounded-xl p-6 w-full max-w-sm mx-4" @tap.stop>
-        <view class="text-gray-800 font-medium text-lg mb-4">编辑课程</view>
+    <view v-if="showEditModal" class="fixed inset-0 bg-overlay flex items-center justify-center z-50" @tap="closeEditModal">
+      <view class="bg-surface rounded-xl p-6 w-full max-w-sm mx-4" @tap.stop>
+        <view class="text-fg font-medium text-lg mb-4">编辑课程</view>
 
         <!-- 课程名称 -->
         <view class="mb-3">
-          <text class="text-gray-700 text-sm mb-2 block">课程名称</text>
-          <view class="flex items-center bg-gray-100 rounded-lg px-3 py-2 h-10">
+          <text class="text-fg text-sm mb-2 block">课程名称</text>
+          <view class="flex items-center bg-surface-muted rounded-lg px-3 py-2 h-10">
             <input
               v-model="editCourseData.courseName"
               placeholder="请输入课程名称"
@@ -508,8 +536,8 @@
         <!-- 学分和成绩 -->
         <view class="grid grid-cols-2 gap-3 mb-4">
           <view>
-            <text class="text-gray-700 text-sm mb-2 block">学分</text>
-            <view class="flex items-center bg-gray-100 rounded-lg px-3 py-2 h-10">
+            <text class="text-fg text-sm mb-2 block">学分</text>
+            <view class="flex items-center bg-surface-muted rounded-lg px-3 py-2 h-10">
               <input
                 v-model.number="editCourseData.credits"
                 type="digit"
@@ -519,8 +547,8 @@
             </view>
           </view>
           <view>
-            <text class="text-gray-700 text-sm mb-2 block">成绩</text>
-            <view class="flex items-center bg-gray-100 rounded-lg px-3 py-2 h-10">
+            <text class="text-fg text-sm mb-2 block">成绩</text>
+            <view class="flex items-center bg-surface-muted rounded-lg px-3 py-2 h-10">
               <input
                 v-model.number="editCourseData.score"
                 type="digit"
@@ -535,7 +563,7 @@
         <view class="flex gap-2 pt-2">
           <view
             @tap="closeEditModal"
-            class="flex-1 bg-gray-100 text-gray-600 text-center py-3 rounded-lg active:bg-gray-200 transition-colors"
+            class="flex-1 bg-surface-muted text-fg-muted text-center py-3 rounded-lg active:bg-line transition-colors"
           >
             <text class="text-sm">取消</text>
           </view>
@@ -543,7 +571,7 @@
             @tap="saveEditCourse"
             :class="[
               'flex-1 text-center py-3 rounded-lg transition-colors',
-              canSaveEdit ? 'bg-blue-100 text-blue-700 active:bg-blue-200' : 'bg-gray-100 text-gray-400 opacity-50'
+              canSaveEdit ? 'bg-brand-soft text-brand active:bg-brand-soft' : 'bg-surface-muted text-fg-subtle opacity-50'
             ]"
           >
             <text class="text-sm">保存</text>
@@ -555,9 +583,12 @@
 </template>
 
 <script setup>
+import { useThemePage } from '../../composables/useThemePage'
 import { ref, computed, onMounted } from 'vue'
 import Taro from '@tarojs/taro'
 import { configAPI, gpaAPI } from '../../api'
+
+const themeStore = useThemePage()
 
 const STORAGE_KEY = 'gpa_calculator_courses'
 const BACKUP_LIMIT = 6
@@ -1084,25 +1115,36 @@ const uploadCurrentLocalBackup = async () => {
   }
 }
 
-const handleRestoreBackup = async (backupId) => {
+const previewBackup = async (backupId) => {
+  if (!backupId) {
+    return
+  }
+
+  await restoreBackupItem(backupId, { overwriteLocal: false })
+}
+
+const overwriteBackup = async (backupId) => {
   if (!backupId) {
     return
   }
 
   try {
-    const { tapIndex } = await Taro.showActionSheet({
-      itemList: ['仅查看，不覆盖本地', '恢复并覆盖本地']
+    const { confirm } = await Taro.showModal({
+      title: '恢复到本地',
+      content: '将用这份备份覆盖当前本地数据，覆盖后不可撤销，确定继续吗？',
+      confirmText: '覆盖',
+      confirmColor: '#ef4444'
     })
 
-    await restoreBackupItem(backupId, {
-      overwriteLocal: tapIndex === 1
-    })
-  } catch (error) {
-    if (error?.errMsg && error.errMsg.includes('cancel')) {
+    if (!confirm) {
       return
     }
-    console.error('选择恢复方式失败:', error)
+  } catch (error) {
+    console.error('确认恢复备份失败:', error)
+    return
   }
+
+  await restoreBackupItem(backupId, { overwriteLocal: true })
 }
 
 const deleteBackupItem = async (backupId) => {

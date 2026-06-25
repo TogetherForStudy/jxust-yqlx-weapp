@@ -1,6 +1,7 @@
 export default {
+  enablePageMeta: true,
   navigationBarTitleText: '英雄榜',
-  backgroundColor: '#f5f5f5',
+  backgroundColor: '@pageBgColor',
   enableShareAppMessage: true,
   enableShareTimeline: true
 }

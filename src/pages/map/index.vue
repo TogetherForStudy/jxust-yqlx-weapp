@@ -1,21 +1,26 @@
 <template>
-  <view class="min-h-screen bg-gray-50 p-4">
+  <page-meta
+    :page-style="themeStore.pageStyle"
+    :background-color="themeStore.nativeTheme.pageBg"
+    :background-text-style="themeStore.nativeTheme.backgroundTextStyle"
+  />
+  <view class="min-h-screen bg-page p-4 text-fg" :class="[themeStore.rootClass]">
 
     <!-- 手风琴式校区列表 -->
     <view class="space-y-2">
       <view
         v-for="campus in campusList"
         :key="campus.key"
-        class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
+        class="bg-surface rounded-lg shadow-sm overflow-hidden"
       >
         <!-- 校区标题栏 -->
         <view
           @tap="toggleCampus(campus)"
-          class="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors duration-200"
+          class="flex items-center justify-between p-4 hover:bg-page transition-colors duration-200"
         >
           <view class="flex items-center">
             <view>
-              <text class="text-base font-medium text-gray-800 block">{{ campus.name }}</text>
+              <text class="text-base font-medium text-fg block">{{ campus.name }}</text>
             </view>
           </view>
 
@@ -26,7 +31,7 @@
               campus.expanded ? 'rotate-180' : 'rotate-0'
             ]"
           >
-            <text class="text-gray-400 i-lucide-chevron-down"></text>
+            <text class="text-fg-subtle i-lucide-chevron-down"></text>
           </view>
         </view>
 
@@ -37,25 +42,25 @@
             campus.expanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
           ]"
         >
-          <view class="px-4 pb-4 border-t border-gray-100">
+          <view class="px-4 pb-4 border-t border-line">
 
             <!-- 加载状态 -->
             <view v-if="campus.loading" class="flex items-center justify-center py-8">
               <view class="text-center">
                 <view class="flex justify-center mb-2">
-                  <view class="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></view>
+                  <view class="w-6 h-6 border-2 border-brand border-t-transparent rounded-full animate-spin"></view>
                 </view>
-                <text class="text-sm text-gray-600">正在加载{{ campus.name }}地图...</text>
+                <text class="text-sm text-fg-muted">正在加载{{ campus.name }}地图...</text>
               </view>
             </view>
 
             <!-- 错误状态 -->
             <view v-else-if="campus.error" class="py-6">
               <view class="text-center">
-                <text class="text-red-500 text-sm mb-3 block">{{ campus.error }}</text>
+                <text class="text-danger text-sm mb-3 block">{{ campus.error }}</text>
                 <button
                   @tap="reloadCampusMap(campus)"
-                  class="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-600 transition-colors duration-200"
+                  class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:bg-brand transition-colors duration-200"
                 >
                   重新加载
                 </button>
@@ -72,29 +77,32 @@
                 @load="() => onImageLoad(campus)"
                 @tap="previewImage(campus.imageUrl)"
               />
-              <text class="text-xs text-gray-500 text-center mt-2 block">点击图片预览</text>
+              <text class="text-xs text-fg-muted text-center mt-2 block">点击图片预览</text>
             </view>
 
             <!-- 无数据状态 -->
             <view v-else class="py-6 text-center">
-              <text class="text-gray-500 text-sm">暂无地图数据</text>
+              <text class="text-fg-muted text-sm">暂无地图数据</text>
             </view>
 
           </view>
         </view>
       </view>
     </view>
-  <view class="text-xs text-gray-400 text-center mt-6 mb-2">
+  <view class="text-xs text-fg-subtle text-center mt-6 mb-2">
     地图来源：江西理工大学
   </view>
   </view>
 </template>
 
 <script setup>
+import { useThemePage } from '../../composables/useThemePage'
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import Taro from '@tarojs/taro'
 import { configAPI } from '../../api/index.js'
 import { getSignedImageUrl } from '../../utils/index.js'
+
+const themeStore = useThemePage()
 
 // 定义组件名称
 defineOptions({

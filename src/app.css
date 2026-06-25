@@ -1,0 +1,164 @@
+@import "tailwindcss";
+@config "../tailwind.config.js";
+@source "./**/*.{html,js,ts,jsx,tsx,vue,wxml,axml,ttml}";
+@source not "../node_modules";
+@source not "../dist";
+@source not "../unpackage";
+
+@custom-variant dark (.dark &);
+
+@theme inline {
+  --color-page: var(--theme-page);
+  --color-surface: var(--theme-surface);
+  --color-surface-muted: var(--theme-surface-muted);
+  --color-elevated: var(--theme-elevated);
+  --color-fg: var(--theme-fg);
+  --color-fg-muted: var(--theme-fg-muted);
+  --color-fg-subtle: var(--theme-fg-subtle);
+  --color-line: var(--theme-line);
+  --color-brand: var(--theme-brand);
+  --color-brand-soft: var(--theme-brand-soft);
+  --color-danger: var(--theme-danger);
+  --color-danger-soft: var(--theme-danger-soft);
+  --color-success: var(--theme-success);
+  --color-success-soft: var(--theme-success-soft);
+  --color-warning: var(--theme-warning);
+  --color-warning-soft: var(--theme-warning-soft);
+  --color-overlay: var(--theme-overlay);
+}
+
+/* 柔和阴影体系：覆写 Tailwind 默认 shadow token。
+   降低透明度 + 收紧偏移/模糊，阴影更贴合卡片而非漂浮；
+   用 slate-900 替代纯黑，避免发灰。卡片靠阴影区分轮廓，不用边框。 */
+@theme {
+  --shadow-xs: 0 1px 1px 0 rgb(15 23 42 / 0.03);
+  --shadow-sm: 0 1px 2px 0 rgb(15 23 42 / 0.05), 0 1px 3px 0 rgb(15 23 42 / 0.04);
+  --shadow-md: 0 2px 4px -1px rgb(15 23 42 / 0.05), 0 1px 2px -1px rgb(15 23 42 / 0.04);
+  --shadow-lg: 0 4px 8px -2px rgb(15 23 42 / 0.06), 0 2px 4px -2px rgb(15 23 42 / 0.05);
+  --shadow-xl: 0 8px 16px -4px rgb(15 23 42 / 0.08), 0 4px 6px -3px rgb(15 23 42 / 0.05);
+  --shadow-2xl: 0 12px 28px -6px rgb(15 23 42 / 0.12);
+}
+
+page {
+  --theme-page: #f7f7f8;
+  --theme-surface: #ffffff;
+  --theme-surface-muted: #efeff1;
+  --theme-elevated: #ffffff;
+  --theme-fg: #1f1f22;
+  --theme-fg-muted: #5c5c61;
+  --theme-fg-subtle: #9b9ba1;
+  --theme-line: #e6e6e9;
+  --theme-brand: #2563eb;
+  --theme-brand-soft: #e8efff;
+  --theme-danger: #e5484d;
+  --theme-danger-soft: #fdecec;
+  --theme-success: #2f9e44;
+  --theme-success-soft: #ebf6ee;
+  --theme-warning: #e8830c;
+  --theme-warning-soft: #fdf1e3;
+  --theme-overlay: rgba(0, 0, 0, 0.45);
+  --theme-skeleton-from: #efeff1;
+  --theme-skeleton-via: #e4e4e7;
+  --theme-skeleton-to: #efeff1;
+  background-color: var(--theme-page);
+  color: var(--theme-fg);
+}
+
+@media (prefers-color-scheme: dark) {
+  page {
+    --theme-page: #161618;
+    --theme-surface: #1e1e20;
+    --theme-surface-muted: #2a2a2e;
+    --theme-elevated: #252528;
+    --theme-fg: #e4e4e6;
+    --theme-fg-muted: #a1a1a6;
+    --theme-fg-subtle: #6e6e74;
+    --theme-line: #2e2e33;
+    --theme-brand: #60a5fa;
+    --theme-brand-soft: #1e335e;
+    --theme-danger: #f0666b;
+    --theme-danger-soft: #3a1e1f;
+    --theme-success: #4cba6a;
+    --theme-success-soft: #182c1d;
+    --theme-warning: #f0973c;
+    --theme-warning-soft: #382611;
+    --theme-overlay: rgba(0, 0, 0, 0.6);
+    --theme-skeleton-from: #1e1e20;
+    --theme-skeleton-via: #2a2a2e;
+    --theme-skeleton-to: #1e1e20;
+  }
+}
+
+.theme-light {
+  --theme-page: #f7f7f8;
+  --theme-surface: #ffffff;
+  --theme-surface-muted: #efeff1;
+  --theme-elevated: #ffffff;
+  --theme-fg: #1f1f22;
+  --theme-fg-muted: #5c5c61;
+  --theme-fg-subtle: #9b9ba1;
+  --theme-line: #e6e6e9;
+  --theme-brand: #2563eb;
+  --theme-brand-soft: #e8efff;
+  --theme-danger: #e5484d;
+  --theme-danger-soft: #fdecec;
+  --theme-success: #2f9e44;
+  --theme-success-soft: #ebf6ee;
+  --theme-warning: #e8830c;
+  --theme-warning-soft: #fdf1e3;
+  --theme-overlay: rgba(0, 0, 0, 0.45);
+  --theme-skeleton-from: #efeff1;
+  --theme-skeleton-via: #e4e4e7;
+  --theme-skeleton-to: #efeff1;
+}
+
+.theme-dark {
+  --theme-page: #161618;
+  --theme-surface: #1e1e20;
+  --theme-surface-muted: #2a2a2e;
+  --theme-elevated: #252528;
+  --theme-fg: #e4e4e6;
+  --theme-fg-muted: #a1a1a6;
+  --theme-fg-subtle: #6e6e74;
+  --theme-line: #2e2e33;
+  --theme-brand: #60a5fa;
+  --theme-brand-soft: #1e335e;
+  --theme-danger: #f0666b;
+  --theme-danger-soft: #3a1e1f;
+  --theme-success: #4cba6a;
+  --theme-success-soft: #182c1d;
+  --theme-warning: #f0973c;
+  --theme-warning-soft: #382611;
+  --theme-overlay: rgba(0, 0, 0, 0.6);
+  --theme-skeleton-from: #1e1e20;
+  --theme-skeleton-via: #2a2a2e;
+  --theme-skeleton-to: #1e1e20;
+}
+
+.theme-light,
+.theme-dark {
+  background-color: var(--theme-page);
+  color: var(--theme-fg);
+}
+
+.theme-dark {
+  color-scheme: dark;
+}
+
+button,
+input,
+textarea {
+  color: inherit;
+}
+
+/* 课程表网格线：淡到几乎隐于白色表格背景。放在全局而非组件 scoped，
+   因为 Taro 运行时不给节点加 scoped 的 data-v 属性，scoped 选择器匹配不到。 */
+.grid-line {
+  border-color: #f5f5f6 !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  .grid-line {
+    border-color: #19191b !important;
+  }
+}

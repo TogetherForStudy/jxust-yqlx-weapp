@@ -2,12 +2,12 @@
   <!-- 倒数日卡片 -->
   <view class="px-4">
     <view class="flex justify-between items-center mb-2">
-      <text class="text-gray-800 font-medium">倒数日</text>
+      <text class="text-fg font-medium">倒数日</text>
       <!-- 非空状态时显示在右上角 -->
       <view
         v-if="authStore.isLoggedIn && countdowns.length > 0"
         @tap="showAddModal = true"
-        class="bg-blue-500 text-white px-2 py-1 rounded-lg text-xs"
+        class="bg-brand text-white px-2 py-1 rounded-lg text-xs"
       >
         <text class="i-lucide-plus w-3 h-3 mr-1"></text>
         添加
@@ -15,27 +15,27 @@
     </view>
 
     <!-- 倒数日内容 -->
-    <view class="bg-white rounded-xl shadow-sm border border-gray-100">
+    <view class="bg-surface rounded-xl shadow-sm">
       <!-- 加载状态 -->
       <view v-if="isLoading" class="flex items-center justify-center py-8">
-        <text class="text-gray-500 text-sm">加载中...</text>
+        <text class="text-fg-muted text-sm">加载中...</text>
       </view>
 
       <!-- 未登录状态 -->
       <view v-else-if="!authStore.isLoggedIn" class="flex flex-col items-center justify-center py-8">
-        <view class="i-lucide-clock text-2xl text-gray-400 mb-2"></view>
-        <text class="text-gray-500 text-sm">纪念 · 期待</text>
+        <view class="i-lucide-clock text-2xl text-fg-subtle mb-2"></view>
+        <text class="text-fg-muted text-sm">纪念 · 期待</text>
       </view>
 
       <!-- 空状态 -->
       <view v-else-if="countdowns.length === 0" class="flex flex-col items-center justify-center py-8">
-        <view class="i-lucide-calendar text-2xl text-gray-400 mb-2"></view>
-        <text class="text-gray-500 text-sm mb-4">纪念 · 期待</text>
+        <view class="i-lucide-calendar text-2xl text-fg-subtle mb-2"></view>
+        <text class="text-fg-muted text-sm mb-4">纪念 · 期待</text>
         <!-- 空状态时显示在提示下方 -->
         <view
           v-if="authStore.isLoggedIn"
           @tap="showAddModal = true"
-          class="bg-blue-500 text-white px-2 py-1 rounded-lg text-sm font-medium flex items-center"
+          class="bg-brand text-white px-2 py-1 rounded-lg text-sm font-medium flex items-center"
         >
           <text class="i-lucide-plus w-4 h-4 mr-1"></text>
           添加倒数日
@@ -76,13 +76,13 @@
               <!-- 状态指示器 -->
               <view
                 v-if="countdown.daysLeft === 0"
-                class="absolute top-1 right-1 w-1.5 h-1.5 bg-white rounded-full animate-pulse"
+                class="absolute top-1 right-1 w-1.5 h-1.5 bg-surface rounded-full animate-pulse"
               ></view>
             </view>
 
             <!-- 卡片装饰元素 -->
-            <view class="absolute -top-2 -right-2 w-8 h-8 bg-white opacity-10 rounded-full"></view>
-            <view class="absolute -bottom-1 -left-1 w-4 h-4 bg-white opacity-10 rounded-full"></view>
+            <view class="absolute -top-2 -right-2 w-8 h-8 bg-surface opacity-10 rounded-full"></view>
+            <view class="absolute -bottom-1 -left-1 w-4 h-4 bg-surface opacity-10 rounded-full"></view>
           </view>
         </view>
 
@@ -90,7 +90,7 @@
         <view v-if="countdowns.length > 8" class="text-center mt-4">
           <view
             @tap="showAllCountdowns = !showAllCountdowns"
-            class="inline-flex items-center px-4 py-2 rounded-full bg-gray-100 text-gray-600 text-sm font-medium active:bg-gray-200 transition-colors"
+            class="inline-flex items-center px-4 py-2 rounded-full bg-surface-muted text-fg-muted text-sm font-medium active:bg-line transition-colors"
           >
             <text class="mr-1">{{ showAllCountdowns ? '收起' : `查看全部 ${countdowns.length} 个` }}</text>
             <text :class="showAllCountdowns ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'" class="w-4 h-4"></text>
@@ -102,18 +102,18 @@
     <!-- 添加倒数日弹窗 -->
     <view
       v-if="showAddModal"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-end justify-center z-50"
+      class="fixed inset-0 bg-overlay flex items-center justify-center z-50"
       @tap="hideAddModal"
     >
       <view
         @tap.stop=""
-        class="bg-white rounded-t-2xl w-full max-h-4/5 flex flex-col"
+        class="bg-surface rounded-2xl w-[90%] max-w-md mx-4 max-h-4/5 flex flex-col"
       >
         <!-- 弹窗头部 -->
-        <view class="flex justify-between items-center px-4 py-2 border-b border-gray-100">
+        <view class="flex justify-between items-center px-4 py-2 border-b border-line">
           <text class="text-lg font-semibold">添加倒数日</text>
           <view @tap="hideAddModal" class="p-1">
-            <text class="i-lucide-x w-5 h-5 text-gray-400"></text>
+            <text class="i-lucide-x w-5 h-5 text-fg-subtle"></text>
           </view>
         </view>
 
@@ -122,39 +122,39 @@
           <view class="p-4 space-y-4">
             <!-- 标题 -->
             <view class="flex flex-col gap-2">
-              <text class="text-sm font-medium text-gray-700">标题</text>
+              <text class="text-sm font-medium text-fg">标题</text>
               <input
                 v-model="newCountdown.title"
                 placeholder="请输入倒数日标题"
-                class="border-solid border-[1px] border-gray-400 rounded-lg p-2"
+                class="border-solid border-[1px] border-line rounded-lg p-2"
               />
             </view>
 
             <!-- 描述 -->
             <view class="flex flex-col gap-2">
-              <text class="text-sm font-medium text-gray-700">描述（可选）</text>
+              <text class="text-sm font-medium text-fg">描述（可选）</text>
               <textarea
                 v-model="newCountdown.description"
                 placeholder="添加一些描述信息"
-                class="border-solid border-[1px] border-gray-400 rounded-lg p-2 box-border w-full"
+                class="border-solid border-[1px] border-line rounded-lg p-2 box-border w-full"
                 maxlength="200"
               />
-              <text class="text-xs text-gray-400">{{ newCountdown.description.length }}/200</text>
+              <text class="text-xs text-fg-subtle">{{ newCountdown.description.length }}/200</text>
             </view>
 
             <!-- 目标日期 -->
             <view class="flex flex-col gap-2">
-              <text class="text-sm font-medium text-gray-700">目标日期</text>
+              <text class="text-sm font-medium text-fg">目标日期</text>
               <picker
                 mode="date"
                 :value="newCountdown.target_date"
                 @change="onDateChange"
               >
-                <view class="flex items-center justify-between border border-gray-300 rounded-lg p-3">
-                  <text :class="newCountdown.target_date ? 'text-gray-900' : 'text-gray-400'">
+                <view class="flex items-center justify-between border border-line rounded-lg p-3">
+                  <text :class="newCountdown.target_date ? 'text-fg' : 'text-fg-subtle'">
                     {{ newCountdown.target_date || '请选择日期' }}
                   </text>
-                  <text class="i-lucide-calendar w-4 h-4 text-gray-400"></text>
+                  <text class="i-lucide-calendar w-4 h-4 text-fg-subtle"></text>
                 </view>
               </picker>
             </view>
@@ -162,10 +162,10 @@
         </scroll-view>
 
         <!-- 弹窗底部 -->
-        <view class="p-4 border-t border-gray-100 flex space-x-3">
+        <view class="p-4 border-t border-line flex space-x-3">
           <view
             @tap="hideAddModal"
-            class="flex-1 py-3 px-4 bg-gray-100 text-gray-600 rounded-lg text-center font-medium"
+            class="flex-1 py-3 px-4 bg-surface-muted text-fg-muted rounded-lg text-center font-medium"
           >
             取消
           </view>
@@ -173,7 +173,7 @@
             @tap="submitCountdown"
             :class="[
               'flex-1 py-3 px-4 rounded-lg text-center text-white font-medium',
-              canSubmit ? 'bg-blue-500' : 'bg-gray-300',
+              canSubmit ? 'bg-brand' : 'bg-line',
             ]"
           >
             {{ submitting ? '提交中...' : '添加' }}
@@ -185,22 +185,22 @@
     <!-- 编辑倒数日弹窗 -->
     <view
       v-if="showEditModal && currentCountdown"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-end justify-center z-50"
+      class="fixed inset-0 bg-overlay flex items-center justify-center z-50"
       @tap="hideEditModal"
     >
       <view
         @tap.stop=""
-        class="bg-white rounded-t-2xl w-full max-h-4/5 flex flex-col"
+        class="bg-surface rounded-2xl w-[90%] max-w-md mx-4 max-h-4/5 flex flex-col"
       >
         <!-- 弹窗头部 -->
-        <view class="flex justify-between items-center px-4 py-2 border-b border-gray-100">
+        <view class="flex justify-between items-center px-4 py-2 border-b border-line">
           <text class="text-lg font-semibold">编辑倒数日</text>
           <view class="flex space-x-2">
             <view @tap="deleteCountdown" class="p-1">
               <text class="i-lucide-trash-2 w-5 h-5 text-red-400"></text>
             </view>
             <view @tap="hideEditModal" class="p-1">
-              <text class="i-lucide-x w-5 h-5 text-gray-400"></text>
+              <text class="i-lucide-x w-5 h-5 text-fg-subtle"></text>
             </view>
           </view>
         </view>
@@ -210,39 +210,39 @@
           <view class="p-4 space-y-4">
             <!-- 标题 -->
             <view class="flex flex-col gap-2">
-              <text class="text-sm font-medium text-gray-700">标题</text>
+              <text class="text-sm font-medium text-fg">标题</text>
               <input
                 v-model="editCountdown.title"
                 placeholder="请输入倒数日标题"
-                class="border-solid border-[1px] border-gray-400 rounded-lg p-2"
+                class="border-solid border-[1px] border-line rounded-lg p-2"
               />
             </view>
 
             <!-- 描述 -->
             <view class="flex flex-col gap-2">
-              <text class="text-sm font-medium text-gray-700">描述（可选）</text>
+              <text class="text-sm font-medium text-fg">描述（可选）</text>
               <textarea
                 v-model="editCountdown.description"
                 placeholder="添加一些描述信息"
-                class="border-solid border-[1px] border-gray-400 rounded-lg p-2 box-border w-full"
+                class="border-solid border-[1px] border-line rounded-lg p-2 box-border w-full"
                 maxlength="200"
               />
-              <text class="text-xs text-gray-400">{{ editCountdown.description.length }}/200</text>
+              <text class="text-xs text-fg-subtle">{{ editCountdown.description.length }}/200</text>
             </view>
 
             <!-- 目标日期 -->
             <view class="flex flex-col gap-2">
-              <text class="text-sm font-medium text-gray-700">目标日期</text>
+              <text class="text-sm font-medium text-fg">目标日期</text>
               <picker
                 mode="date"
                 :value="editCountdown.target_date"
                 @change="onEditDateChange"
               >
-                <view class="flex items-center justify-between border border-gray-300 rounded-lg p-3">
-                  <text :class="editCountdown.target_date ? 'text-gray-900' : 'text-gray-400'">
+                <view class="flex items-center justify-between border border-line rounded-lg p-3">
+                  <text :class="editCountdown.target_date ? 'text-fg' : 'text-fg-subtle'">
                     {{ editCountdown.target_date || '请选择日期' }}
                   </text>
-                  <text class="i-lucide-calendar w-4 h-4 text-gray-400"></text>
+                  <text class="i-lucide-calendar w-4 h-4 text-fg-subtle"></text>
                 </view>
               </picker>
             </view>
@@ -250,10 +250,10 @@
         </scroll-view>
 
         <!-- 弹窗底部 -->
-        <view class="p-4 border-t border-gray-100 flex space-x-3">
+        <view class="p-4 border-t border-line flex space-x-3">
           <view
             @tap="hideEditModal"
-            class="flex-1 py-3 px-4 bg-gray-100 text-gray-600 rounded-lg text-center font-medium"
+            class="flex-1 py-3 px-4 bg-surface-muted text-fg-muted rounded-lg text-center font-medium"
           >
             取消
           </view>
@@ -261,7 +261,7 @@
             @tap="updateCountdown"
             :class="[
               'flex-1 py-3 px-4 rounded-lg text-center text-white font-medium',
-              canEditSubmit ? 'bg-blue-500' : 'bg-gray-300',
+              canEditSubmit ? 'bg-brand' : 'bg-line',
             ]"
           >
             {{ submitting ? '更新中...' : '更新' }}

@@ -1,67 +1,72 @@
 <template>
-  <view class="min-h-screen bg-gray-50">
+  <page-meta
+    :page-style="themeStore.pageStyle"
+    :background-color="themeStore.nativeTheme.pageBg"
+    :background-text-style="themeStore.nativeTheme.backgroundTextStyle"
+  />
+  <view class="min-h-screen bg-page text-fg" :class="[themeStore.rootClass]">
     <!-- 功能卡片网格 -->
      <!-- 来学 -->
     <view class="p-4">
       <view class="flex justify-between items-center mb-2">
-        <text class="text-gray-800 font-medium">江理一起来学</text>
+        <text class="text-fg font-medium">江理一起来学</text>
         <text
           v-if="systemOnlineCount !== null"
-          class="text-xs text-gray-500"
+          class="text-xs text-fg-muted"
         >
           {{ systemOnlineCount }} 人与你一起来学
         </text>
       </view>
       <view class="grid grid-cols-4 gap-2">
-        <view @tap="goToNotice" class="bg-white rounded-xl p-3 shadow-sm">
+        <view @tap="goToNotice" class="bg-surface rounded-xl p-3 shadow-sm">
           <view class="flex flex-col items-center text-center">
             <view
               class="w-8 h-8 bg-gradient-to-br from-indigo-300 to-indigo-500 rounded-full flex items-center justify-center mb-2"
             >
               <text class="i-lucide-bell text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">信息海洋</text>
+            <text class="text-fg font-medium text-sm">信息海洋</text>
           </view>
         </view>
-        <view @tap="goToDatabase" class="bg-white rounded-xl p-3 shadow-sm">
+        <view @tap="goToDatabase" class="bg-surface rounded-xl p-3 shadow-sm">
           <view class="flex flex-col items-center text-center">
             <view
               class="w-8 h-8 bg-gradient-to-br from-green-300 to-green-500 rounded-full flex items-center justify-center mb-2"
             >
               <text class="i-lucide-folder-open text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">资料库</text>
+            <text class="text-fg font-medium text-sm">资料库</text>
           </view>
         </view>
-        <view @tap="goToHero" class="bg-white rounded-xl p-3 shadow-sm">
+        <view @tap="goToHero" class="bg-surface rounded-xl p-3 shadow-sm">
           <view class="flex flex-col items-center text-center">
             <view
               class="w-8 h-8 bg-gradient-to-br from-yellow-300 to-yellow-500 rounded-full flex items-center justify-center mb-2"
             >
               <text class="i-lucide-trophy text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">英雄榜</text>
+            <text class="text-fg font-medium text-sm">英雄榜</text>
           </view>
         </view>
-        <view @tap="goToGroupChat" class="bg-white rounded-xl p-3 shadow-sm">
+        <view @tap="goToGroupChat" class="bg-surface rounded-xl p-3 shadow-sm">
           <view class="flex flex-col items-center text-center">
             <view
               class="w-8 h-8 bg-gradient-to-br from-blue-300 to-blue-500 rounded-full flex items-center justify-center mb-2"
             >
               <text class="i-lucide-message-circle text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">交流群</text>
+            <text class="text-fg font-medium text-sm">交流群</text>
           </view>
         </view>
       </view>
     </view>
     <view class="p-4 pt-0">
       <view class="flex justify-between items-center mb-2">
-        <text class="text-gray-800 font-medium">学业</text>
+        <text class="text-fg font-medium">学业</text>
       </view>
       <view class="grid grid-cols-4 gap-2">
         <view
-          class="bg-white rounded-xl p-3 shadow-sm active:scale-95 transition-transform duration-200"
+          class="bg-surface rounded-xl p-3 shadow-sm active:scale-95 transition-transform duration-200"
           @tap="goToFinalReview"
         >
           <view class="flex flex-col items-center text-center">
@@ -70,12 +75,12 @@
             >
               <text class="i-lucide-list-check text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">考试复习</text>
+            <text class="text-fg font-medium text-sm">考试复习</text>
           </view>
         </view>
         <!-- 教师评价 -->
         <view
-          class="bg-white rounded-xl p-3 shadow-sm active:scale-95 transition-transform duration-200"
+          class="bg-surface rounded-xl p-3 shadow-sm active:scale-95 transition-transform duration-200"
           @tap="goToTeacherReviews"
         >
           <view class="flex flex-col items-center text-center">
@@ -84,22 +89,22 @@
             >
               <text class="i-lucide-book-open text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">选课助手</text>
+            <text class="text-fg font-medium text-sm">选课助手</text>
           </view>
         </view>
-        <view @tap="goToFailRate" class="bg-white rounded-xl p-3 shadow-sm">
+        <view @tap="goToFailRate" class="bg-surface rounded-xl p-3 shadow-sm">
           <view class="flex flex-col items-center text-center">
             <view
               class="w-8 h-8 bg-gradient-to-br from-red-300 to-red-500 rounded-full flex items-center justify-center mb-2"
             >
               <text class="i-lucide-alert-triangle text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">挂科率</text>
+            <text class="text-fg font-medium text-sm">挂科率</text>
           </view>
         </view>
         <view
           @tap="goToGraduationPaper"
-          class="bg-white rounded-xl p-3 shadow-sm"
+          class="bg-surface rounded-xl p-3 shadow-sm"
         >
           <view class="flex flex-col items-center text-center">
             <view
@@ -107,13 +112,13 @@
             >
               <text class="i-lucide-file-text text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">毕业论文</text>
+            <text class="text-fg font-medium text-sm">毕业论文</text>
           </view>
         </view>
 
         <view
           @tap="goToJw"
-          class="bg-white rounded-xl p-3 shadow-sm"
+          class="bg-surface rounded-xl p-3 shadow-sm"
         >
           <view class="flex flex-col items-center text-center">
             <view
@@ -121,12 +126,12 @@
             >
               <text class="i-lucide-bar-chart-2 text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">成绩查询</text>
+            <text class="text-fg font-medium text-sm">成绩查询</text>
           </view>
         </view>
         <view
           @tap="goToJw"
-          class="bg-white rounded-xl p-3 shadow-sm"
+          class="bg-surface rounded-xl p-3 shadow-sm"
         >
           <view class="flex flex-col items-center text-center">
             <view
@@ -134,12 +139,12 @@
             >
               <text class="i-lucide-calendar-days text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">考试安排</text>
+            <text class="text-fg font-medium text-sm">考试安排</text>
           </view>
         </view>
         <view
           @tap="goToGpaCalculator"
-          class="bg-white rounded-xl p-3 shadow-sm"
+          class="bg-surface rounded-xl p-3 shadow-sm"
         >
           <view class="flex flex-col items-center text-center">
             <view
@@ -147,13 +152,13 @@
             >
               <text class="i-lucide-award text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">绩点计算</text>
+            <text class="text-fg font-medium text-sm">绩点计算</text>
           </view>
         </view>
 
         <view
           @tap="goToGraduation"
-          class="bg-white rounded-xl p-3 shadow-sm"
+          class="bg-surface rounded-xl p-3 shadow-sm"
         >
           <view class="flex flex-col items-center text-center">
             <view
@@ -161,7 +166,7 @@
             >
               <text class="i-lucide-check-circle text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">毕业条件</text>
+            <text class="text-fg font-medium text-sm">毕业条件</text>
           </view>
         </view>
 
@@ -170,87 +175,87 @@
     <!-- 校园 -->
     <view class="p-4 pt-0">
       <view class="flex justify-between items-center mb-2">
-        <text class="text-gray-800 font-medium">校园</text>
+        <text class="text-fg font-medium">校园</text>
       </view>
       <view class="grid grid-cols-4 gap-2">
-        <view @tap="goToAchievePrint" class="bg-white rounded-xl p-3 shadow-sm">
+        <view @tap="goToAchievePrint" class="bg-surface rounded-xl p-3 shadow-sm">
           <view class="flex flex-col items-center text-center">
             <view
               class="w-8 h-8 bg-gradient-to-br from-blue-200 to-blue-400 rounded-full flex items-center justify-center mb-2"
             >
               <text class="i-lucide-file-text text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">成绩打印</text>
+            <text class="text-fg font-medium text-sm">成绩打印</text>
           </view>
         </view>
-        <view @tap="goToCalendar" class="bg-white rounded-xl p-3 shadow-sm">
+        <view @tap="goToCalendar" class="bg-surface rounded-xl p-3 shadow-sm">
           <view class="flex flex-col items-center text-center">
             <view
               class="w-8 h-8 bg-gradient-to-br from-green-200 to-green-400 rounded-full flex items-center justify-center mb-2"
             >
               <text class="i-lucide-calendar text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">校历</text>
+            <text class="text-fg font-medium text-sm">校历</text>
           </view>
         </view>
-        <view @tap="goToAddress" class="bg-white rounded-xl p-3 shadow-sm">
+        <view @tap="goToAddress" class="bg-surface rounded-xl p-3 shadow-sm">
           <view class="flex flex-col items-center text-center">
             <view
               class="w-8 h-8 bg-gradient-to-br from-yellow-200 to-yellow-400 rounded-full flex items-center justify-center mb-2"
             >
               <text class="i-lucide-truck text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">快递地址</text>
+            <text class="text-fg font-medium text-sm">快递地址</text>
           </view>
         </view>
-        <view @tap="goToMap" class="bg-white rounded-xl p-3 shadow-sm">
+        <view @tap="goToMap" class="bg-surface rounded-xl p-3 shadow-sm">
           <view class="flex flex-col items-center text-center">
             <view
               class="w-8 h-8 bg-gradient-to-br from-green-200 to-green-300 rounded-full flex items-center justify-center mb-2"
             >
               <text class="i-lucide-map text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">地图</text>
+            <text class="text-fg font-medium text-sm">地图</text>
           </view>
         </view>
-        <!-- <view @tap="goToNoticeToZLK" class="bg-white rounded-xl p-3 shadow-sm">
+        <!-- <view @tap="goToNoticeToZLK" class="bg-surface rounded-xl p-3 shadow-sm">
           <view class="flex flex-col items-center text-center">
             <view
               class="w-8 h-8 bg-gradient-to-br from-pink-200 to-pink-400 rounded-full flex items-center justify-center mb-2"
             >
               <text class="i-lucide-eye text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">视觉资源</text>
+            <text class="text-fg font-medium text-sm">视觉资源</text>
           </view>
         </view>
-        <view @tap="goToNoticeToZLK" class="bg-white rounded-xl p-3 shadow-sm">
+        <view @tap="goToNoticeToZLK" class="bg-surface rounded-xl p-3 shadow-sm">
           <view class="flex flex-col items-center text-center">
             <view
               class="w-8 h-8 bg-gradient-to-br from-purple-200 to-purple-400 rounded-full flex items-center justify-center mb-2"
             >
               <text class="i-lucide-book-open text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">学生手册</text>
+            <text class="text-fg font-medium text-sm">学生手册</text>
           </view>
         </view>
-        <view @tap="goToNoticeToZLK" class="bg-white rounded-xl p-3 shadow-sm">
+        <view @tap="goToNoticeToZLK" class="bg-surface rounded-xl p-3 shadow-sm">
           <view class="flex flex-col items-center text-center">
             <view
               class="w-8 h-8 bg-gradient-to-br from-blue-100 to-blue-300 rounded-full flex items-center justify-center mb-2"
             >
               <text class="i-lucide-image text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">校园风光</text>
+            <text class="text-fg font-medium text-sm">校园风光</text>
           </view>
         </view>
-        <view @tap="goToNoticeToZLK" class="bg-white rounded-xl p-3 shadow-sm">
+        <view @tap="goToNoticeToZLK" class="bg-surface rounded-xl p-3 shadow-sm">
           <view class="flex flex-col items-center text-center">
             <view
               class="w-8 h-8 bg-gradient-to-br from-yellow-100 to-yellow-300 rounded-full flex items-center justify-center mb-2"
             >
               <text class="i-lucide-layout-template text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">模板</text>
+            <text class="text-fg font-medium text-sm">模板</text>
           </view>
         </view> -->
       </view>
@@ -260,12 +265,12 @@
     <!-- 发展 -->
     <view class="p-4 pt-0">
       <view class="flex justify-between items-center mb-2">
-        <text class="text-gray-800 font-medium">发展</text>
+        <text class="text-fg font-medium">发展</text>
       </view>
       <view class="grid grid-cols-4 gap-2">
         <view
           @tap="goToExchange"
-          class="bg-white rounded-xl p-3 shadow-sm active:scale-95 transition-transform duration-200"
+          class="bg-surface rounded-xl p-3 shadow-sm active:scale-95 transition-transform duration-200"
         >
           <view class="flex flex-col items-center text-center">
             <view
@@ -273,12 +278,12 @@
             >
               <text class="i-lucide-globe text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">交换生</text>
+            <text class="text-fg font-medium text-sm">交换生</text>
           </view>
         </view>
         <view
           @tap="goToMajorTransfer"
-          class="bg-white rounded-xl p-3 shadow-sm active:scale-95 transition-transform duration-200"
+          class="bg-surface rounded-xl p-3 shadow-sm active:scale-95 transition-transform duration-200"
         >
           <view class="flex flex-col items-center text-center">
             <view
@@ -286,12 +291,12 @@
             >
               <text class="i-lucide-repeat text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">转专业</text>
+            <text class="text-fg font-medium text-sm">转专业</text>
           </view>
         </view>
         <view
           @tap="goToCompetition"
-          class="bg-white rounded-xl p-3 shadow-sm active:scale-95 transition-transform duration-200"
+          class="bg-surface rounded-xl p-3 shadow-sm active:scale-95 transition-transform duration-200"
         >
           <view class="flex flex-col items-center text-center">
             <view
@@ -299,12 +304,12 @@
             >
               <text class="i-lucide-trophy text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">竞赛</text>
+            <text class="text-fg font-medium text-sm">竞赛</text>
           </view>
         </view>
         <view
           @tap="goToQualification"
-          class="bg-white rounded-xl p-3 shadow-sm active:scale-95 transition-transform duration-200"
+          class="bg-surface rounded-xl p-3 shadow-sm active:scale-95 transition-transform duration-200"
         >
           <view class="flex flex-col items-center text-center">
             <view
@@ -312,12 +317,12 @@
             >
               <text class="i-lucide-badge-check text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">考级考证</text>
+            <text class="text-fg font-medium text-sm">考级考证</text>
           </view>
         </view>
         <view
           @tap="goToCoding"
-          class="bg-white rounded-xl p-3 shadow-sm opacity-60"
+          class="bg-surface rounded-xl p-3 shadow-sm opacity-60"
         >
           <view class="flex flex-col items-center text-center">
             <view
@@ -325,12 +330,12 @@
             >
               <text class="i-lucide-rocket text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">大学生涯</text>
+            <text class="text-fg font-medium text-sm">大学生涯</text>
           </view>
         </view>
         <view
           @tap="goToOrganization"
-          class="bg-white rounded-xl p-3 shadow-sm active:scale-95 transition-transform duration-200"
+          class="bg-surface rounded-xl p-3 shadow-sm active:scale-95 transition-transform duration-200"
         >
           <view class="flex flex-col items-center text-center">
             <view
@@ -338,13 +343,13 @@
             >
               <text class="i-lucide-users text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">组织</text>
+            <text class="text-fg font-medium text-sm">组织</text>
           </view>
         </view>
 
         <view
           @tap="goToCoding"
-          class="bg-white rounded-xl p-3 shadow-sm opacity-60"
+          class="bg-surface rounded-xl p-3 shadow-sm opacity-60"
         >
           <view class="flex flex-col items-center text-center">
             <view
@@ -352,12 +357,12 @@
             >
               <text class="i-lucide-scroll text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">科研</text>
+            <text class="text-fg font-medium text-sm">科研</text>
           </view>
         </view>
         <view
           @tap="goToCoding"
-          class="bg-white rounded-xl p-3 shadow-sm opacity-60"
+          class="bg-surface rounded-xl p-3 shadow-sm opacity-60"
         >
           <view class="flex flex-col items-center text-center">
             <view
@@ -365,7 +370,7 @@
             >
               <text class="i-lucide-flask-conical text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">项目</text>
+            <text class="text-fg font-medium text-sm">项目</text>
           </view>
         </view>
       </view>
@@ -374,12 +379,12 @@
     <!-- 认可
     <view class="p-4 pt-0">
       <view class="flex justify-between items-center mb-2">
-        <text class="text-gray-800 font-medium">认可</text>
+        <text class="text-fg font-medium">认可</text>
       </view>
       <view class="grid grid-cols-4 gap-2">
         <view
           @tap="goToCoding"
-          class="bg-white rounded-xl p-3 shadow-sm opacity-60"
+          class="bg-surface rounded-xl p-3 shadow-sm opacity-60"
         >
           <view class="flex flex-col items-center text-center">
             <view
@@ -387,12 +392,12 @@
             >
               <text class="i-lucide-star text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">综合测评</text>
+            <text class="text-fg font-medium text-sm">综合测评</text>
           </view>
         </view>
         <view
           @tap="goToCoding"
-          class="bg-white rounded-xl p-3 shadow-sm opacity-60"
+          class="bg-surface rounded-xl p-3 shadow-sm opacity-60"
         >
           <view class="flex flex-col items-center text-center">
             <view
@@ -400,7 +405,7 @@
             >
               <text class="i-lucide-award text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">荣誉奖励</text>
+            <text class="text-fg font-medium text-sm">荣誉奖励</text>
           </view>
         </view>
       </view>
@@ -409,22 +414,22 @@
     <!-- 未来 -->
     <view class="p-4 pt-0">
       <view class="flex justify-between items-center mb-2">
-        <text class="text-gray-800 font-medium">未来</text>
+        <text class="text-fg font-medium">未来</text>
       </view>
       <view class="grid grid-cols-4 gap-2">
-        <view @tap="goToBaoYan" class="bg-white rounded-xl p-3 shadow-sm">
+        <view @tap="goToBaoYan" class="bg-surface rounded-xl p-3 shadow-sm">
           <view class="flex flex-col items-center text-center">
             <view
               class="w-8 h-8 bg-gradient-to-br from-blue-100 to-blue-300 rounded-full flex items-center justify-center mb-2"
             >
               <text class="i-lucide-graduation-cap text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">保研</text>
+            <text class="text-fg font-medium text-sm">保研</text>
           </view>
         </view>
         <view
           @tap="goToCoding"
-          class="bg-white rounded-xl p-3 shadow-sm opacity-60"
+          class="bg-surface rounded-xl p-3 shadow-sm opacity-60"
         >
           <view class="flex flex-col items-center text-center">
             <view
@@ -432,12 +437,12 @@
             >
               <text class="i-lucide-book text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">考研</text>
+            <text class="text-fg font-medium text-sm">考研</text>
           </view>
         </view>
         <view
           @tap="goToCoding"
-          class="bg-white rounded-xl p-3 shadow-sm opacity-60"
+          class="bg-surface rounded-xl p-3 shadow-sm opacity-60"
         >
           <view class="flex flex-col items-center text-center">
             <view
@@ -445,12 +450,12 @@
             >
               <text class="i-lucide-clipboard-list text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">实习</text>
+            <text class="text-fg font-medium text-sm">实习</text>
           </view>
         </view>
         <view
           @tap="goToCoding"
-          class="bg-white rounded-xl p-3 shadow-sm opacity-60"
+          class="bg-surface rounded-xl p-3 shadow-sm opacity-60"
         >
           <view class="flex flex-col items-center text-center">
             <view
@@ -458,12 +463,12 @@
             >
               <text class="i-lucide-briefcase text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">就业</text>
+            <text class="text-fg font-medium text-sm">就业</text>
           </view>
         </view>
         <view
           @tap="goToCoding"
-          class="bg-white rounded-xl p-3 shadow-sm opacity-60"
+          class="bg-surface rounded-xl p-3 shadow-sm opacity-60"
         >
           <view class="flex flex-col items-center text-center">
             <view
@@ -471,12 +476,12 @@
             >
               <text class="i-lucide-banknote text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">考公考编</text>
+            <text class="text-fg font-medium text-sm">考公考编</text>
           </view>
         </view>
         <view
           @tap="goToCoding"
-          class="bg-white rounded-xl p-3 shadow-sm opacity-60"
+          class="bg-surface rounded-xl p-3 shadow-sm opacity-60"
         >
           <view class="flex flex-col items-center text-center">
             <view
@@ -484,7 +489,7 @@
             >
               <text class="i-lucide-globe-2 text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">出国留学</text>
+            <text class="text-fg font-medium text-sm">出国留学</text>
           </view>
         </view>
       </view>
@@ -493,12 +498,12 @@
     <!-- 生活 -->
     <!-- <view class="p-4 pt-0">
       <view class="flex justify-between items-center">
-        <text class="text-gray-800 font-medium">生活</text>
+        <text class="text-fg font-medium">生活</text>
       </view>
       <view class="grid grid-cols-4 gap-2 mb-2">
         <view
           @tap="goToCoding"
-          class="bg-white rounded-xl p-3 shadow-sm opacity-60"
+          class="bg-surface rounded-xl p-3 shadow-sm opacity-60"
         >
           <view class="flex flex-col items-center text-center">
             <view
@@ -506,12 +511,12 @@
             >
               <text class="i-lucide-bolt text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">电费查询</text>
+            <text class="text-fg font-medium text-sm">电费查询</text>
           </view>
         </view>
         <view
           @tap="goToCoding"
-          class="bg-white rounded-xl p-3 shadow-sm opacity-60"
+          class="bg-surface rounded-xl p-3 shadow-sm opacity-60"
         >
           <view class="flex flex-col items-center text-center">
             <view
@@ -519,12 +524,12 @@
             >
               <text class="i-lucide-search text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">失物招领</text>
+            <text class="text-fg font-medium text-sm">失物招领</text>
           </view>
         </view>
         <view
           @tap="goToCoding"
-          class="bg-white rounded-xl p-3 shadow-sm opacity-60"
+          class="bg-surface rounded-xl p-3 shadow-sm opacity-60"
         >
           <view class="flex flex-col items-center text-center">
             <view
@@ -532,12 +537,12 @@
             >
               <text class="i-lucide-users text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">社团空间</text>
+            <text class="text-fg font-medium text-sm">社团空间</text>
           </view>
         </view>
         <view
           @tap="goToCoding"
-          class="bg-white rounded-xl p-3 shadow-sm opacity-60"
+          class="bg-surface rounded-xl p-3 shadow-sm opacity-60"
         >
           <view class="flex flex-col items-center text-center">
             <view
@@ -545,7 +550,7 @@
             >
               <text class="i-lucide-book-user text-white w-4 h-4"></text>
             </view>
-            <text class="text-gray-800 font-medium text-sm">通讯录</text>
+            <text class="text-fg font-medium text-sm">通讯录</text>
           </view>
         </view>
       </view>
@@ -554,10 +559,13 @@
 </template>
 
 <script setup>
+import { useThemePage } from '../../composables/useThemePage'
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { useAuthStore } from "../../stores/auth";
 import Taro from "@tarojs/taro";
 import { statAPI } from "../../api";
+
+const themeStore = useThemePage()
 
 const authStore = useAuthStore();
 
@@ -600,6 +608,7 @@ onBeforeUnmount(() => {
 
 // 导航方法
 const goToTeacherReviews = () => {
+  if (!authStore.requireAuth()) return;
   Taro.navigateTo({ url: "/pages/teacher-reviews/index" });
 };
 
@@ -642,10 +651,12 @@ const goToBaoYan = () => {
 };
 
 const goToMajorTransfer = () => {
+  if (!authStore.requireAuth()) return;
   Taro.navigateTo({ url: "/pages/major-transfer/index" });
 };
 
 const goToCompetition = () => {
+  if (!authStore.requireAuth()) return;
   Taro.navigateTo({ url: "/pages/competition/index" });
 };
 
@@ -655,10 +666,12 @@ const goToOrganization = () => {
 };
 
 const goToQualification = () => {
+  if (!authStore.requireAuth()) return;
   Taro.navigateTo({ url: "/pages/qualification/index" });
 };
 
 const goToExchange = () => {
+  if (!authStore.requireAuth()) return;
   Taro.navigateTo({ url: "/pages/exchange/index" });
 };
 
@@ -705,6 +718,7 @@ const goToJw = () => {
 };
 
 const goToGpaCalculator = () => {
+  if (!authStore.requireAuth()) return;
   Taro.navigateTo({ url: "/pages/gpa-calculator/index" });
 };
 

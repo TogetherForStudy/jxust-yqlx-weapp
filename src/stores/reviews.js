@@ -55,21 +55,21 @@ export const useReviewsStore = defineStore('reviews', {
     // 获取评价态度样式类
     getAttitudeClass: () => (attitude) => {
       const classMap = {
-        [REVIEW_ATTITUDES.RECOMMEND]: 'bg-green-100 text-green-800',
-        [REVIEW_ATTITUDES.AVOID]: 'bg-red-100 text-red-800',
-        [REVIEW_ATTITUDES.NEUTRAL]: 'bg-gray-100 text-gray-800'
+        [REVIEW_ATTITUDES.RECOMMEND]: 'bg-success-soft text-success',
+        [REVIEW_ATTITUDES.AVOID]: 'bg-danger-soft text-danger',
+        [REVIEW_ATTITUDES.NEUTRAL]: 'bg-surface-muted text-fg'
       }
-      return classMap[attitude] || 'bg-gray-100 text-gray-800'
+      return classMap[attitude] || 'bg-surface-muted text-fg'
     },
 
     // 获取状态样式类
     getStatusClass: () => (status) => {
       const classMap = {
-        [REVIEW_STATUS.PENDING]: 'bg-yellow-100 text-yellow-800',
-        [REVIEW_STATUS.APPROVED]: 'bg-green-100 text-green-800',
-        [REVIEW_STATUS.REJECTED]: 'bg-red-100 text-red-800'
+        [REVIEW_STATUS.PENDING]: 'bg-warning-soft text-warning',
+        [REVIEW_STATUS.APPROVED]: 'bg-success-soft text-success',
+        [REVIEW_STATUS.REJECTED]: 'bg-danger-soft text-danger'
       }
-      return classMap[status] || 'bg-gray-100 text-gray-800'
+      return classMap[status] || 'bg-surface-muted text-fg'
     },
 
     // 获取已通过的评价

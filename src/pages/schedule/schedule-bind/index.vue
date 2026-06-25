@@ -1,48 +1,49 @@
 <template>
-  <view class="min-h-screen bg-gray-50 p-4">
+  <page-meta
+    :page-style="themeStore.pageStyle"
+    :background-color="themeStore.nativeTheme.pageBg"
+    :background-text-style="themeStore.nativeTheme.backgroundTextStyle"
+  />
+  <view class="min-h-screen bg-page p-4 text-fg" :class="[themeStore.rootClass]">
     <!-- 搜索框 -->
-    <view class="bg-white rounded-lg shadow-sm mb-4">
-      <view class="flex items-center gap-2">
-        <view class="flex-1">
-          <input v-model="searchKeyword" placeholder="请输入班级名称进行搜索"
-            class="w-full px-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-            @input="handleSearch" />
-        </view>
-        <view @tap="search" class="bg-blue-500 text-white px-4 py-2 rounded-lg">
-          搜索
-        </view>
-      </view>
+    <view class="flex items-center bg-surface-muted rounded-lg px-3 py-2 h-10 mb-4">
+      <text class="i-lucide-search text-fg-subtle w-4 h-4 mr-2 shrink-0"></text>
+      <input v-model="searchKeyword" placeholder="请输入班级名称进行搜索"
+        class="flex-1 bg-transparent text-sm outline-none h-full"
+        confirm-type="search"
+        @input="handleSearch"
+        @confirm="search" />
     </view>
 
     <!-- 搜索结果 -->
-    <view v-if="searchResults.length > 0" class="bg-white rounded-lg shadow-sm">
-      <view class="p-4 border-b border-gray-100">
-        <view class="text-sm font-medium text-gray-700">搜索结果</view>
+    <view v-if="searchResults.length > 0" class="bg-surface rounded-lg shadow-sm">
+      <view class="p-4 border-b border-line">
+        <view class="text-sm font-medium text-fg">搜索结果</view>
       </view>
 
-      <view class="divide-y divide-gray-100">
+      <view class="divide-y divide-line">
         <view v-for="classItem in searchResults" :key="classItem.class_id" class="p-4 flex items-center justify-between"
           @tap="selectClass(classItem)">
           <view class="flex-1">
-            <view class="font-medium text-gray-900">{{ classItem.class_id }}</view>
-            <view v-if="classItem.semester" class="text-sm text-gray-500 mt-1">{{ classItem.semester }}</view>
+            <view class="font-medium text-fg">{{ classItem.class_id }}</view>
+            <view v-if="classItem.semester" class="text-sm text-fg-muted mt-1">{{ classItem.semester }}</view>
           </view>
-          <view class="text-blue-500 text-sm">选择</view>
+          <view class="text-brand text-sm">选择</view>
         </view>
       </view>
 
       <!-- 分页控制 -->
-      <view v-if="totalPages > 1" class="p-4 border-t border-gray-100 flex justify-center">
+      <view v-if="totalPages > 1" class="p-4 border-t border-line flex justify-center">
         <view class="flex items-center space-x-2">
           <view @tap="previousPage" :disabled="currentPage <= 1"
-            class="px-3 py-1 text-sm bg-blue-400 text-white rounded" :class="{ 'opacity-50': currentPage <= 1 }">
+            class="px-3 py-1 text-sm bg-brand text-white rounded" :class="{ 'opacity-50': currentPage <= 1 }">
             上一页
           </view>
-          <view class="text-sm text-gray-500 px-2">
+          <view class="text-sm text-fg-muted px-2">
             {{ currentPage }} / {{ totalPages }}
           </view>
           <view @tap="nextPage" :disabled="currentPage >= totalPages"
-            class="px-3 py-1 text-sm bg-blue-400 text-white rounded"
+            class="px-3 py-1 text-sm bg-brand text-white rounded"
             :class="{ 'opacity-50': currentPage >= totalPages }">
             下一页
           </view>
@@ -52,39 +53,39 @@
 
     <!-- 空状态 -->
     <view v-if="hasSearched && searchResults.length === 0 && !isLoading"
-      class="bg-white rounded-lg shadow-sm p-8 text-center">
+      class="bg-surface rounded-lg shadow-sm p-8 text-center">
       <view class="i-lucide-search text-4xl mb-4"></view>
-      <view class="text-gray-500">没有找到相关班级</view>
-      <view class="text-sm text-gray-400 mt-2">请检查班级名称是否正确</view>
+      <view class="text-fg-muted">没有找到相关班级</view>
+      <view class="text-sm text-fg-subtle mt-2">请检查班级名称是否正确</view>
     </view>
 
     <!-- 搜索提示 -->
-    <view v-if="!hasSearched && !isLoading" class="bg-white rounded-lg shadow-sm p-8 text-center">
-      <view v-if="isOnlyUserBasic && bindCountLoaded" class="text-sm text-gray-400 mb-2">已绑定 {{ bindCount }}/2 次</view>
-      <view class="text-gray-500">请输入班级名称进行搜索</view>
-      <view class="text-sm text-gray-400 mt-2">如：25软件1班</view>
+    <view v-if="!hasSearched && !isLoading" class="bg-surface rounded-lg shadow-sm p-8 text-center">
+      <view v-if="isOnlyUserBasic && bindCountLoaded" class="text-sm text-fg-subtle mb-2">已绑定 {{ bindCount }}/2 次</view>
+      <view class="text-fg-muted">请输入班级名称进行搜索</view>
+      <view class="text-sm text-fg-subtle mt-2">如：25软件1班</view>
 
       <!-- 重置个人课表 -->
       <view v-if="authStore.userInfo?.class_id" @tap="handleResetSchedule"
-        class="mt-6 mx-auto bg-red-50 text-red-500 border border-red-200 rounded-lg px-4 py-2 text-sm inline-block">
+        class="mt-6 mx-auto bg-danger-soft text-danger border border-danger rounded-lg px-4 py-2 text-sm inline-block">
         重置课表数据
       </view>
     </view>
 
     <!-- 确认绑定弹窗 -->
-    <view v-if="selectedClass" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <view class="bg-white rounded-lg p-6 m-4 max-w-sm w-full">
-        <view class="text-lg font-semibold text-gray-900 mb-2 text-center">确认绑定班级</view>
-        <view class="text-gray-600 mb-4 text-center">
+    <view v-if="selectedClass" class="fixed inset-0 bg-overlay flex items-center justify-center z-50">
+      <view class="bg-surface rounded-lg p-6 m-4 max-w-sm w-full">
+        <view class="text-lg font-semibold text-fg mb-2 text-center">确认绑定班级</view>
+        <view class="text-fg-muted mb-4 text-center">
           班级：{{ selectedClass.class_id }}
         </view>
 
         <view class="flex space-x-3">
-          <view @tap="cancelSelect" class="flex-1 px-4 py-2 bg-gray-300 text-white rounded-lg font-medium text-center">
+          <view @tap="cancelSelect" class="flex-1 px-4 py-2 bg-line text-white rounded-lg font-medium text-center">
             取消
           </view>
           <view @tap="confirmBind" :disabled="isBinding"
-            class="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg font-medium text-center">
+            class="flex-1 px-4 py-2 bg-brand text-white rounded-lg font-medium text-center">
             {{ isBinding ? '绑定中...' : '确认绑定' }}
           </view>
         </view>
@@ -94,11 +95,14 @@
 </template>
 
 <script setup>
+import { useThemePage } from '../../../composables/useThemePage'
 import { ref, computed, onBeforeUnmount } from 'vue'
 import Taro from '@tarojs/taro'
 import { useScheduleStore } from '../../../stores/schedule'
 import { useAuthStore } from '../../../stores/auth'
 import { courseTableAPI } from '../../../api/index'
+
+const themeStore = useThemePage()
 
 defineOptions({
   name: 'ScheduleBindPage'

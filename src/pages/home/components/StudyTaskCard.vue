@@ -2,36 +2,36 @@
   <!-- 学习清单卡片 -->
   <view class="px-4">
     <view class="flex justify-between items-center mb-2">
-      <text class="text-gray-800 font-medium">学习清单</text>
+      <text class="text-fg font-medium">学习清单</text>
       <!-- 非空状态时显示在右上角 -->
       <view v-if="authStore.isLoggedIn && (stats.total_count > 0)" @tap="showAddModal = true"
-        class="bg-green-500 text-white px-2 py-1 rounded-lg text-xs">
+        class="bg-success text-white px-2 py-1 rounded-lg text-xs">
         <text class="i-lucide-plus w-3 h-3 mr-1"></text>
         添加
       </view>
     </view>
 
     <!-- 学习任务内容 -->
-    <view class="bg-white rounded-xl shadow-sm border border-gray-100">
+    <view class="bg-surface rounded-xl shadow-sm">
       <!-- 加载状态 -->
       <view v-if="isLoading" class="flex items-center justify-center py-8">
-        <text class="text-gray-500 text-sm">加载中...</text>
+        <text class="text-fg-muted text-sm">加载中...</text>
       </view>
 
       <!-- 未登录状态 -->
       <view v-else-if="!authStore.isLoggedIn" class="flex flex-col items-center justify-center py-8">
-        <view class="i-lucide-clipboard-list text-2xl text-gray-400 mb-2"></view>
-        <text class="text-gray-500 text-sm">化繁为简 · 分而治之</text>
+        <view class="i-lucide-clipboard-list text-2xl text-fg-subtle mb-2"></view>
+        <text class="text-fg-muted text-sm">化繁为简 · 分而治之</text>
       </view>
 
       <!-- 空状态 -->
       <view v-else-if="stats.total_count === 0"
         class="flex flex-col items-center justify-center py-8">
-        <view class="i-lucide-clipboard text-2xl text-gray-400 mb-2"></view>
-        <text class="text-gray-500 text-sm mb-4">化繁为简 · 分而治之</text>
+        <view class="i-lucide-clipboard text-2xl text-fg-subtle mb-2"></view>
+        <text class="text-fg-muted text-sm mb-4">化繁为简 · 分而治之</text>
         <!-- 空状态时显示在提示下方 -->
         <view v-if="authStore.isLoggedIn" @tap="showAddModal = true"
-          class="bg-green-500 text-white px-2 py-1 rounded-lg text-sm flex items-center">
+          class="bg-success text-white px-2 py-1 rounded-lg text-sm flex items-center">
           <text class="i-lucide-plus w-4 h-4 mr-1"></text>
           添加任务
         </view>
@@ -40,13 +40,13 @@
       <!-- 学习任务列表 -->
       <view v-else class="p-3">
         <!-- Tab 切换（按钮组样式） -->
-        <view class="flex gap-0 mb-3 p-1 bg-gray-100 rounded-lg">
+        <view class="flex gap-0 mb-3 p-1 bg-surface-muted rounded-lg">
           <view
             @tap="switchToCompletedTab"
             class="flex-1 text-center py-1 text-sm font-medium rounded-md transition-all"
             :class="activeTab === 'completed'
-              ? 'bg-white text-green-600 shadow-sm'
-              : 'text-gray-600'"
+              ? 'bg-surface text-success shadow-sm'
+              : 'text-fg-muted'"
           >
             已完成({{ stats.completed_count }})
           </view>
@@ -54,8 +54,8 @@
             @tap="switchToPendingTab"
             class="flex-1 text-center py-1 text-sm font-medium rounded-md transition-all"
             :class="activeTab === 'pending'
-              ? 'bg-white text-green-600 shadow-sm'
-              : 'text-gray-600'"
+              ? 'bg-surface text-success shadow-sm'
+              : 'text-fg-muted'"
           >
             待完成({{ stats.pending_count }})
           </view>
@@ -71,8 +71,8 @@
             :lower-threshold="100"
           >
             <view v-if="pendingTasks.length === 0" class="flex flex-col items-center justify-center py-8">
-              <view class="i-lucide-clipboard text-2xl text-gray-400 mb-2"></view>
-              <text class="text-gray-500 text-sm">劳逸结合 · 爱自己</text>
+              <view class="i-lucide-clipboard text-2xl text-fg-subtle mb-2"></view>
+              <text class="text-fg-muted text-sm">劳逸结合 · 爱自己</text>
             </view>
 
             <view v-else class="space-y-2">
@@ -82,18 +82,18 @@
                 <!-- 任务内容 -->
                 <view class="flex items-start gap-3">
                   <!-- 优先级指示器 -->
-                  <view class="w-1 h-4 rounded-full flex-shrink-0 mt-0.5" :class="getPriorityColorClass(task.priority)">
+                  <view class="w-1 h-4 rounded-full shrink-0 mt-0.5" :class="getPriorityColorClass(task.priority)">
                   </view>
 
                   <view class="flex-1 min-w-0">
                     <!-- 任务标题和右上角操作区 -->
                     <view class="flex items-start justify-between gap-2">
-                      <text class="text-sm font-medium text-gray-900 line-clamp-2 flex-1">
+                      <text class="text-sm font-medium text-fg line-clamp-2 flex-1">
                         {{ task.title }}
                       </text>
 
                       <!-- 右上角操作区 -->
-                      <view class="flex items-center gap-2 flex-shrink-0">
+                      <view class="flex items-center gap-2 shrink-0">
                         <!-- 天数提醒 -->
                         <view v-if="getDaysLeftBadge(task.due_date, task.status)"
                           class="px-1.5 py-0.5 rounded text-xs font-medium" :class="getDaysLeftBadgeClass(task.due_date, task.status)
@@ -103,14 +103,14 @@
 
                         <!-- 完成按钮 -->
                         <view @tap.stop="toggleTaskStatus(task.id)"
-                          class="flex-shrink-0 w-5 h-5 border-2 border-gray-300 rounded-full flex items-center justify-center active:bg-gray-100">
-                          <text v-if="task.status === 2" class="i-lucide-check w-3 h-3 text-green-500"></text>
+                          class="shrink-0 w-5 h-5 border-2 border-line rounded-full flex items-center justify-center active:bg-surface-muted">
+                          <text v-if="task.status === 2" class="i-lucide-check w-3 h-3 text-success"></text>
                         </view>
                       </view>
                     </view>
 
                     <!-- 任务描述 -->
-                    <text v-if="task.description" class="text-xs text-gray-600 line-clamp-1 mt-1">
+                    <text v-if="task.description" class="text-xs text-fg-muted line-clamp-1 mt-1">
                       {{ task.description }}
                     </text>
                   </view>
@@ -120,8 +120,8 @@
 
             <!-- 加载更多指示器 -->
             <view v-if="pendingTasks.length > 0" class="text-center py-2">
-              <text v-if="isLoadingMorePending" class="text-gray-500 text-sm">加载中...</text>
-              <text v-else-if="!hasMorePendingData" class="text-gray-400 text-xs">已加载全部</text>
+              <text v-if="isLoadingMorePending" class="text-fg-muted text-sm">加载中...</text>
+              <text v-else-if="!hasMorePendingData" class="text-fg-subtle text-xs">已加载全部</text>
             </view>
           </scroll-view>
 
@@ -134,36 +134,36 @@
             :lower-threshold="100"
           >
             <view v-if="completedTasks.length === 0" class="flex flex-col items-center justify-center py-8">
-              <view class="i-lucide-check-circle text-2xl text-gray-400 mb-2"></view>
-              <text class="text-gray-500 text-sm">还没有完成的任务</text>
+              <view class="i-lucide-check-circle text-2xl text-fg-subtle mb-2"></view>
+              <text class="text-fg-muted text-sm">还没有完成的任务</text>
             </view>
 
             <view v-else class="space-y-2">
               <view v-for="task in completedTasks" :key="`completed-${task.id}`"
-                class="relative p-3 border border-gray-200 rounded-lg bg-white" @tap="showEditTaskModal(task)">
+                class="relative p-3 border border-line rounded-lg bg-surface" @tap="showEditTaskModal(task)">
                 <!-- 任务内容 -->
                 <view class="flex items-start gap-3">
                   <!-- 完成指示器 -->
-                  <view class="w-1 h-4 rounded-full bg-green-400 flex-shrink-0 mt-0.5"></view>
+                  <view class="w-1 h-4 rounded-full bg-success shrink-0 mt-0.5"></view>
 
                   <view class="flex-1 min-w-0">
                     <!-- 任务标题和右上角操作区 -->
                     <view class="flex items-start justify-between gap-2">
-                      <text class="text-sm font-medium text-gray-700 line-clamp-2 flex-1">
+                      <text class="text-sm font-medium text-fg line-clamp-2 flex-1">
                         {{ task.title }}
                       </text>
 
                       <!-- 完成按钮 -->
                       <view @tap.stop="toggleTaskStatus(task.id)"
-                        class="flex-shrink-0 w-5 h-5 border-2 border-green-400 rounded-full flex items-center justify-center bg-green-400 active:bg-green-500">
+                        class="shrink-0 w-5 h-5 border-2 border-success rounded-full flex items-center justify-center bg-success active:bg-success">
                         <text class="i-lucide-check w-3 h-3 text-white"></text>
                       </view>
                     </view>
 
                     <!-- 完成时间 -->
                     <view class="flex items-center gap-1 mt-1">
-                      <text class="i-lucide-check-circle w-3 h-3 text-gray-500"></text>
-                      <text class="text-xs text-gray-500">
+                      <text class="i-lucide-check-circle w-3 h-3 text-fg-muted"></text>
+                      <text class="text-xs text-fg-muted">
                         {{
                           formatCompletedTime(
                             task.completed_at || task.updated_at
@@ -178,64 +178,63 @@
 
             <!-- 加载更多指示器 -->
             <view v-if="completedTasks.length > 0" class="text-center py-2">
-              <text v-if="isLoadingMoreCompleted" class="text-gray-500 text-sm">加载中...</text>
-              <text v-else-if="!hasMoreCompletedData" class="text-gray-400 text-xs">已加载全部</text>
+              <text v-if="isLoadingMoreCompleted" class="text-fg-muted text-sm">加载中...</text>
+              <text v-else-if="!hasMoreCompletedData" class="text-fg-subtle text-xs">已加载全部</text>
             </view>
           </scroll-view>
         </view>
       </view>
 
     <!-- 添加学习任务弹窗 -->
-    <view v-if="showAddModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-end justify-center z-50"
+    <view v-if="showAddModal" class="fixed inset-0 bg-overlay flex items-center justify-center z-50"
       @tap="hideAddModal">
-      <view @tap.stop="" class="bg-white rounded-t-2xl w-full h-4/5 flex flex-col">
+      <view @tap.stop="" class="bg-surface rounded-2xl w-[90%] max-w-md mx-4 max-h-[80vh] flex flex-col overflow-hidden">
         <!-- 弹窗头部 -->
-        <view class="flex justify-between items-center px-4 py-2 border-b border-gray-100">
+        <view class="flex justify-between items-center px-4 py-2 border-b border-line">
           <text class="text-lg font-semibold">添加学习任务</text>
           <view @tap="hideAddModal" class="p-1">
-            <text class="i-lucide-x w-5 h-5 text-gray-400"></text>
+            <text class="i-lucide-x w-5 h-5 text-fg-subtle"></text>
           </view>
         </view>
 
         <!-- 弹窗内容 -->
-        <view class="flex-1 h-[1px]">
-          <scroll-view :scroll-y="true" class="h-full">
+        <scroll-view :scroll-y="true" class="flex-1 min-h-0" style="max-height: 60vh;">
             <view class="p-4 space-y-4">
               <!-- 标题 -->
               <view class="flex flex-col gap-2">
-                <text class="text-sm font-medium text-gray-700">任务标题 *</text>
+                <text class="text-sm font-medium text-fg">任务标题 *</text>
                 <input v-model="newTask.title" placeholder="请输入学习任务标题"
-                  class="border-solid border-[1px] border-gray-400 rounded-lg p-2" />
+                  class="border-solid border-[1px] border-line rounded-lg p-2" />
               </view>
 
               <!-- 描述 -->
               <view class="flex flex-col gap-2">
-                <text class="text-sm font-medium text-gray-700">任务描述（可选）</text>
+                <text class="text-sm font-medium text-fg">任务描述（可选）</text>
                 <textarea v-model="newTask.description" placeholder="添加一些描述信息"
-                  class="border-solid border-[1px] border-gray-400 rounded-lg p-2 box-border w-full" maxlength="500" />
-                <text class="text-xs text-gray-400">{{ newTask.description.length }}/500</text>
+                  class="border-solid border-[1px] border-line rounded-lg p-2 box-border w-full" maxlength="500" />
+                <text class="text-xs text-fg-subtle">{{ newTask.description.length }}/500</text>
               </view>
 
               <!-- 截止日期 -->
               <view class="flex flex-col gap-2">
-                <text class="text-sm font-medium text-gray-700">截止时间</text>
+                <text class="text-sm font-medium text-fg">截止时间</text>
                 <view class="grid grid-cols-2 gap-2">
                   <picker mode="date" :value="newTask.due_date" @change="onDateChange">
-                    <view class="flex items-center justify-between border border-gray-300 rounded-lg p-3">
-                      <text :class="newTask.due_date ? 'text-gray-900' : 'text-gray-400'
+                    <view class="flex items-center justify-between border border-line rounded-lg p-3">
+                      <text :class="newTask.due_date ? 'text-fg' : 'text-fg-subtle'
                         ">
                         {{ newTask.due_date || "日期" }}
                       </text>
-                      <text class="i-lucide-calendar w-4 h-4 text-gray-400"></text>
+                      <text class="i-lucide-calendar w-4 h-4 text-fg-subtle"></text>
                     </view>
                   </picker>
                   <picker mode="time" :value="newTask.due_time" @change="onTimeChange">
-                    <view class="flex items-center justify-between border border-gray-300 rounded-lg p-3">
-                      <text :class="newTask.due_time ? 'text-gray-900' : 'text-gray-400'
+                    <view class="flex items-center justify-between border border-line rounded-lg p-3">
+                      <text :class="newTask.due_time ? 'text-fg' : 'text-fg-subtle'
                         ">
                         {{ newTask.due_time || "时间" }}
                       </text>
-                      <text class="i-lucide-clock w-4 h-4 text-gray-400"></text>
+                      <text class="i-lucide-clock w-4 h-4 text-fg-subtle"></text>
                     </view>
                   </picker>
                 </view>
@@ -243,31 +242,30 @@
 
               <!-- 优先级 -->
               <view class="flex flex-col gap-2">
-                <text class="text-sm font-medium text-gray-700">优先级</text>
+                <text class="text-sm font-medium text-fg">优先级</text>
                 <view class="flex gap-2">
                   <view v-for="priority in priorityOptions" :key="priority.value"
                     @tap="newTask.priority = priority.value"
-                    class="flex-1 p-3 rounded-lg border text-center text-sm font-medium" :class="newTask.priority === priority.value
+                    class="flex-1 py-2.5 rounded-lg border flex items-center justify-center gap-1.5 text-sm font-medium" :class="newTask.priority === priority.value
                         ? priority.activeClass
-                        : 'border-gray-200 text-gray-600 bg-white'
+                        : 'border-line text-fg-muted bg-surface'
                       ">
-                    <text class="block">{{ priority.icon }}</text>
-                    <text class="block mt-1">{{ priority.label }}</text>
+                    <view class="w-2 h-2 rounded-full" :class="priority.dotClass"></view>
+                    <text>{{ priority.label }}</text>
                   </view>
                 </view>
               </view>
             </view>
           </scroll-view>
-        </view>
         <!-- 弹窗底部 -->
-        <view class="p-4 border-t border-gray-100 flex space-x-3">
+        <view class="p-4 border-t border-line flex space-x-3 shrink-0">
           <view @tap="hideAddModal"
-            class="flex-1 py-3 px-4 bg-gray-100 text-gray-600 rounded-lg text-center font-medium">
+            class="flex-1 py-3 px-4 bg-surface-muted text-fg-muted rounded-lg text-center font-medium">
             取消
           </view>
           <view @tap="submitTask" :class="[
             'flex-1 py-3 px-4 rounded-lg text-center text-white font-medium',
-            canSubmit ? 'bg-green-500' : 'bg-gray-300',
+            canSubmit ? 'bg-success' : 'bg-line',
           ]">
             {{ submitting ? "添加中..." : "添加" }}
           </view>
@@ -277,60 +275,59 @@
 
     <!-- 编辑学习任务弹窗 -->
     <view v-if="showEditModal && currentTask"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-end justify-center z-50" @tap="hideEditModal">
-      <view @tap.stop="" class="bg-white rounded-t-2xl w-full h-4/5 flex flex-col">
+      class="fixed inset-0 bg-overlay flex items-center justify-center z-50" @tap="hideEditModal">
+      <view @tap.stop="" class="bg-surface rounded-2xl w-[90%] max-w-md mx-4 max-h-[80vh] flex flex-col overflow-hidden">
         <!-- 弹窗头部 -->
-        <view class="flex justify-between items-center px-4 py-2 border-b border-gray-100">
+        <view class="flex justify-between items-center px-4 py-2 border-b border-line">
           <text class="text-lg font-semibold">编辑学习任务</text>
           <view class="flex space-x-2">
             <view @tap="deleteTask" class="p-1">
               <text class="i-lucide-trash-2 w-5 h-5 text-red-400"></text>
             </view>
             <view @tap="hideEditModal" class="p-1">
-              <text class="i-lucide-x w-5 h-5 text-gray-400"></text>
+              <text class="i-lucide-x w-5 h-5 text-fg-subtle"></text>
             </view>
           </view>
         </view>
 
         <!-- 弹窗内容 -->
-        <view class="flex-1 h-[1px]">
-          <scroll-view :scroll-y="true" class="h-full">
+        <scroll-view :scroll-y="true" class="flex-1 min-h-0" style="max-height: 60vh;">
             <view class="p-4 space-y-4">
               <!-- 标题 -->
               <view class="flex flex-col gap-2">
-                <text class="text-sm font-medium text-gray-700">任务标题 *</text>
+                <text class="text-sm font-medium text-fg">任务标题 *</text>
                 <input v-model="editTask.title" placeholder="请输入学习任务标题"
-                  class="border-solid border-[1px] border-gray-400 rounded-lg p-2" />
+                  class="border-solid border-[1px] border-line rounded-lg p-2" />
               </view>
 
               <!-- 描述 -->
               <view class="flex flex-col gap-2">
-                <text class="text-sm font-medium text-gray-700">任务描述（可选）</text>
+                <text class="text-sm font-medium text-fg">任务描述（可选）</text>
                 <textarea v-model="editTask.description" placeholder="添加一些描述信息"
-                  class="border-solid border-[1px] border-gray-400 rounded-lg p-2 box-border w-full" maxlength="500" />
-                <text class="text-xs text-gray-400">{{ editTask.description.length }}/500</text>
+                  class="border-solid border-[1px] border-line rounded-lg p-2 box-border w-full" maxlength="500" />
+                <text class="text-xs text-fg-subtle">{{ editTask.description.length }}/500</text>
               </view>
 
               <!-- 截止日期 -->
               <view class="flex flex-col gap-2">
-                <text class="text-sm font-medium text-gray-700">截止日期</text>
+                <text class="text-sm font-medium text-fg">截止日期</text>
                 <view class="grid grid-cols-2 gap-2">
                   <picker mode="date" :value="editTask.due_date" @change="onEditDateChange">
-                    <view class="flex items-center justify-between border border-gray-300 rounded-lg p-3">
-                      <text :class="editTask.due_date ? 'text-gray-900' : 'text-gray-400'
+                    <view class="flex items-center justify-between border border-line rounded-lg p-3">
+                      <text :class="editTask.due_date ? 'text-fg' : 'text-fg-subtle'
                         ">
                         {{ editTask.due_date || "日期" }}
                       </text>
-                      <text class="i-lucide-calendar w-4 h-4 text-gray-400"></text>
+                      <text class="i-lucide-calendar w-4 h-4 text-fg-subtle"></text>
                     </view>
                   </picker>
                   <picker mode="time" :value="editTask.due_time" @change="onEditTimeChange">
-                    <view class="flex items-center justify-between border border-gray-300 rounded-lg p-3">
-                      <text :class="editTask.due_time ? 'text-gray-900' : 'text-gray-400'
+                    <view class="flex items-center justify-between border border-line rounded-lg p-3">
+                      <text :class="editTask.due_time ? 'text-fg' : 'text-fg-subtle'
                         ">
                         {{ editTask.due_time || "时间" }}
                       </text>
-                      <text class="i-lucide-clock w-4 h-4 text-gray-400"></text>
+                      <text class="i-lucide-clock w-4 h-4 text-fg-subtle"></text>
                     </view>
                   </picker>
                 </view>
@@ -338,32 +335,31 @@
 
               <!-- 优先级 -->
               <view class="flex flex-col gap-2">
-                <text class="text-sm font-medium text-gray-700">优先级</text>
+                <text class="text-sm font-medium text-fg">优先级</text>
                 <view class="flex gap-2">
                   <view v-for="priority in priorityOptions" :key="priority.value"
                     @tap="editTask.priority = priority.value"
-                    class="flex-1 p-3 rounded-lg border text-center text-sm font-medium" :class="editTask.priority === priority.value
+                    class="flex-1 py-2.5 rounded-lg border flex items-center justify-center gap-1.5 text-sm font-medium" :class="editTask.priority === priority.value
                         ? priority.activeClass
-                        : 'border-gray-200 text-gray-600 bg-white'
+                        : 'border-line text-fg-muted bg-surface'
                       ">
-                    <text class="block">{{ priority.icon }}</text>
-                    <text class="block mt-1">{{ priority.label }}</text>
+                    <view class="w-2 h-2 rounded-full" :class="priority.dotClass"></view>
+                    <text>{{ priority.label }}</text>
                   </view>
                 </view>
               </view>
             </view>
           </scroll-view>
-        </view>
 
         <!-- 弹窗底部 -->
-        <view class="p-4 border-t border-gray-100 flex space-x-3">
+        <view class="p-4 border-t border-line flex space-x-3 shrink-0">
           <view @tap="hideEditModal"
-            class="flex-1 py-3 px-4 bg-gray-100 text-gray-600 rounded-lg text-center font-medium">
+            class="flex-1 py-3 px-4 bg-surface-muted text-fg-muted rounded-lg text-center font-medium">
             取消
           </view>
           <view @tap="updateTask" :class="[
             'flex-1 py-3 px-4 rounded-lg text-center text-white font-medium',
-            canEditSubmit ? 'bg-green-500' : 'bg-gray-300',
+            canEditSubmit ? 'bg-success' : 'bg-line',
           ]">
             {{ submitting ? "更新中..." : "更新" }}
           </view>
@@ -431,20 +427,20 @@ const priorityOptions = [
   {
     value: 1,
     label: "高",
-    icon: "🔴",
-    activeClass: "border-red-400 bg-red-50 text-red-600",
+    dotClass: "bg-danger",
+    activeClass: "border-danger bg-danger-soft text-danger",
   },
   {
     value: 2,
     label: "中",
-    icon: "🟡",
-    activeClass: "border-yellow-400 bg-yellow-50 text-yellow-600",
+    dotClass: "bg-warning",
+    activeClass: "border-warning bg-warning-soft text-warning",
   },
   {
     value: 3,
     label: "低",
-    icon: "🟢",
-    activeClass: "border-green-400 bg-green-50 text-green-600",
+    dotClass: "bg-success",
+    activeClass: "border-success bg-success-soft text-success",
   },
 ];
 
@@ -492,15 +488,15 @@ const formatCompletedTime = (dateStr) => {
 
 const getPriorityColorClass = (priority) => {
   const map = {
-    1: "bg-red-400",
-    2: "bg-yellow-400",
-    3: "bg-green-400",
+    1: "bg-danger",
+    2: "bg-warning",
+    3: "bg-success",
   };
-  return map[priority] || "bg-yellow-400";
+  return map[priority] || "bg-warning";
 };
 
 const getTaskBorderClass = (task) => {
-  return "border-gray-200";
+  return "border-line";
 };
 
 const getDaysLeftBadge = (dueDate, status) => {
@@ -557,26 +553,26 @@ const getDaysLeftBadgeClass = (dueDate, status) => {
 
   if (hasTime) {
     // 有具体时间的情况，精确到小时
-    if (target < now) return "bg-red-100 text-red-600";
+    if (target < now) return "bg-danger-soft text-danger";
 
     const diffTime = target - now;
     const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
 
-    if (diffHours <= 1) return "bg-red-100 text-red-600"; // 1小时内，红色
-    if (diffHours <= 6) return "bg-orange-100 text-orange-600"; // 6小时内，橙色
-    if (diffHours <= 24) return "bg-amber-100 text-amber-600"; // 今天，琥珀色
+    if (diffHours <= 1) return "bg-danger-soft text-danger"; // 1小时内，红色
+    if (diffHours <= 6) return "bg-warning-soft text-warning"; // 6小时内，橙色
+    if (diffHours <= 24) return "bg-warning-soft text-warning"; // 今天，琥珀色
 
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    if (diffDays <= 3) return "bg-amber-100 text-amber-600";
-    return "bg-blue-100 text-blue-600";
+    if (diffDays <= 3) return "bg-warning-soft text-warning";
+    return "bg-brand-soft text-brand";
   }
 
   // 没有具体时间的情况，按天计算
   const daysLeft = studyTaskStore.calculateDaysLeft(dueDate);
-  if (daysLeft < 0) return "bg-red-100 text-red-600";
-  if (daysLeft === 0) return "bg-orange-100 text-orange-600";
-  if (daysLeft <= 3) return "bg-amber-100 text-amber-600";
-  return "bg-blue-100 text-blue-600";
+  if (daysLeft < 0) return "bg-danger-soft text-danger";
+  if (daysLeft === 0) return "bg-warning-soft text-warning";
+  if (daysLeft <= 3) return "bg-warning-soft text-warning";
+  return "bg-brand-soft text-brand";
 };
 
 // 显示编辑弹窗
