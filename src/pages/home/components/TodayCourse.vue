@@ -7,7 +7,7 @@
 
       <!-- 今日课程内容 -->
       <view
-        class="bg-surface rounded-xl shadow-sm border border-line"
+        class="bg-surface rounded-xl shadow-sm"
       >
         <!-- 加载状态 -->
         <view v-if="scheduleStore.isLoading" class="flex items-center justify-center py-8">
@@ -43,7 +43,7 @@
         </view>
 
         <!-- 有课程时显示课程列表（按时间段分组） -->
-        <view v-else class="m-2 space-y-1">
+        <view v-else class="p-2 space-y-0">
           <view
             v-for="(group, gIndex) in groupedCourses"
             :key="group.period"
@@ -51,15 +51,12 @@
             <!-- 单门课程：直接显示 -->
             <template v-if="group.courses.length === 1">
               <view
-                class="flex items-center active:bg-page transition-all duration-200 border border-transparent"
-                :class="[
-                  { 'border-t border-line': gIndex > 0 },
-                  getCourseStatusClass(group.courses[0].timeStatus, group.courses[0].minutesToStart)
-                ]"
+                class="flex items-center px-2 py-1.5 rounded-lg active:opacity-80 transition-all duration-200"
+                :class="getCourseStatusClass(group.courses[0].timeStatus, group.courses[0].minutesToStart)"
               >
-                <view class="flex-shrink-0 mr-2">
+                <view class="shrink-0 mr-2.5">
                   <view
-                    class="w-1 h-12 rounded-full"
+                    class="w-1 h-11 rounded-full"
                     :class="getTimeSlotColorClass(group.courses[0].timeStatus, group.courses[0].minutesToStart)"
                   ></view>
                 </view>
@@ -78,7 +75,7 @@
                     </view>
                   </view>
                 </view>
-                <view class="flex-shrink-0 text-right">
+                <view class="shrink-0 text-right ml-2">
                   <view class="text-sm font-medium text-fg mb-1 w-24">
                     {{ getTimeSlotTime(group.period) }}
                   </view>
@@ -99,12 +96,12 @@
               <view>
                 <!-- 第一门课程（始终显示） -->
                 <view
-                  class="flex items-center active:bg-page transition-all duration-200 border border-transparent"
+                  class="flex items-center px-2 py-1.5 active:opacity-80 transition-all duration-200"
                   :class="getCourseStatusClass(group.courses[0].timeStatus, group.courses[0].minutesToStart)"
                 >
-                  <view class="flex-shrink-0 mr-2">
+                  <view class="shrink-0 mr-2.5">
                     <view
-                      class="w-1 h-12 rounded-full"
+                      class="w-1 h-11 rounded-full"
                       :class="getTimeSlotColorClass(group.courses[0].timeStatus, group.courses[0].minutesToStart)"
                     ></view>
                   </view>
@@ -123,7 +120,7 @@
                       </view>
                     </view>
                   </view>
-                  <view class="flex-shrink-0 text-right">
+                  <view class="shrink-0 text-right ml-2">
                     <view class="text-sm font-medium text-fg mb-1 w-24">
                       {{ getTimeSlotTime(group.period) }}
                     </view>
@@ -138,32 +135,17 @@
                   </view>
                 </view>
 
-                <!-- 展开/收起窄条（固定在第一条下方） -->
-                <view
-                  @tap="togglePeriod(group.period)"
-                  class="flex items-center justify-center py-1 bg-page active:bg-surface-muted transition-colors"
-                  :class="expandedPeriods[group.period] ? '' : 'rounded-b-lg'"
-                >
-                  <text class="text-xs text-fg-subtle mr-1">
-                    {{ expandedPeriods[group.period] ? '收起' : `还有${group.courses.length - 1}门课` }}
-                  </text>
-                  <view
-                    class="i-lucide-chevron-down w-3 h-3 text-fg-subtle transition-transform duration-200"
-                    :class="{ 'rotate-180': expandedPeriods[group.period] }"
-                  ></view>
-                </view>
-
-                <!-- 展开后的其余课程 -->
-                <view v-if="expandedPeriods[group.period]" class="space-y-1">
+                <!-- 其余课程项之间的分隔 + 展开内容 -->
+                <view v-if="expandedPeriods[group.period]">
                   <view
                     v-for="(course, cIndex) in group.courses.slice(1)"
                     :key="`${group.period}-${cIndex}-${course.course}`"
-                    class="flex items-center active:bg-page transition-all duration-200 border border-transparent"
+                    class="flex items-center px-2 py-1.5 border-t border-line active:opacity-80 transition-all duration-200"
                     :class="getCourseStatusClass(course.timeStatus, course.minutesToStart)"
                   >
-                    <view class="flex-shrink-0 mr-2">
+                    <view class="shrink-0 mr-2.5">
                       <view
-                        class="w-1 h-12 rounded-full"
+                        class="w-1 h-11 rounded-full"
                         :class="getTimeSlotColorClass(course.timeStatus, course.minutesToStart)"
                       ></view>
                     </view>
@@ -182,7 +164,7 @@
                         </view>
                       </view>
                     </view>
-                    <view class="flex-shrink-0 text-right">
+                    <view class="shrink-0 text-right ml-2">
                       <view class="text-sm font-medium text-fg mb-1 w-24">
                         {{ getTimeSlotTime(course.period) }}
                       </view>
@@ -195,6 +177,22 @@
                         </view>
                       </view>
                     </view>
+                  </view>
+                </view>
+
+                <!-- 展开/收起按钮（居中药丸） -->
+                <view class="flex justify-center pt-1 pb-0.5">
+                  <view
+                    @tap="togglePeriod(group.period)"
+                    class="flex items-center gap-1 px-3 py-1 rounded-full bg-surface-muted active:bg-line transition-colors"
+                  >
+                    <text class="text-xs text-fg-muted">
+                      {{ expandedPeriods[group.period] ? '收起' : `还有 ${group.courses.length - 1} 门课` }}
+                    </text>
+                    <view
+                      class="i-lucide-chevron-down w-3 h-3 text-fg-subtle transition-transform duration-200"
+                      :class="{ 'rotate-180': expandedPeriods[group.period] }"
+                    ></view>
                   </view>
                 </view>
               </view>
@@ -352,16 +350,16 @@ const getTimeSlotColorClass = (timeStatus, minutesToStart = 0) => {
   }
 }
 
-// 获取课程状态样式类
+// 获取课程状态样式类（普通课程透明，仅状态课程用柔和色区分）
 const getCourseStatusClass = (timeStatus, minutesToStart = 0) => {
   switch (timeStatus) {
     case 'finished':
       return 'opacity-60'
     case 'ongoing':
-      return 'bg-success-soft border-success'
+      return 'bg-success-soft'
     case 'upcoming':
-      // 30分钟内即将开始 - 橙色背景
-      return minutesToStart <= 20 ? 'bg-warning-soft border-warning' : ''
+      // 20分钟内即将开始 - 橙色背景，否则透明
+      return minutesToStart <= 20 ? 'bg-warning-soft' : ''
     default:
       return ''
   }

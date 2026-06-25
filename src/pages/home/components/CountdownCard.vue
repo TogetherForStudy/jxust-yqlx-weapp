@@ -15,7 +15,7 @@
     </view>
 
     <!-- 倒数日内容 -->
-    <view class="bg-surface rounded-xl shadow-sm border border-line">
+    <view class="bg-surface rounded-xl shadow-sm">
       <!-- 加载状态 -->
       <view v-if="isLoading" class="flex items-center justify-center py-8">
         <text class="text-fg-muted text-sm">加载中...</text>
@@ -102,12 +102,12 @@
     <!-- 添加倒数日弹窗 -->
     <view
       v-if="showAddModal"
-      class="fixed inset-0 bg-overlay flex items-end justify-center z-50"
+      class="fixed inset-0 bg-overlay flex items-center justify-center z-50"
       @tap="hideAddModal"
     >
       <view
         @tap.stop=""
-        class="bg-surface rounded-t-2xl w-full max-h-4/5 flex flex-col"
+        class="bg-surface rounded-2xl w-[90%] max-w-md mx-4 max-h-4/5 flex flex-col"
       >
         <!-- 弹窗头部 -->
         <view class="flex justify-between items-center px-4 py-2 border-b border-line">
@@ -185,12 +185,12 @@
     <!-- 编辑倒数日弹窗 -->
     <view
       v-if="showEditModal && currentCountdown"
-      class="fixed inset-0 bg-overlay flex items-end justify-center z-50"
+      class="fixed inset-0 bg-overlay flex items-center justify-center z-50"
       @tap="hideEditModal"
     >
       <view
         @tap.stop=""
-        class="bg-surface rounded-t-2xl w-full max-h-4/5 flex flex-col"
+        class="bg-surface rounded-2xl w-[90%] max-w-md mx-4 max-h-4/5 flex flex-col"
       >
         <!-- 弹窗头部 -->
         <view class="flex justify-between items-center px-4 py-2 border-b border-line">

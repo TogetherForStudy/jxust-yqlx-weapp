@@ -14,7 +14,7 @@
             {{ projectInfo.name }}
           </view>
           </view>
-          <view v-if="onlineCount !== null" class="flex items-center gap-1 text-xs text-fg-muted flex-shrink-0">
+          <view v-if="onlineCount !== null" class="flex items-center gap-1 text-xs text-fg-muted shrink-0">
             <text>{{ onlineCount }} 人一起在学</text>
           </view>
         </view>
@@ -29,7 +29,7 @@
           <view class="flex items-center justify-between">
             <view>
               <view class="text-base font-semibold text-fg">复习设置</view>
-              <view class="text-xs text-fg-subtle mt-1">选择题目来源、顺序与练习模式</view>
+              <view class="text-xs text-fg-subtle mt-1">选择来源与顺序后，点下方卡片开始</view>
             </view>
             <!-- 清空错题本按钮 -->
             <view
@@ -84,31 +84,49 @@
           </view>
 
           <!-- 模式选择 -->
+          <view class="flex items-center gap-1.5 pt-1">
+            <text class="text-sm text-fg-muted shrink-0">选择模式开始</text>
+            <view class="flex-1 h-px bg-line"></view>
+          </view>
           <view class="grid grid-cols-2 gap-3">
             <view
-              class="rounded-2xl border px-4 py-4 active:scale-[0.98] transition-all duration-150"
-              :class="mode === 'study' ? 'border-success bg-success-soft' : 'border-line bg-page'"
+              class="relative rounded-2xl border border-line bg-surface px-4 py-4 shadow-sm active:scale-[0.97] active:shadow transition-all duration-150"
+              hover-class="opacity-90"
               @tap="startSession('study')"
             >
-              <view class="flex items-center gap-1.5">
-                <text class="i-lucide-book-open w-4 h-4 text-success"></text>
-                <view class="text-sm font-semibold text-fg">学习模式</view>
+              <view class="flex items-center justify-between">
+                <view class="w-9 h-9 rounded-xl bg-success-soft flex items-center justify-center">
+                  <text class="i-lucide-book-open w-5 h-5 text-success"></text>
+                </view>
+                <text class="i-lucide-arrow-right w-4 h-4 text-fg-subtle"></text>
               </view>
-              <view class="text-xs text-fg-muted mt-1.5 leading-relaxed">
-                直接展示答案，点击正确选项进入下一题
+              <view class="text-base font-semibold text-fg mt-3">学习模式</view>
+              <view class="text-xs text-fg-muted mt-1 leading-relaxed">
+                直接展示答案，点正确选项进入下一题
+              </view>
+              <view class="flex items-center gap-1 mt-3 text-fg-muted font-medium text-sm">
+                <text>开始学习</text>
+                <text class="i-lucide-chevron-right w-4 h-4"></text>
               </view>
             </view>
             <view
-              class="rounded-2xl border px-4 py-4 active:scale-[0.98] transition-all duration-150"
-              :class="mode === 'practice' ? 'border-brand bg-brand-soft' : 'border-line bg-page'"
+              class="relative rounded-2xl border border-line bg-surface px-4 py-4 shadow-sm active:scale-[0.97] active:shadow transition-all duration-150"
+              hover-class="opacity-90"
               @tap="startSession('practice')"
             >
-              <view class="flex items-center gap-1.5">
-                <text class="i-lucide-pencil-line w-4 h-4 text-brand"></text>
-                <view class="text-sm font-semibold text-fg">考试模式</view>
+              <view class="flex items-center justify-between">
+                <view class="w-9 h-9 rounded-xl bg-brand-soft flex items-center justify-center">
+                  <text class="i-lucide-pencil-line w-5 h-5 text-brand"></text>
+                </view>
+                <text class="i-lucide-arrow-right w-4 h-4 text-fg-subtle"></text>
               </view>
-              <view class="text-xs text-fg-muted mt-1.5 leading-relaxed">
-                不展示答案，需要作答后显示答案
+              <view class="text-base font-semibold text-fg mt-3">考试模式</view>
+              <view class="text-xs text-fg-muted mt-1 leading-relaxed">
+                不展示答案，作答后才显示对错
+              </view>
+              <view class="flex items-center gap-1 mt-3 text-fg-muted font-medium text-sm">
+                <text>开始考试</text>
+                <text class="i-lucide-chevron-right w-4 h-4"></text>
               </view>
             </view>
           </view>

@@ -7,7 +7,7 @@
   />
   <view class="h-screen bg-page flex flex-col text-fg" :class="[themeStore.rootClass]">
     <!-- 积分概览卡片 -->
-    <view class="px-4 pt-4 pb-2 flex-shrink-0">
+    <view class="px-4 pt-4 pb-2 shrink-0">
       <view class="bg-surface rounded-2xl shadow-sm p-5">
         <view class="flex items-center justify-between">
           <!-- 左侧：积分和排名 -->
@@ -49,7 +49,7 @@
     <view class="px-4 mb-4 flex-1 h-[1px] flex flex-col">
       <view class="bg-surface rounded-2xl shadow-sm flex-1 flex flex-col overflow-hidden">
         <!-- 标题栏 -->
-        <view class="px-4 py-3 border-b border-line flex items-center justify-between flex-shrink-0">
+        <view class="px-4 py-3 border-b border-line flex items-center justify-between shrink-0">
           <text class="text-fg font-medium">积分流水</text>
           <view class="flex space-x-2">
             <view
@@ -136,7 +136,7 @@
       @tap="showSourceStats = false"
     >
       <view @tap.stop="" class="bg-surface rounded-2xl mx-4 w-full max-w-md max-h-[80vh] flex flex-col">
-        <view class="px-4 py-2 flex-shrink-0 border-b border-line">
+        <view class="px-4 py-2 shrink-0 border-b border-line">
           <view class="flex items-center justify-between">
             <text class="text-lg font-semibold text-fg">积分来源统计</text>
             <view @tap="showSourceStats = false" class="p-1">

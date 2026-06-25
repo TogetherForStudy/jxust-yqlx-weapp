@@ -13,7 +13,7 @@
       <view
         v-for="(campus, index) in campusList"
         :key="index"
-        class="bg-surface rounded-lg shadow-sm"
+        class="bg-surface rounded-lg shadow-sm overflow-hidden"
       >
         <!-- 校区名称 -->
         <view class="bg-brand-soft px-4 py-3 border-b border-line">

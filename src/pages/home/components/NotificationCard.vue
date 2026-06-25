@@ -13,7 +13,7 @@
     </view>
 
     <!-- 通知公告内容 -->
-    <view class="bg-surface rounded-xl shadow-sm border border-line">
+    <view class="bg-surface rounded-xl shadow-sm">
       <!-- 加载状态 -->
       <view v-if="notificationStore.isLoading" class="flex items-center justify-center py-8">
         <text class="text-fg-muted text-sm">加载中...</text>
@@ -32,31 +32,36 @@
       </view>
 
       <!-- 通知列表 -->
-      <view v-else class="divide-y divide-line">
+      <view v-else>
         <view
-          v-for="(notification) in notifications"
+          v-for="(notification, index) in notifications"
           :key="notification.id"
-          class="px-4 py-3 active:bg-page transition-colors"
-          @tap="goToNotificationDetail(notification.id)"
         >
-          <view class="flex justify-between items-start">
-              <!-- 通知标题 -->
-              <view class="flex items-center flex-1 mr-2">
-                <!-- 置顶标识 -->
-                <view v-if="notification.is_pinned" class="flex items-center justify-center w-4.5 h-4.5 bg-surface rounded-full mr-1.5 shrink-0">
-                  <text class="i-lucide-pin text-danger w-3 h-3"></text>
+          <view
+            class="px-4 py-3 active:bg-page transition-colors"
+            @tap="goToNotificationDetail(notification.id)"
+          >
+            <view class="flex justify-between items-start">
+                <!-- 通知标题 -->
+                <view class="flex items-center flex-1 mr-2">
+                  <!-- 置顶标识 -->
+                  <view v-if="notification.is_pinned" class="flex items-center justify-center w-4.5 h-4.5 bg-surface rounded-full mr-1.5 shrink-0">
+                    <text class="i-lucide-pin text-danger w-3 h-3"></text>
+                  </view>
+                  <text class="text-fg font-medium leading-tight line-clamp-1">
+                    {{ notification.title }}
+                  </text>
+                  <!-- 日程图标 -->
+                  <text v-if="hasScheduleData(notification)" class="i-lucide-calendar text-brand mx-2 shrink-0 text-sm"></text>
                 </view>
-                <text class="text-fg font-medium leading-tight line-clamp-1">
-                  {{ notification.title }}
-                </text>
-                <!-- 日程图标 -->
-                <text v-if="hasScheduleData(notification)" class="i-lucide-calendar text-brand mx-2 shrink-0 text-sm"></text>
-              </view>
-                <!-- 发布时间 -->
-                <text v-if="!notification.is_pinned" class="text-fg-subtle text-xs shrink-0">
-                  {{ formatDate(notification.published_at || notification.created_at) }}
-                </text>
+                  <!-- 发布时间 -->
+                  <text v-if="!notification.is_pinned" class="text-fg-subtle text-xs shrink-0">
+                    {{ formatDate(notification.published_at || notification.created_at) }}
+                  </text>
+            </view>
           </view>
+          <!-- 条目分割线：左右内缩，淡色，最后一条不显示 -->
+          <view v-if="index < notifications.length - 1" class="mx-4 h-px bg-line"></view>
         </view>
       </view>
     </view>

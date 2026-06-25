@@ -114,7 +114,7 @@
             <view class="flex items-start">
               <view
                 :class="[
-                  'w-6 h-6 flex items-center justify-center text-xs font-bold mr-3 flex-shrink-0',
+                  'w-6 h-6 flex items-center justify-center text-xs font-bold mr-3 shrink-0',
                   index < 3 ? 'bg-danger text-white rounded' : 'text-fg-subtle',
                 ]"
               >
@@ -160,18 +160,18 @@
           class="text-sm"
         >
           <view class="flex items-center space-x-2 whitespace-nowrap">
-            <text class="text-brand flex-shrink-0" @tap="navigateToRoot">
+            <text class="text-brand shrink-0" @tap="navigateToRoot">
               江理一起来学
             </text>
             <template v-for="(item, index) in breadcrumb" :key="item.id">
-              <text class="text-fg-subtle flex-shrink-0">/</text>
+              <text class="text-fg-subtle shrink-0">/</text>
               <text
                 :class="
                   index === breadcrumb.length - 1
                     ? 'text-fg font-medium'
                     : 'text-brand'
                 "
-                class="flex-shrink-0"
+                class="shrink-0"
                 @tap="navigateToBreadcrumb(index)"
               >
                 {{ item.name }}
@@ -181,7 +181,7 @@
         </scroll-view>
       </view>
       <view
-        class="flex items-center ml-3 px-2 py-1 rounded-md text-xs flex-shrink-0 active:bg-surface-muted"
+        class="flex items-center ml-3 px-2 py-1 rounded-md text-xs shrink-0 active:bg-surface-muted"
         @tap="toggleSort"
       >
         <text class="i-lucide-arrow-up-down w-3.5 h-3.5 mr-1 text-fg-muted"></text>
@@ -225,7 +225,7 @@
         <view class="flex items-center justify-between gap-3">
           <view class="flex items-center gap-3 flex-1 min-w-0">
             <view
-              class="w-6 h-6 bg-gradient-to-br from-orange-300 to-orange-400 rounded flex items-center justify-center flex-shrink-0"
+              class="w-6 h-6 bg-gradient-to-br from-orange-300 to-orange-400 rounded flex items-center justify-center shrink-0"
             >
               <text class="i-lucide-folder text-white w-4 h-4"></text>
             </view>
@@ -233,7 +233,7 @@
               <text class="text-fg font-medium line-clamp-2 break-all">{{ category.name }}</text>
             </view>
           </view>
-          <text class="i-lucide-chevron-right text-fg-subtle w-5 h-5 flex-shrink-0"></text>
+          <text class="i-lucide-chevron-right text-fg-subtle w-5 h-5 shrink-0"></text>
         </view>
       </view>
 
@@ -246,7 +246,7 @@
       >
         <view class="flex items-start space-x-3">
           <view
-            class="w-6 h-6 bg-gradient-to-br from-green-400 to-green-600 rounded flex items-center justify-center flex-shrink-0"
+            class="w-6 h-6 bg-gradient-to-br from-green-400 to-green-600 rounded flex items-center justify-center shrink-0"
           >
             <text class="i-lucide-file-text text-white w-4 h-4"></text>
           </view>

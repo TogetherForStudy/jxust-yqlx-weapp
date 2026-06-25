@@ -6,7 +6,7 @@
     :background-text-style="themeStore.nativeTheme.backgroundTextStyle"
   />
   <view class="h-screen bg-page flex flex-col text-fg" :class="[themeStore.rootClass]">
-    <view class="px-4 pt-4 flex-shrink-0">
+    <view class="px-4 pt-4 shrink-0">
       <!-- 绩点结果显示区域 -->
       <view class="bg-surface rounded-xl shadow-sm px-6 py-3 mb-4">
         <view class="text-center">
@@ -92,17 +92,20 @@
 
       <view
         v-if="!isLocalDataView"
-        class="mb-4 bg-warning-soft border border-warning rounded-xl px-4 py-3 flex items-center justify-between"
+        class="mb-4 bg-surface-muted rounded-xl px-4 py-3 flex items-center justify-between"
       >
-        <view class="pr-3">
-          <text class="text-warning text-sm font-medium block">
-            {{ activeBackupTitle || `云端存档 ${activeBackupId}` }}
-          </text>
-          <text class="text-warning text-xs block mt-1">当前操作不会影响本地数据</text>
+        <view class="flex items-center pr-3 min-w-0">
+          <text class="i-lucide-eye text-fg-muted w-4 h-4 mr-2 shrink-0"></text>
+          <view class="min-w-0">
+            <text class="text-fg text-sm font-medium block truncate">
+              正在预览：{{ activeBackupTitle || `云端存档 ${activeBackupId}` }}
+            </text>
+            <text class="text-fg-subtle text-xs block mt-0.5">当前操作不会影响本地数据</text>
+          </view>
         </view>
         <view
           @tap="switchToLocalData"
-          class="shrink-0 bg-surface text-warning text-xs px-3 py-2 rounded-lg border border-warning active:bg-warning-soft"
+          class="shrink-0 bg-surface text-fg text-xs px-3 py-2 rounded-lg border border-line active:bg-surface-muted"
         >
           <text>切回本地</text>
         </view>
@@ -112,7 +115,7 @@
     <!-- 历史数据列表 -->
     <view class="px-4 flex-1 h-[1px] flex flex-col">
       <view v-if="courses.length > 0" class="bg-surface rounded-xl shadow-sm overflow-hidden flex-1 flex flex-col h-full">
-        <view class="px-4 py-3 border-b border-line flex-shrink-0 flex items-center justify-between">
+        <view class="px-4 py-3 border-b border-line shrink-0 flex items-center justify-between">
           <view>
             <text class="text-fg font-medium text-sm block">
               {{ isLocalDataView ? '已添加课程' : '备份预览课程' }}
@@ -121,7 +124,7 @@
               更新时间：{{ activeBackupUpdatedAt }}
             </text>
           </view>
-          <view class="flex items-center flex-shrink-0">
+          <view class="flex items-center shrink-0">
             <view
               @tap="selectAll"
               class="mx-2 active:bg-surface-muted rounded"
@@ -144,7 +147,7 @@
               class="px-4 py-3 flex items-center"
             >
               <!-- 左侧勾选框 -->
-              <view class="mr-3 flex-shrink-0" @tap.stop="toggleCourseSelection(index)">
+              <view class="mr-3 shrink-0" @tap.stop="toggleCourseSelection(index)">
                 <view
                   class="w-5 h-5 rounded border-2 flex items-center justify-center transition-colors"
                   :class="course.selected
@@ -170,7 +173,7 @@
               </view>
 
               <!-- 右侧操作按钮 -->
-              <view class="flex items-center flex-shrink-0">
+              <view class="flex items-center shrink-0">
                 <view
                   @tap.stop="editCourse(index)"
                   :class="[
@@ -208,7 +211,7 @@
     </view>
 
     <!-- 底部提示 -->
-    <view class="p-4 flex-shrink-0">
+    <view class="p-4 shrink-0">
       <text class="text-fg-subtle text-xs text-center block">
         默认仅保存在本地，点击“备份恢复”后才会上传到服务器
       </text>
@@ -359,7 +362,7 @@
         </view>
 
         <!-- 表头 -->
-        <view class="grid grid-cols-[2fr,1fr,1fr] gap-2 pb-2 border-b border-line mb-1">
+        <view class="grid grid-cols-[2fr_1fr_1fr] gap-2 pb-2 border-b border-line mb-1">
           <text class="text-fg-muted text-xs font-medium">专业</text>
           <text class="text-fg-muted text-xs font-medium text-center">平均绩点</text>
           <text class="text-fg-muted text-xs font-medium text-center">平均附加</text>
@@ -370,7 +373,7 @@
           <view
             v-for="(major, index) in graduateMajorData"
             :key="index"
-            class="grid grid-cols-[2fr,1fr,1fr] gap-2 py-2 border-b border-line"
+            class="grid grid-cols-[2fr_1fr_1fr] gap-2 py-2 border-b border-line"
           >
             <text class="text-fg text-xs leading-tight">{{ major.name }}</text>
             <text class="text-brand text-xs font-medium text-center">{{ major.gpa }}</text>
@@ -393,103 +396,123 @@
     <!-- 备份恢复弹窗 -->
     <view v-if="showBackupModal" class="fixed inset-0 bg-overlay flex items-center justify-center z-50" @tap="closeBackupModal">
       <view class="bg-surface rounded-xl p-6 w-full max-w-sm mx-4" @tap.stop>
-        <view class="flex items-center justify-between mb-3">
+        <!-- 头部 -->
+        <view class="flex items-center justify-between mb-4">
           <view>
-            <text class="text-fg font-medium text-lg block">备份恢复</text>
-            <text class="text-fg-subtle text-xs block mt-1">最多可上传 6 份数据</text>
+            <text class="text-fg font-semibold text-lg block leading-tight">备份恢复</text>
+            <text class="text-fg-subtle text-xs block mt-1">数据存云端，可跨设备同步</text>
           </view>
           <view
-            @tap="loadBackupList"
-            class="text-brand text-xs px-2 py-1 rounded active:bg-brand-soft"
+            @tap="closeBackupModal"
+            class="w-8 h-8 rounded-full bg-surface-muted flex items-center justify-center active:bg-line"
           >
-            <text>刷新</text>
+            <text class="i-lucide-x text-fg-muted w-4 h-4"></text>
           </view>
         </view>
 
-        <view class="grid grid-cols-2 gap-3 mb-4">
+        <!-- 本地数据区 -->
+        <view class="bg-page rounded-xl p-3 mb-4">
+          <view class="flex items-center justify-between mb-3">
+            <text class="text-fg text-sm font-medium">本地数据</text>
+            <text class="text-fg-subtle text-xs">{{ localCoursesSnapshot.length }} 门课程</text>
+          </view>
           <view
             @tap="uploadCurrentLocalBackup"
             :class="[
-              'rounded-xl px-3 py-3 text-center transition-colors border',
-              canUploadLocalBackup ? 'bg-brand text-white border-brand active:bg-brand' : 'bg-surface-muted text-fg-subtle border-line'
+              'rounded-lg py-3 text-center transition-colors',
+              canUploadLocalBackup ? 'bg-brand active:opacity-90' : 'bg-surface-muted'
             ]"
           >
-            <text class="text-sm font-medium block">上传本地数据</text>
-            <text class="text-xs opacity-90 block mt-1">当前 {{ localCoursesSnapshot.length }} 门课程</text>
+            <text
+              class="text-sm font-medium"
+              :class="canUploadLocalBackup ? 'text-white' : 'text-fg-subtle'"
+            >备份到云端</text>
           </view>
-
           <view
+            v-if="!isLocalDataView"
             @tap="switchToLocalData"
-            :class="[
-              'rounded-xl px-3 py-3 text-center transition-colors border',
-              isLocalDataView
-                ? 'bg-surface-muted text-fg-subtle border-line'
-                : 'bg-surface text-warning border-warning active:bg-warning-soft'
-            ]"
+            class="mt-2 rounded-lg py-2.5 text-center border border-line active:bg-surface-muted"
           >
-            <text class="text-sm font-medium block">切回本地</text>
-            <text class="text-xs block mt-1">恢复本地展示</text>
+            <text class="text-fg text-sm font-medium">切回本地数据</text>
           </view>
         </view>
 
-        <view class="mb-2 flex items-center justify-between">
-          <text class="text-fg text-sm font-medium">云端备份列表</text>
-          <text v-if="isBackupLoading" class="text-fg-subtle text-xs">加载中...</text>
+        <!-- 云端备份区 -->
+        <view class="flex items-center justify-between mb-3">
+          <view class="flex items-center">
+            <text class="text-fg text-sm font-medium">云端备份</text>
+            <text class="text-fg-subtle text-xs ml-2">{{ displayedBackupList.length }} / {{ BACKUP_LIMIT }}</text>
+          </view>
+          <view
+            @tap="loadBackupList"
+            class="px-2 py-1 rounded-lg active:bg-brand-soft"
+          >
+            <text class="text-brand text-xs">{{ isBackupLoading ? '加载中' : '刷新' }}</text>
+          </view>
         </view>
 
-        <scroll-view :scroll-y="true" class="mb-4" style="max-height: 320px;">
+        <scroll-view :scroll-y="true" class="mb-4" style="max-height: 300px;">
           <view v-if="displayedBackupList.length > 0" class="space-y-3">
             <view
               v-for="backup in displayedBackupList"
               :key="backup.id"
-              class="border rounded-xl px-4 py-3"
-              :class="isActiveBackup(backup.id) ? 'border-line bg-brand-soft' : 'border-line bg-page'"
+              class="rounded-xl border overflow-hidden"
+              :class="isActiveBackup(backup.id) ? 'border-line bg-surface-muted' : 'border-line bg-page'"
             >
-              <view class="flex items-start justify-between gap-3">
-                <view class="flex-1 min-w-0">
-                  <text class="text-fg text-sm font-medium block">
+              <!-- 信息行 -->
+              <view class="px-3 pt-3 pb-2.5">
+                <view class="flex items-center justify-between mb-1.5">
+                  <text class="text-fg text-sm font-semibold truncate flex-1 mr-2">
                     {{ backup.title || `云端存档 ${backup.id}` }}
                   </text>
-                  <text class="text-fg-muted text-xs block mt-1">
-                    更新时间：{{ formatBackupTime(backup.updated_at || backup.created_at) }}
-                  </text>
-                  <text class="text-fg-subtle text-xs block mt-1">
-                    课程数：{{ getBackupCourseCount(backup) }}
-                  </text>
+                  <text
+                    v-if="isActiveBackup(backup.id)"
+                    class="shrink-0 text-fg-muted text-xs bg-surface rounded-full px-2 py-0.5"
+                  >查看中</text>
                 </view>
-                <view class="shrink-0 flex flex-col gap-2">
-                  <view
-                    @tap="handleRestoreBackup(backup.id)"
-                    class="w-8 h-8 rounded-lg flex items-center justify-center"
-                    :class="isActiveBackup(backup.id) ? 'bg-surface text-brand border border-line' : 'bg-brand text-white active:bg-brand'"
-                  >
-                    <text class="i-lucide-rotate-ccw w-3.5 h-3.5"></text>
-                  </view>
-                  <view
-                    @tap="deleteBackupItem(backup.id)"
-                    class="w-8 h-8 rounded-lg flex items-center justify-center bg-surface text-danger border border-line active:bg-danger-soft"
-                  >
-                    <text class="i-lucide-trash-2 w-3.5 h-3.5"></text>
-                  </view>
+                <text class="text-fg-muted text-xs block">
+                  {{ getBackupCourseCount(backup) }} 门课程 · {{ formatBackupTime(backup.updated_at || backup.created_at) }}
+                </text>
+              </view>
+              <!-- 操作行 -->
+              <view class="flex border-t border-line">
+                <view
+                  @tap="previewBackup(backup.id)"
+                  class="flex-1 py-2.5 text-center active:bg-surface-muted"
+                >
+                  <text class="text-brand text-xs font-medium">预览</text>
+                </view>
+                <view
+                  @tap="overwriteBackup(backup.id)"
+                  class="flex-1 py-2.5 text-center border-l border-line active:bg-surface-muted"
+                >
+                  <text class="text-brand text-xs font-medium">恢复</text>
+                </view>
+                <view
+                  @tap="deleteBackupItem(backup.id)"
+                  class="flex-1 py-2.5 text-center border-l border-line active:bg-danger-soft"
+                >
+                  <text class="text-danger text-xs font-medium">删除</text>
                 </view>
               </view>
             </view>
           </view>
 
-          <view v-else class="bg-page rounded-xl px-4 py-6 text-center">
+          <!-- 空状态 -->
+          <view v-else class="bg-page rounded-xl px-4 py-8 text-center">
             <text class="text-fg-muted text-sm block">
               {{ isBackupListLoadFailed ? '备份加载失败' : '暂无云端备份' }}
             </text>
-            <text v-if="isBackupListLoadFailed" class="text-fg-subtle text-xs block mt-1">请点击右上角刷新重试</text>
+            <text class="text-fg-subtle text-xs block mt-1">
+              {{ isBackupListLoadFailed ? '请点击上方刷新重试' : '点击上方按钮备份当前数据' }}
+            </text>
           </view>
         </scroll-view>
 
-        <view
-          @tap="closeBackupModal"
-          class="w-full bg-surface-muted text-fg-muted text-center py-3 rounded-lg active:bg-line transition-colors"
-        >
-          <text class="text-sm">关闭</text>
-        </view>
+        <!-- 底部说明 -->
+        <text class="text-fg-subtle text-xs text-center block leading-relaxed">
+          预览仅临时查看不影响本地，恢复会覆盖当前数据
+        </text>
       </view>
     </view>
 
@@ -1092,25 +1115,36 @@ const uploadCurrentLocalBackup = async () => {
   }
 }
 
-const handleRestoreBackup = async (backupId) => {
+const previewBackup = async (backupId) => {
+  if (!backupId) {
+    return
+  }
+
+  await restoreBackupItem(backupId, { overwriteLocal: false })
+}
+
+const overwriteBackup = async (backupId) => {
   if (!backupId) {
     return
   }
 
   try {
-    const { tapIndex } = await Taro.showActionSheet({
-      itemList: ['仅查看，不覆盖本地', '恢复并覆盖本地']
+    const { confirm } = await Taro.showModal({
+      title: '恢复到本地',
+      content: '将用这份备份覆盖当前本地数据，覆盖后不可撤销，确定继续吗？',
+      confirmText: '覆盖',
+      confirmColor: '#ef4444'
     })
 
-    await restoreBackupItem(backupId, {
-      overwriteLocal: tapIndex === 1
-    })
-  } catch (error) {
-    if (error?.errMsg && error.errMsg.includes('cancel')) {
+    if (!confirm) {
       return
     }
-    console.error('选择恢复方式失败:', error)
+  } catch (error) {
+    console.error('确认恢复备份失败:', error)
+    return
   }
+
+  await restoreBackupItem(backupId, { overwriteLocal: true })
 }
 
 const deleteBackupItem = async (backupId) => {

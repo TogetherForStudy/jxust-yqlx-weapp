@@ -19,7 +19,7 @@
               :key="tab.key"
               @tap="activeTab = tab.key"
               :class="[
-                'mr-2 min-w-[72px] flex-shrink-0 border-b-2 px-3 py-3 text-center transition-colors duration-200 last:mr-0',
+                'mr-2 min-w-[72px] shrink-0 border-b-2 px-3 py-3 text-center transition-colors duration-200 last:mr-0',
                 activeTab === tab.key ? 'border-warning text-warning font-semibold' : 'border-transparent text-fg-muted'
               ]"
             >
@@ -40,7 +40,7 @@
             <view>
               <text class="text-base font-semibold text-fg">竞赛目录</text>
             </view>
-            <text class="flex-shrink-0 text-warning">{{ competitionCount }} 项</text>
+            <text class="shrink-0 text-warning">{{ competitionCount }} 项</text>
           </view>
           <text v-if="competitionSource" class="mt-2 block leading-5 text-fg-subtle">
             数据来源：{{ competitionSource }}
@@ -64,7 +64,7 @@
             <view
               @tap.stop="copyCompetitionLink(item)"
               :class="[
-                'flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full transition-colors duration-200',
+                'flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors duration-200',
                 item.url ? 'bg-warning-soft text-warning' : 'bg-surface-muted text-fg-subtle'
               ]"
             >
@@ -105,7 +105,7 @@
                 <view
                   @tap.stop="copyCompetitionLink(item)"
                   :class="[
-                    'flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full transition-colors duration-200',
+                    'flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors duration-200',
                     item.url ? 'bg-warning-soft text-warning' : 'bg-surface-muted text-fg-subtle'
                   ]"
                 >

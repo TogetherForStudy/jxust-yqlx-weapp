@@ -9,7 +9,7 @@
     <view class="flex-1 flex flex-col">
       <!-- Logo和标题 -->
       <view class="flex flex-col items-center mb-8 mt-24">
-        <image :src="LogoJPG" class="w-[539px] h-[155px]" mode="aspectFit"></image>
+        <image :src="logoSrc" class="w-[539px] h-[155px]" mode="aspectFit"></image>
       </view>
 
       <!-- 登录按钮 -->
@@ -31,7 +31,7 @@
 
         <view class="flex items-center justify-center my-6">
           <view
-            class="flex-shrink-0 w-5 h-5 border-2 rounded flex items-center justify-center mr-2"
+            class="shrink-0 w-5 h-5 border-2 rounded flex items-center justify-center mr-2"
             :class="isTermsAgreed ? 'bg-brand border-brand' : 'border-line'"
             @tap="toggleTermsAgreement"
           >
@@ -71,9 +71,12 @@ import { useThemePage } from '../../composables/useThemePage'
 import { ref, computed } from 'vue'
 import { useAuthStore } from '../../stores/auth'
 import Taro from '@tarojs/taro'
-import LogoJPG from './logo.jpg'
+import LogoLight from './logolight.png'
+import LogoDark from './logodark.png'
 
 const themeStore = useThemePage()
+
+const logoSrc = computed(() => themeStore.isDark ? LogoDark : LogoLight)
 
 const authStore = useAuthStore()
 const isLoading = ref(false)

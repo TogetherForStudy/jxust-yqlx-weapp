@@ -10,7 +10,7 @@
       </view>
     </view>
 
-    <view class="bg-surface rounded-xl shadow-sm border border-line overflow-hidden">
+    <view class="bg-surface rounded-xl shadow-sm overflow-hidden">
       <view class="p-4">
         <view class="flex gap-2 mb-4">
           <view
@@ -38,7 +38,7 @@
               <text class="block text-[40px] leading-none font-black tracking-[2px] mt-2">{{ formattedTime }}</text>
             </view>
             <view
-              class="px-2.5 py-1 rounded-full text-xs font-medium border bg-surface bg-opacity-80"
+              class="px-2.5 py-1 rounded-full text-xs font-medium border bg-surface/80"
               :class="currentPreset.badgeClass"
             >
               {{ isRunning ? '进行中' : '待开始' }}
@@ -68,18 +68,18 @@
               <view class="flex items-center justify-center leading-none">
                 <text
                   :class="isRunning ? 'i-lucide-pause' : 'i-lucide-play'"
-                  class="w-4 h-4 mr-1.5 leading-none flex-shrink-0"
+                  class="w-4 h-4 mr-1.5 leading-none shrink-0"
                 ></text>
                 <text class="leading-none">{{ isRunning ? '暂停' : '开始' }}</text>
               </view>
             </view>
             <view
-              class="rounded-xl py-3 text-center text-sm font-semibold border bg-surface bg-opacity-75 active:bg-surface"
+              class="rounded-xl py-3 text-center text-sm font-semibold border bg-surface/75 active:bg-surface"
               :class="currentPreset.secondaryButtonClass"
               @tap="confirmResetTimer"
             >
               <view class="flex items-center justify-center leading-none">
-                <text class="i-lucide-rotate-ccw w-4 h-4 mr-1.5 leading-none flex-shrink-0"></text>
+                <text class="i-lucide-rotate-ccw w-4 h-4 mr-1.5 leading-none shrink-0"></text>
                 <text class="leading-none">重置</text>
               </view>
             </view>
@@ -98,7 +98,7 @@
         class="relative bg-surface rounded-2xl w-full max-w-md max-h-[70vh] flex flex-col overflow-hidden shadow-2xl"
         @tap.stop=""
       >
-        <view class="px-4 py-2 border-b border-line flex items-center justify-between flex-shrink-0">
+        <view class="px-4 py-2 border-b border-line flex items-center justify-between shrink-0">
           <text class="text-base font-semibold text-fg">专注排行榜</text>
           <view class="w-7 h-7 flex items-center justify-center" @tap="showRankingModal = false">
             <text class="i-lucide-x w-5 h-5 text-fg-subtle"></text>
@@ -107,7 +107,7 @@
 
         <view
           v-if="authStore.isLoggedIn"
-          class="px-4 py-2.5 bg-page border-b border-line flex items-center justify-center flex-shrink-0"
+          class="px-4 py-2.5 bg-page border-b border-line flex items-center justify-center shrink-0"
         >
           <text class="text-sm text-fg-muted">我的累计完成</text>
           <text class="text-sm font-semibold text-fg ml-2">{{ completedCount }} 次</text>

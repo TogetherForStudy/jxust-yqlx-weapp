@@ -6,17 +6,13 @@
   />
   <view class="min-h-screen bg-page p-4 text-fg" :class="[themeStore.rootClass]">
     <!-- 搜索框 -->
-    <view class="bg-surface rounded-lg shadow-sm mb-4">
-      <view class="flex items-center gap-2">
-        <view class="flex-1">
-          <input v-model="searchKeyword" placeholder="请输入班级名称进行搜索"
-            class="w-full px-3 border border-line rounded-lg focus:outline-none focus:border-brand"
-            @input="handleSearch" />
-        </view>
-        <view @tap="search" class="bg-brand text-white px-4 py-2 rounded-lg">
-          搜索
-        </view>
-      </view>
+    <view class="flex items-center bg-surface-muted rounded-lg px-3 py-2 h-10 mb-4">
+      <text class="i-lucide-search text-fg-subtle w-4 h-4 mr-2 shrink-0"></text>
+      <input v-model="searchKeyword" placeholder="请输入班级名称进行搜索"
+        class="flex-1 bg-transparent text-sm outline-none h-full"
+        confirm-type="search"
+        @input="handleSearch"
+        @confirm="search" />
     </view>
 
     <!-- 搜索结果 -->

@@ -1,7 +1,7 @@
 <template>
   <view class="min-h-screen bg-page">
     <view class="p-4">
-      <view class="bg-surface rounded-xl p-4 shadow-sm border border-line">
+      <view class="bg-surface rounded-xl p-4 shadow-sm">
         <!-- 标题骨架 -->
         <view class="mb-4">
           <view class="skeleton-box h-6 w-3/4 mb-3 rounded"></view>

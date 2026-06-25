@@ -608,6 +608,7 @@ onBeforeUnmount(() => {
 
 // 导航方法
 const goToTeacherReviews = () => {
+  if (!authStore.requireAuth()) return;
   Taro.navigateTo({ url: "/pages/teacher-reviews/index" });
 };
 
@@ -650,10 +651,12 @@ const goToBaoYan = () => {
 };
 
 const goToMajorTransfer = () => {
+  if (!authStore.requireAuth()) return;
   Taro.navigateTo({ url: "/pages/major-transfer/index" });
 };
 
 const goToCompetition = () => {
+  if (!authStore.requireAuth()) return;
   Taro.navigateTo({ url: "/pages/competition/index" });
 };
 
@@ -663,10 +666,12 @@ const goToOrganization = () => {
 };
 
 const goToQualification = () => {
+  if (!authStore.requireAuth()) return;
   Taro.navigateTo({ url: "/pages/qualification/index" });
 };
 
 const goToExchange = () => {
+  if (!authStore.requireAuth()) return;
   Taro.navigateTo({ url: "/pages/exchange/index" });
 };
 
@@ -713,6 +718,7 @@ const goToJw = () => {
 };
 
 const goToGpaCalculator = () => {
+  if (!authStore.requireAuth()) return;
   Taro.navigateTo({ url: "/pages/gpa-calculator/index" });
 };
 

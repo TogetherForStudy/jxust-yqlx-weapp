@@ -34,7 +34,7 @@
               <text class="text-base font-semibold text-fg" :user-select="true">{{ activeTitle }}</text>
               <text v-if="activeDescription" class="mt-1 block leading-5 text-fg-muted" :user-select="true">{{ activeDescription }}</text>
             </view>
-            <text class="flex-shrink-0 text-warning">{{ activeCount }} 项</text>
+            <text class="shrink-0 text-warning">{{ activeCount }} 项</text>
           </view>
         </view>
 
@@ -93,7 +93,7 @@
               >
                 <view class="flex items-start justify-between gap-3">
                   <text class="min-w-0 flex-1 font-medium leading-5 text-fg" :user-select="true">{{ child.name }}</text>
-                  <text class="flex-shrink-0 leading-5 text-fg-subtle" :user-select="true">{{ child.displayDate || '时间待更新' }}</text>
+                  <text class="shrink-0 leading-5 text-fg-subtle" :user-select="true">{{ child.displayDate || '时间待更新' }}</text>
                 </view>
               </view>
             </view>

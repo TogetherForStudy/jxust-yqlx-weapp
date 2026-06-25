@@ -12,7 +12,7 @@
     </view>
 
     <!-- 学习任务内容 -->
-    <view class="bg-surface rounded-xl shadow-sm border border-line">
+    <view class="bg-surface rounded-xl shadow-sm">
       <!-- 加载状态 -->
       <view v-if="isLoading" class="flex items-center justify-center py-8">
         <text class="text-fg-muted text-sm">加载中...</text>
@@ -82,7 +82,7 @@
                 <!-- 任务内容 -->
                 <view class="flex items-start gap-3">
                   <!-- 优先级指示器 -->
-                  <view class="w-1 h-4 rounded-full flex-shrink-0 mt-0.5" :class="getPriorityColorClass(task.priority)">
+                  <view class="w-1 h-4 rounded-full shrink-0 mt-0.5" :class="getPriorityColorClass(task.priority)">
                   </view>
 
                   <view class="flex-1 min-w-0">
@@ -93,7 +93,7 @@
                       </text>
 
                       <!-- 右上角操作区 -->
-                      <view class="flex items-center gap-2 flex-shrink-0">
+                      <view class="flex items-center gap-2 shrink-0">
                         <!-- 天数提醒 -->
                         <view v-if="getDaysLeftBadge(task.due_date, task.status)"
                           class="px-1.5 py-0.5 rounded text-xs font-medium" :class="getDaysLeftBadgeClass(task.due_date, task.status)
@@ -103,7 +103,7 @@
 
                         <!-- 完成按钮 -->
                         <view @tap.stop="toggleTaskStatus(task.id)"
-                          class="flex-shrink-0 w-5 h-5 border-2 border-line rounded-full flex items-center justify-center active:bg-surface-muted">
+                          class="shrink-0 w-5 h-5 border-2 border-line rounded-full flex items-center justify-center active:bg-surface-muted">
                           <text v-if="task.status === 2" class="i-lucide-check w-3 h-3 text-success"></text>
                         </view>
                       </view>
@@ -144,7 +144,7 @@
                 <!-- 任务内容 -->
                 <view class="flex items-start gap-3">
                   <!-- 完成指示器 -->
-                  <view class="w-1 h-4 rounded-full bg-success flex-shrink-0 mt-0.5"></view>
+                  <view class="w-1 h-4 rounded-full bg-success shrink-0 mt-0.5"></view>
 
                   <view class="flex-1 min-w-0">
                     <!-- 任务标题和右上角操作区 -->
@@ -155,7 +155,7 @@
 
                       <!-- 完成按钮 -->
                       <view @tap.stop="toggleTaskStatus(task.id)"
-                        class="flex-shrink-0 w-5 h-5 border-2 border-success rounded-full flex items-center justify-center bg-success active:bg-success">
+                        class="shrink-0 w-5 h-5 border-2 border-success rounded-full flex items-center justify-center bg-success active:bg-success">
                         <text class="i-lucide-check w-3 h-3 text-white"></text>
                       </view>
                     </view>
@@ -186,9 +186,9 @@
       </view>
 
     <!-- 添加学习任务弹窗 -->
-    <view v-if="showAddModal" class="fixed inset-0 bg-overlay flex items-end justify-center z-50"
+    <view v-if="showAddModal" class="fixed inset-0 bg-overlay flex items-center justify-center z-50"
       @tap="hideAddModal">
-      <view @tap.stop="" class="bg-surface rounded-t-2xl w-full h-4/5 flex flex-col">
+      <view @tap.stop="" class="bg-surface rounded-2xl w-[90%] max-w-md mx-4 max-h-[80vh] flex flex-col overflow-hidden">
         <!-- 弹窗头部 -->
         <view class="flex justify-between items-center px-4 py-2 border-b border-line">
           <text class="text-lg font-semibold">添加学习任务</text>
@@ -198,8 +198,7 @@
         </view>
 
         <!-- 弹窗内容 -->
-        <view class="flex-1 h-[1px]">
-          <scroll-view :scroll-y="true" class="h-full">
+        <scroll-view :scroll-y="true" class="flex-1 min-h-0" style="max-height: 60vh;">
             <view class="p-4 space-y-4">
               <!-- 标题 -->
               <view class="flex flex-col gap-2">
@@ -247,20 +246,19 @@
                 <view class="flex gap-2">
                   <view v-for="priority in priorityOptions" :key="priority.value"
                     @tap="newTask.priority = priority.value"
-                    class="flex-1 p-3 rounded-lg border text-center text-sm font-medium" :class="newTask.priority === priority.value
+                    class="flex-1 py-2.5 rounded-lg border flex items-center justify-center gap-1.5 text-sm font-medium" :class="newTask.priority === priority.value
                         ? priority.activeClass
                         : 'border-line text-fg-muted bg-surface'
                       ">
-                    <text class="block">{{ priority.icon }}</text>
-                    <text class="block mt-1">{{ priority.label }}</text>
+                    <view class="w-2 h-2 rounded-full" :class="priority.dotClass"></view>
+                    <text>{{ priority.label }}</text>
                   </view>
                 </view>
               </view>
             </view>
           </scroll-view>
-        </view>
         <!-- 弹窗底部 -->
-        <view class="p-4 border-t border-line flex space-x-3">
+        <view class="p-4 border-t border-line flex space-x-3 shrink-0">
           <view @tap="hideAddModal"
             class="flex-1 py-3 px-4 bg-surface-muted text-fg-muted rounded-lg text-center font-medium">
             取消
@@ -277,8 +275,8 @@
 
     <!-- 编辑学习任务弹窗 -->
     <view v-if="showEditModal && currentTask"
-      class="fixed inset-0 bg-overlay flex items-end justify-center z-50" @tap="hideEditModal">
-      <view @tap.stop="" class="bg-surface rounded-t-2xl w-full h-4/5 flex flex-col">
+      class="fixed inset-0 bg-overlay flex items-center justify-center z-50" @tap="hideEditModal">
+      <view @tap.stop="" class="bg-surface rounded-2xl w-[90%] max-w-md mx-4 max-h-[80vh] flex flex-col overflow-hidden">
         <!-- 弹窗头部 -->
         <view class="flex justify-between items-center px-4 py-2 border-b border-line">
           <text class="text-lg font-semibold">编辑学习任务</text>
@@ -293,8 +291,7 @@
         </view>
 
         <!-- 弹窗内容 -->
-        <view class="flex-1 h-[1px]">
-          <scroll-view :scroll-y="true" class="h-full">
+        <scroll-view :scroll-y="true" class="flex-1 min-h-0" style="max-height: 60vh;">
             <view class="p-4 space-y-4">
               <!-- 标题 -->
               <view class="flex flex-col gap-2">
@@ -342,21 +339,20 @@
                 <view class="flex gap-2">
                   <view v-for="priority in priorityOptions" :key="priority.value"
                     @tap="editTask.priority = priority.value"
-                    class="flex-1 p-3 rounded-lg border text-center text-sm font-medium" :class="editTask.priority === priority.value
+                    class="flex-1 py-2.5 rounded-lg border flex items-center justify-center gap-1.5 text-sm font-medium" :class="editTask.priority === priority.value
                         ? priority.activeClass
                         : 'border-line text-fg-muted bg-surface'
                       ">
-                    <text class="block">{{ priority.icon }}</text>
-                    <text class="block mt-1">{{ priority.label }}</text>
+                    <view class="w-2 h-2 rounded-full" :class="priority.dotClass"></view>
+                    <text>{{ priority.label }}</text>
                   </view>
                 </view>
               </view>
             </view>
           </scroll-view>
-        </view>
 
         <!-- 弹窗底部 -->
-        <view class="p-4 border-t border-line flex space-x-3">
+        <view class="p-4 border-t border-line flex space-x-3 shrink-0">
           <view @tap="hideEditModal"
             class="flex-1 py-3 px-4 bg-surface-muted text-fg-muted rounded-lg text-center font-medium">
             取消
@@ -431,19 +427,19 @@ const priorityOptions = [
   {
     value: 1,
     label: "高",
-    icon: "🔴",
+    dotClass: "bg-danger",
     activeClass: "border-danger bg-danger-soft text-danger",
   },
   {
     value: 2,
     label: "中",
-    icon: "🟡",
+    dotClass: "bg-warning",
     activeClass: "border-warning bg-warning-soft text-warning",
   },
   {
     value: 3,
     label: "低",
-    icon: "🟢",
+    dotClass: "bg-success",
     activeClass: "border-success bg-success-soft text-success",
   },
 ];
@@ -492,11 +488,11 @@ const formatCompletedTime = (dateStr) => {
 
 const getPriorityColorClass = (priority) => {
   const map = {
-    1: "bg-red-400",
-    2: "bg-yellow-400",
+    1: "bg-danger",
+    2: "bg-warning",
     3: "bg-success",
   };
-  return map[priority] || "bg-yellow-400";
+  return map[priority] || "bg-warning";
 };
 
 const getTaskBorderClass = (task) => {

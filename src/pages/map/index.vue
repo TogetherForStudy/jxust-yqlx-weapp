@@ -11,7 +11,7 @@
       <view
         v-for="campus in campusList"
         :key="campus.key"
-        class="bg-surface rounded-lg shadow-sm border border-line overflow-hidden"
+        class="bg-surface rounded-lg shadow-sm overflow-hidden"
       >
         <!-- 校区标题栏 -->
         <view

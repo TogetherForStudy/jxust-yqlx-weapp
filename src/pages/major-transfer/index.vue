@@ -72,11 +72,11 @@
                     class="border-t border-line"
                   >
                     <view class="flex items-start gap-3 py-3" @tap="toggleNotice(`${noticeYearTab}-${season.key}-${noticeIndex}`)">
-                      <text class="i-lucide-file-text mt-0.5 h-4 w-4 flex-shrink-0 text-warning" :user-select="true"></text>
+                      <text class="i-lucide-file-text mt-0.5 h-4 w-4 shrink-0 text-warning" :user-select="true"></text>
                       <view class="flex-1">
                         <view class="flex items-center justify-between gap-3">
                           <text class="flex-1 leading-6 text-fg line-clamp-2">{{ notice.name || '未命名通知' }}</text>
-                          <text :class="Number(notice.status) === 1 ? 'flex-shrink-0 text-emerald-600' : 'flex-shrink-0 text-fg-subtle'" :user-select="true">
+                          <text :class="Number(notice.status) === 1 ? 'shrink-0 text-emerald-600' : 'shrink-0 text-fg-subtle'" :user-select="true">
                             {{ Number(notice.status) === 1 ? '已发布' : '未发布' }}
                           </text>
                         </view>
@@ -102,7 +102,7 @@
                           :key="`${noticeYearTab}-${season.key}-${noticeIndex}-${attachmentIndex}`"
                           class="flex items-center gap-2 text-fg-muted"
                         >
-                          <text class="i-lucide-paperclip h-3.5 w-3.5 flex-shrink-0 text-fg-subtle"></text>
+                          <text class="i-lucide-paperclip h-3.5 w-3.5 shrink-0 text-fg-subtle"></text>
                           <text class="min-w-0 flex-1 line-clamp-2 text-sm">{{ attachment.name }}</text>
                         </view>
                       </view>
@@ -205,7 +205,7 @@
                     :key="`${index}-${item}`"
                     class="flex items-start gap-2 border-t border-line py-2.5 first:border-t-0 first:pt-0"
                   >
-                    <view class="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-rose-400"></view>
+                    <view class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-rose-400"></view>
                       <text class="leading-6 text-fg" :user-select="true">{{ item }}</text>
                   </view>
                 </view>
@@ -243,7 +243,7 @@
           </view>
 
           <view v-else class="overflow-x-auto border-b border-line">
-            <view class="grid grid-cols-[1fr,1.1fr,1.2fr] gap-3 border-b border-line py-3 text-fg-subtle">
+            <view class="grid grid-cols-[1fr_1.1fr_1.2fr] gap-3 border-b border-line py-3 text-fg-subtle">
               <text :user-select="true">学院</text>
               <text :user-select="true">专业</text>
               <text :user-select="true">备注</text>
@@ -251,7 +251,7 @@
             <view
               v-for="(group, groupIndex) in currentMajorGroups"
               :key="`${group.college}-${groupIndex}`"
-              class="grid grid-cols-[1fr,2.3fr] gap-3 border-t border-line leading-6"
+              class="grid grid-cols-[1fr_2.3fr] gap-3 border-t border-line leading-6"
             >
               <view class="flex items-center border-r border-line py-3 pr-3 text-fg">
                 <text :user-select="true">{{ group.college }}</text>
@@ -260,7 +260,7 @@
                 <view
                   v-for="(row, rowIndex) in group.rows"
                   :key="`${group.college}-${row.name}-${rowIndex}`"
-                  class="grid grid-cols-[1.1fr,1.2fr] gap-3 py-3"
+                  class="grid grid-cols-[1.1fr_1.2fr] gap-3 py-3"
                   :class="rowIndex > 0 ? 'border-t border-line' : ''"
                 >
                   <text class="text-fg" :user-select="true">{{ row.name }}</text>
@@ -379,11 +379,11 @@
               class="border-b border-line"
             >
               <view class="flex items-center gap-3 py-3" @tap="toggleQA(item.id)">
-                <text class="w-6 flex-shrink-0 text-center font-semibold text-warning" :user-select="true">{{ item.id || '?' }}</text>
+                <text class="w-6 shrink-0 text-center font-semibold text-warning" :user-select="true">{{ item.id || '?' }}</text>
                 <text class="min-w-0 flex-1 leading-6 text-fg" :user-select="true">{{ item.title || '未命名问题' }}</text>
                 <text
                   :class="[
-                    'i-lucide-chevron-down h-4 w-4 flex-shrink-0 transform text-fg-subtle transition-transform duration-200',
+                    'i-lucide-chevron-down h-4 w-4 shrink-0 transform text-fg-subtle transition-transform duration-200',
                     activeQuestionId === item.id ? 'rotate-180 text-warning' : 'rotate-0'
                   ]"
                   :user-select="true"

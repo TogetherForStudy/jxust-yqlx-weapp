@@ -210,12 +210,12 @@
     <!-- 新增评价弹窗 -->
     <view
       v-if="showAddModal"
-      class="fixed inset-0 bg-overlay flex items-end justify-center z-50"
+      class="fixed inset-0 bg-overlay flex items-center justify-center z-50"
       @tap="hideAddReviewModal"
     >
       <view
         @tap.stop=""
-        class="bg-surface rounded-t-2xl w-full max-h-4/5 flex flex-col"
+        class="bg-surface rounded-2xl w-[90%] max-w-md mx-4 max-h-[80vh] flex flex-col overflow-hidden"
       >
         <!-- 弹窗头部 -->
         <view
@@ -228,7 +228,7 @@
         </view>
 
         <!-- 弹窗内容 -->
-        <scroll-view scroll-y>
+        <scroll-view scroll-y class="flex-1 min-h-0" style="max-height: 60vh;">
           <view class="p-4 space-y-2">
             <!-- 教师姓名 -->
             <view class="flex flex-col gap-2">
@@ -318,7 +318,7 @@
         </scroll-view>
 
         <!-- 弹窗底部 -->
-        <view class="p-4 border-t border-line flex-shrink-0">
+        <view class="p-4 border-t border-line shrink-0">
           <view class="flex space-x-3">
             <view
               @tap="hideAddReviewModal"

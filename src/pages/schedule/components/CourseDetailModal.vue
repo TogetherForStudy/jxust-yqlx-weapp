@@ -88,7 +88,7 @@
       </view>
 
       <!-- 底部操作按钮 -->
-      <view class="flex-shrink-0 px-4 pb-4 pt-2 border-t border-line">
+      <view class="shrink-0 px-4 pb-4 pt-2 border-t border-line">
         <view class="flex gap-2">
           <view
             @tap="handleAddNew"

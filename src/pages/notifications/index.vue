@@ -51,7 +51,7 @@
     <view class="p-4 flex-1 h-[1px]">
       <!-- 加载状态 -->
       <view v-if="isListLoading && displayedNotifications.length === 0">
-        <view class="bg-surface rounded-xl p-8 shadow-sm border border-line">
+        <view class="bg-surface rounded-xl p-8 shadow-sm">
           <view class="flex items-center justify-center">
             <text class="text-fg-muted text-sm">加载中...</text>
           </view>
@@ -60,7 +60,7 @@
 
       <!-- 空状态 -->
       <view v-else-if="displayedNotifications.length === 0">
-        <view class="bg-surface rounded-xl p-8 shadow-sm border border-line">
+        <view class="bg-surface rounded-xl p-8 shadow-sm">
           <view class="flex flex-col items-center justify-center">
             <text class="i-lucide-bell-off text-fg-subtle text-4xl mb-2"></text>
             <text class="text-fg-muted text-sm">暂无信息</text>
@@ -72,7 +72,7 @@
       <scroll-view v-else :scroll-y="true" class="h-full" @scrolltolower="loadMore" :lower-threshold="100">
         <view class="space-y-3">
           <view v-for="notification in displayedNotifications" :key="notification.id"
-            class="bg-surface rounded-xl p-4 shadow-sm border border-line active:scale-98 transition-transform"
+            class="bg-surface rounded-xl p-4 shadow-sm active:scale-98 transition-transform"
             @tap="goToNotificationDetail(notification)">
             <!-- 通知头部 -->
             <view class="flex justify-between items-start mb-2">

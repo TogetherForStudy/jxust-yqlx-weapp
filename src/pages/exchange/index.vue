@@ -70,7 +70,7 @@
                 class="flex items-start gap-2 py-2"
                 :class="itemIndex > 0 ? 'border-t border-line' : ''"
               >
-                <view class="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-warning"></view>
+                <view class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-warning"></view>
                 <text class="min-w-0 flex-1 leading-6 text-fg" :user-select="true">{{ item }}</text>
               </view>
             </view>
@@ -84,7 +84,7 @@
               >
                 <view class="flex items-start justify-between gap-3">
                   <text class="min-w-0 flex-1 font-semibold leading-6 text-fg" :user-select="true">{{ school.name || `学校 ${schoolIndex + 1}` }}</text>
-                  <text v-if="school.quotaLabel" class="flex-shrink-0 text-warning" :user-select="true">{{ school.quotaLabel }}</text>
+                  <text v-if="school.quotaLabel" class="shrink-0 text-warning" :user-select="true">{{ school.quotaLabel }}</text>
                 </view>
                 <text v-if="school.remarks" class="mt-1 block leading-6 text-fg-muted" :user-select="true">{{ school.remarks }}</text>
               </view>

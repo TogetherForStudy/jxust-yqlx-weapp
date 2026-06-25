@@ -1,18 +1,18 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
   <page-meta
-    :page-style="themeStore.pageStyle"
+    :page-style="mergedPageStyle"
     :background-color="themeStore.nativeTheme.pageBg"
     :background-text-style="themeStore.nativeTheme.backgroundTextStyle"
   />
   <view
     class="min-h-screen bg-page flex flex-col text-fg"
-    :class="[themeStore.rootClass, { 'h-screen overflow-hidden': isWordDetailVisible || isChildModalVisible }]"
+    :class="themeStore.rootClass"
   >
     <!-- 顶部栏 -->
     <view v-if="authStore.isLoggedIn" class="flex items-center justify-between px-4 py-1 bg-surface border-b border-line">
       <view class="flex items-center gap-1.5 flex-1 min-w-0" @tap="showWordDetail">
-        <text class="i-lucide-book w-4 h-4 text-brand flex-shrink-0"></text>
+        <text class="i-lucide-book w-4 h-4 text-brand shrink-0"></text>
         <view v-if="dailyWord" class="flex-1 min-w-0 overflow-hidden">
           <text class="text-sm text-fg font-medium line-clamp-1">
             {{ dailyWord.word }}
@@ -218,6 +218,14 @@ const isWordDetailVisible = ref(false)
 const isRefreshingWord = ref(false)
 // 子组件（如番茄钟排行榜）弹窗显隐，用于锁定页面滚动，避免滚动穿透
 const isChildModalVisible = ref(false)
+// 有弹层打开时锁定页面滚动。通过 page-meta 的 page-style 给原生 page 元素加
+// overflow:hidden，而不是改内容容器的高度/overflow——后者会重置滚动位置，
+// 导致关闭弹层后页面跳回顶部。
+const isAnyModalVisible = computed(() => isWordDetailVisible.value || isChildModalVisible.value)
+const mergedPageStyle = computed(() => {
+  const base = themeStore.pageStyle
+  return isAnyModalVisible.value ? `${base} overflow: hidden;` : base
+})
 const onChildModalVisibilityChange = (visible) => {
   isChildModalVisible.value = visible
 }

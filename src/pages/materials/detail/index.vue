@@ -15,7 +15,7 @@
       <!-- 文件信息卡片 -->
       <view class="bg-surface p-4 mb-2">
         <view class="flex items-start space-x-3">
-          <view class="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-xl flex items-center justify-center flex-shrink-0">
+          <view class="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-xl flex items-center justify-center shrink-0">
             <text class="i-lucide-file-text text-white w-6 h-6"></text>
           </view>
           <view class="flex-1 min-w-0">

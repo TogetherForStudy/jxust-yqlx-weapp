@@ -12,7 +12,7 @@
     <!-- 通知详情 -->
     <view v-else-if="notification" class="p-4">
       <!-- 主要内容卡片 -->
-      <view class="bg-surface rounded-xl p-4 shadow-sm border border-line">
+      <view class="bg-surface rounded-xl p-4 shadow-sm">
         <!-- 通知头部 -->
         <view class="mb-4">
           <!-- 标题 -->
@@ -145,7 +145,7 @@
     </view>
     <!-- 错误状态 -->
     <view v-else class="p-4">
-      <view class="bg-surface rounded-xl p-8 shadow-sm border border-line">
+      <view class="bg-surface rounded-xl p-8 shadow-sm">
         <view class="flex flex-col items-center justify-center">
           <text class="i-lucide-alert-circle text-red-400 text-4xl mb-2"></text>
           <text class="text-fg-muted text-sm">信息不存在或已被删除</text>
