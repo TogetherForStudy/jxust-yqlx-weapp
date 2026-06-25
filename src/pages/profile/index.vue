@@ -9,21 +9,26 @@
     <!-- 主要内容区域 -->
     <view>
       <!-- 用户信息头部 -->
-      <view class="bg-gradient-to-br from-blue-500 to-indigo-600 pt-8 pb-8">
-      <view v-if="!authStore.isLoggedIn" class="text-center px-4">
-        <text class="text-white text-lg font-medium block mb-1">未登录</text>
+      <view class="px-4 pt-10 pb-5">
+        <view class="flex items-center gap-3">
+          <view class="w-12 h-12 rounded-full bg-surface-muted flex items-center justify-center shrink-0">
+            <text class="i-lucide-user text-fg-subtle w-6 h-6"></text>
+          </view>
+          <view v-if="!authStore.isLoggedIn" class="min-w-0">
+            <text class="text-fg text-xl font-semibold block truncate">未登录</text>
+            <text class="text-fg-subtle text-sm">登录后查看更多</text>
+          </view>
+          <view v-else class="min-w-0">
+            <text class="text-fg text-xl font-semibold block truncate">
+              {{ userInfo?.nickname || "江理一起来学" }}
+            </text>
+          </view>
+        </view>
       </view>
-
-      <view v-else class="text-center px-4">
-        <text class="text-white text-lg font-medium block mb-1">
-          {{ userInfo?.nickname || "江理一起来学" }}
-        </text>
-      </view>
-    </view>
 
     <!-- 个人信息卡片 -->
-    <view v-if="authStore.isLoggedIn" class="px-4 -mt-6">
-      <view class="bg-surface rounded-xl p-4 shadow-sm mb-4">
+    <view v-if="authStore.isLoggedIn" class="px-4">
+      <view class="bg-surface rounded-xl p-4 shadow-sm mb-4 border border-line">
         <view class="space-y-3">
           <view class="flex justify-between items-center">
               <text class="text-fg-muted">账号</text>

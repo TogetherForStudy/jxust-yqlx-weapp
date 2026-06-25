@@ -1,10 +1,5 @@
 <template>
-  <page-meta
-    :page-style="themeStore.pageStyle"
-    :background-color="themeStore.nativeTheme.pageBg"
-    :background-text-style="themeStore.nativeTheme.backgroundTextStyle"
-  />
-  <view class="min-h-screen bg-[#bc0300] text-[#fff5d3]" :class="[themeStore.rootClass]">
+  <view class="min-h-screen bg-[#bc0300] text-[#fff5d3]">
     <!-- 头部标题 -->
     <view class="pt-8 pb-8">
       <view class="absolute left-0 top-0 z-10 flex flex-col">
@@ -58,12 +53,9 @@
 </template>
 
 <script setup>
-import { useThemePage } from '../../composables/useThemePage'
 import { ref, onMounted } from 'vue'
 import { heroAPI } from '../../api'
 import Taro from '@tarojs/taro'
-
-const themeStore = useThemePage()
 
 const heroes = ref([])
 const loading = ref(false)

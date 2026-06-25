@@ -40,53 +40,53 @@ export const WEEK_DAYS = ['周一', '周二', '周三', '周四', '周五', '周
 // 课程颜色配置 - 预设10套颜色组合
 export const COURSE_COLORS = [
   {
-    backgroundColor: 'bg-blue-100 dark:bg-blue-950',
-    textColor: 'text-blue-800 dark:text-blue-200',
+    backgroundColor: 'bg-blue-100 dark:bg-blue-900/40',
+    textColor: 'text-blue-700 dark:text-blue-200',
     name: 'blue'
   },
   {
-    backgroundColor: 'bg-purple-100 dark:bg-purple-950',
-    textColor: 'text-purple-800 dark:text-purple-200',
+    backgroundColor: 'bg-purple-100 dark:bg-purple-900/40',
+    textColor: 'text-purple-700 dark:text-purple-200',
     name: 'purple'
   },
   {
-    backgroundColor: 'bg-success-soft',
-    textColor: 'text-success',
+    backgroundColor: 'bg-emerald-100 dark:bg-emerald-900/40',
+    textColor: 'text-emerald-700 dark:text-emerald-200',
     name: 'green'
   },
   {
-    backgroundColor: 'bg-warning-soft',
-    textColor: 'text-warning',
+    backgroundColor: 'bg-amber-100 dark:bg-amber-900/40',
+    textColor: 'text-amber-700 dark:text-amber-200',
     name: 'yellow'
   },
   {
-    backgroundColor: 'bg-danger-soft',
-    textColor: 'text-danger',
+    backgroundColor: 'bg-rose-100 dark:bg-rose-900/40',
+    textColor: 'text-rose-700 dark:text-rose-200',
     name: 'red'
   },
   {
-    backgroundColor: 'bg-indigo-100 dark:bg-indigo-950',
-    textColor: 'text-indigo-800 dark:text-indigo-200',
+    backgroundColor: 'bg-indigo-100 dark:bg-indigo-900/40',
+    textColor: 'text-indigo-700 dark:text-indigo-200',
     name: 'indigo'
   },
   {
-    backgroundColor: 'bg-pink-100 dark:bg-pink-950',
-    textColor: 'text-pink-800 dark:text-pink-200',
+    backgroundColor: 'bg-pink-100 dark:bg-pink-900/40',
+    textColor: 'text-pink-700 dark:text-pink-200',
     name: 'pink'
   },
   {
-    backgroundColor: 'bg-teal-100 dark:bg-teal-950',
-    textColor: 'text-teal-800 dark:text-teal-200',
+    backgroundColor: 'bg-teal-100 dark:bg-teal-900/40',
+    textColor: 'text-teal-700 dark:text-teal-200',
     name: 'teal'
   },
   {
-    backgroundColor: 'bg-orange-100 dark:bg-orange-950',
-    textColor: 'text-orange-800 dark:text-orange-200',
+    backgroundColor: 'bg-orange-100 dark:bg-orange-900/40',
+    textColor: 'text-orange-700 dark:text-orange-200',
     name: 'orange'
   },
   {
-    backgroundColor: 'bg-cyan-100 dark:bg-cyan-950',
-    textColor: 'text-cyan-800 dark:text-cyan-200',
+    backgroundColor: 'bg-cyan-100 dark:bg-cyan-900/40',
+    textColor: 'text-cyan-700 dark:text-cyan-200',
     name: 'cyan'
   }
 ]

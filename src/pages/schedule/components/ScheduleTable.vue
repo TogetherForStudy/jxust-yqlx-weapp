@@ -1,5 +1,5 @@
 <template>
-  <view class="flex flex-col h-full bg-surface">
+  <view class="schedule-grid flex flex-col h-full bg-surface">
     <!-- 课程表头部 - 星期 -->
     <view
       class="flex items-center py-1 border-b border-line"
@@ -396,3 +396,15 @@ const handleCourseClick = (period, dayIndex) => {
 </script>
 
 
+<style scoped>
+/* 课表网格线更贴近背景：浅色用近背景的浅灰，深色用近表面的深灰 */
+.schedule-grid {
+  --theme-line: #f0f0f2;
+}
+
+@media (prefers-color-scheme: dark) {
+  .schedule-grid {
+    --theme-line: #242427;
+  }
+}
+</style>

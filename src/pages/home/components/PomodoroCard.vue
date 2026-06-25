@@ -139,7 +139,7 @@
             <text>昵称</text>
             <text class="text-right whitespace-nowrap">专注次数</text>
           </view>
-          <view class="divide-y divide-gray-100">
+          <view class="divide-y divide-line">
             <view
               v-for="(item, index) in ranking"
               :key="`${item.nickname || 'rank'}-${index}`"
@@ -187,14 +187,14 @@ const modePresets = [
     shortLabel: '25 分钟',
     duration: 25 * 60,
     helper: '完成后转入短休',
-    panelClass: 'from-rose-50 via-red-50 to-orange-50 border-red-100 dark:from-rose-950 dark:via-red-950 dark:to-orange-950 dark:border-red-900',
-    activeClass: 'bg-red-400 border-danger text-white',
+    panelClass: 'from-rose-50 to-orange-50 border-rose-100 dark:from-rose-900/25 dark:to-orange-900/20 dark:border-rose-900/40',
+    activeClass: 'bg-rose-500 border-rose-500 text-white dark:bg-rose-600 dark:border-rose-600',
     inactiveClass: 'bg-surface border-line text-fg-muted',
-    badgeClass: 'text-danger border-danger',
-    trackClass: 'bg-surface bg-opacity-70',
-    progressClass: 'bg-red-400',
-    primaryButtonClass: 'bg-red-400',
-    secondaryButtonClass: 'border-danger text-danger'
+    badgeClass: 'text-rose-600 border-rose-200 dark:text-rose-300 dark:border-rose-800',
+    trackClass: 'bg-black/5 dark:bg-white/10',
+    progressClass: 'bg-rose-500 dark:bg-rose-400',
+    primaryButtonClass: 'bg-rose-500 dark:bg-rose-600',
+    secondaryButtonClass: 'border-rose-200 text-rose-600 dark:border-rose-800 dark:text-rose-300'
   },
   {
     key: 'shortBreak',
@@ -202,14 +202,14 @@ const modePresets = [
     shortLabel: '5 分钟',
     duration: 5 * 60,
     helper: '快速放松一下，再回来继续推进',
-    panelClass: 'from-emerald-100 via-teal-50 to-lime-50 border-emerald-200 dark:from-emerald-950 dark:via-teal-950 dark:to-lime-950 dark:border-emerald-900',
-    activeClass: 'bg-emerald-500 border-emerald-500 text-white',
+    panelClass: 'from-emerald-50 to-teal-50 border-emerald-100 dark:from-emerald-900/25 dark:to-teal-900/20 dark:border-emerald-900/40',
+    activeClass: 'bg-emerald-500 border-emerald-500 text-white dark:bg-emerald-600 dark:border-emerald-600',
     inactiveClass: 'bg-surface border-line text-fg-muted',
-    badgeClass: 'text-emerald-700 border-emerald-200 dark:text-emerald-200 dark:border-emerald-700',
-    trackClass: 'bg-surface bg-opacity-70',
-    progressClass: 'bg-emerald-500',
-    primaryButtonClass: 'bg-emerald-500',
-    secondaryButtonClass: 'border-emerald-200 text-emerald-700 dark:border-emerald-700 dark:text-emerald-200'
+    badgeClass: 'text-emerald-600 border-emerald-200 dark:text-emerald-300 dark:border-emerald-800',
+    trackClass: 'bg-black/5 dark:bg-white/10',
+    progressClass: 'bg-emerald-500 dark:bg-emerald-400',
+    primaryButtonClass: 'bg-emerald-500 dark:bg-emerald-600',
+    secondaryButtonClass: 'border-emerald-200 text-emerald-600 dark:border-emerald-800 dark:text-emerald-300'
   },
   {
     key: 'longBreak',
@@ -217,14 +217,14 @@ const modePresets = [
     shortLabel: '15 分钟',
     duration: 15 * 60,
     helper: '做一轮深度恢复，下一轮继续开工',
-    panelClass: 'from-sky-100 via-cyan-50 to-indigo-50 border-sky-200 dark:from-sky-950 dark:via-cyan-950 dark:to-indigo-950 dark:border-sky-900',
-    activeClass: 'bg-sky-500 border-sky-500 text-white',
+    panelClass: 'from-sky-50 to-indigo-50 border-sky-100 dark:from-sky-900/25 dark:to-indigo-900/20 dark:border-sky-900/40',
+    activeClass: 'bg-sky-500 border-sky-500 text-white dark:bg-sky-600 dark:border-sky-600',
     inactiveClass: 'bg-surface border-line text-fg-muted',
-    badgeClass: 'text-sky-700 border-sky-200 dark:text-sky-200 dark:border-sky-700',
-    trackClass: 'bg-surface bg-opacity-70',
-    progressClass: 'bg-sky-500',
-    primaryButtonClass: 'bg-sky-500',
-    secondaryButtonClass: 'border-sky-200 text-sky-700 dark:border-sky-700 dark:text-sky-200'
+    badgeClass: 'text-sky-600 border-sky-200 dark:text-sky-300 dark:border-sky-800',
+    trackClass: 'bg-black/5 dark:bg-white/10',
+    progressClass: 'bg-sky-500 dark:bg-sky-400',
+    primaryButtonClass: 'bg-sky-500 dark:bg-sky-600',
+    secondaryButtonClass: 'border-sky-200 text-sky-600 dark:border-sky-800 dark:text-sky-300'
   }
 ]
 
