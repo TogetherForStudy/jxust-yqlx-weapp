@@ -137,7 +137,7 @@
           </view>
         </view>
         <scroll-view :scroll-y="true" class="flex-1 h-[0px]">
-          <view class="divide-y divide-gray-100">
+          <view class="divide-y divide-line">
             <view
               v-for="(course, index) in courses"
               :key="`${course.courseName}-${index}`"

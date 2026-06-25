@@ -74,7 +74,7 @@
             </view>
             <view class="text-right">
               <view class="text-xs text-fg-subtle">题量</view>
-              <text class="text-lg font-semibold text-indigo-500">
+              <text class="text-lg font-semibold text-brand">
                 {{ project.question_count || project.total || '--' }}
               </text>
             </view>

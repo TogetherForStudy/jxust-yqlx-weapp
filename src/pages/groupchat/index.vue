@@ -25,7 +25,7 @@
         </view>
 
         <!-- 群组列表 -->
-        <view class="divide-y divide-gray-100">
+        <view class="divide-y divide-line">
           <view
             v-for="(group, groupIndex) in card.list"
             :key="groupIndex"

@@ -92,17 +92,13 @@
     <view
       v-if="showRankingModal"
       class="fixed inset-0 z-50 flex items-center justify-center px-5"
-      :catch-move="true"
-      @touchmove.stop.prevent="handleRankingModalTouchMove"
     >
-      <view class="absolute inset-0 bg-black bg-opacity-40" @tap="showRankingModal = false"></view>
+      <view class="absolute inset-0 bg-overlay" :catch-move="true" @tap="showRankingModal = false"></view>
       <view
-        class="relative bg-surface rounded-2xl w-full max-w-md max-h-[70vh] overflow-hidden shadow-2xl"
-        :catch-move="true"
+        class="relative bg-surface rounded-2xl w-full max-w-md max-h-[70vh] flex flex-col overflow-hidden shadow-2xl"
         @tap.stop=""
-        @touchmove.stop="handleRankingModalTouchMove"
       >
-        <view class="px-4 py-2 border-b border-line flex items-center justify-between">
+        <view class="px-4 py-2 border-b border-line flex items-center justify-between flex-shrink-0">
           <text class="text-base font-semibold text-fg">专注排行榜</text>
           <view class="w-7 h-7 flex items-center justify-center" @tap="showRankingModal = false">
             <text class="i-lucide-x w-5 h-5 text-fg-subtle"></text>
@@ -111,7 +107,7 @@
 
         <view
           v-if="authStore.isLoggedIn"
-          class="px-4 py-2.5 bg-page border-b border-line flex items-center justify-center"
+          class="px-4 py-2.5 bg-page border-b border-line flex items-center justify-center flex-shrink-0"
         >
           <text class="text-sm text-fg-muted">我的累计完成</text>
           <text class="text-sm font-semibold text-fg ml-2">{{ completedCount }} 次</text>
@@ -133,7 +129,7 @@
           <text class="text-sm text-fg-muted mt-1">完成一个番茄后会自动同步</text>
         </view>
 
-        <scroll-view v-else scroll-y class="max-h-[52vh]" style="max-height: 52vh;">
+        <scroll-view v-else :scroll-y="true" class="flex-1 min-h-0" style="max-height: 52vh;">
           <view class="px-4 py-2 border-b border-line bg-page grid grid-cols-[44px_1fr_84px] gap-3 text-xs text-fg-muted font-medium">
             <text></text>
             <text>昵称</text>
@@ -143,8 +139,7 @@
             <view
               v-for="(item, index) in ranking"
               :key="`${item.nickname || 'rank'}-${index}`"
-              class="px-4 py-2 grid grid-cols-[44px_1fr_84px] gap-3 items-center"
-              :class="getRankingRowClass(index)"
+              class="px-4 py-2 grid grid-cols-[44px_1fr_84px] gap-3 items-center bg-surface"
             >
               <view class="flex items-center">
                 <view
@@ -176,6 +171,8 @@ defineOptions({
   name: 'PomodoroCard'
 })
 
+const emit = defineEmits(['modal-visibility-change'])
+
 const STORAGE_KEY = 'home-pomodoro-state-v1'
 const DEFAULT_MODE = 'focus'
 const FOCUS_SESSIONS_PER_LONG_BREAK = 4
@@ -187,14 +184,14 @@ const modePresets = [
     shortLabel: '25 分钟',
     duration: 25 * 60,
     helper: '完成后转入短休',
-    panelClass: 'from-rose-50 to-orange-50 border-rose-100 dark:from-rose-900/25 dark:to-orange-900/20 dark:border-rose-900/40',
-    activeClass: 'bg-rose-500 border-rose-500 text-white dark:bg-rose-600 dark:border-rose-600',
+    panelClass: 'from-rose-50 to-orange-50 border-rose-100 dark:from-rose-900/40 dark:to-orange-900/30 dark:border-rose-800/50',
+    activeClass: 'bg-rose-400 border-rose-400 text-white dark:bg-rose-500/80 dark:border-rose-500/75',
     inactiveClass: 'bg-surface border-line text-fg-muted',
-    badgeClass: 'text-rose-600 border-rose-200 dark:text-rose-300 dark:border-rose-800',
+    badgeClass: 'text-rose-500 border-rose-200 dark:text-rose-300 dark:border-rose-800',
     trackClass: 'bg-black/5 dark:bg-white/10',
-    progressClass: 'bg-rose-500 dark:bg-rose-400',
-    primaryButtonClass: 'bg-rose-500 dark:bg-rose-600',
-    secondaryButtonClass: 'border-rose-200 text-rose-600 dark:border-rose-800 dark:text-rose-300'
+    progressClass: 'bg-rose-400 dark:bg-rose-400',
+    primaryButtonClass: 'bg-rose-400 dark:bg-rose-500/90',
+    secondaryButtonClass: 'border-rose-200 text-rose-500 dark:border-rose-800 dark:text-rose-300'
   },
   {
     key: 'shortBreak',
@@ -202,8 +199,8 @@ const modePresets = [
     shortLabel: '5 分钟',
     duration: 5 * 60,
     helper: '快速放松一下，再回来继续推进',
-    panelClass: 'from-emerald-50 to-teal-50 border-emerald-100 dark:from-emerald-900/25 dark:to-teal-900/20 dark:border-emerald-900/40',
-    activeClass: 'bg-emerald-500 border-emerald-500 text-white dark:bg-emerald-600 dark:border-emerald-600',
+    panelClass: 'from-emerald-50 to-teal-50 border-emerald-100 dark:from-emerald-900/40 dark:to-teal-900/30 dark:border-emerald-800/50',
+    activeClass: 'bg-emerald-500 border-emerald-500 text-white dark:bg-emerald-600/85 dark:border-emerald-600/80',
     inactiveClass: 'bg-surface border-line text-fg-muted',
     badgeClass: 'text-emerald-600 border-emerald-200 dark:text-emerald-300 dark:border-emerald-800',
     trackClass: 'bg-black/5 dark:bg-white/10',
@@ -217,8 +214,8 @@ const modePresets = [
     shortLabel: '15 分钟',
     duration: 15 * 60,
     helper: '做一轮深度恢复，下一轮继续开工',
-    panelClass: 'from-sky-50 to-indigo-50 border-sky-100 dark:from-sky-900/25 dark:to-indigo-900/20 dark:border-sky-900/40',
-    activeClass: 'bg-sky-500 border-sky-500 text-white dark:bg-sky-600 dark:border-sky-600',
+    panelClass: 'from-sky-50 to-indigo-50 border-sky-100 dark:from-sky-900/40 dark:to-indigo-900/30 dark:border-sky-800/50',
+    activeClass: 'bg-sky-500 border-sky-500 text-white dark:bg-sky-600/85 dark:border-sky-600/80',
     inactiveClass: 'bg-surface border-line text-fg-muted',
     badgeClass: 'text-sky-600 border-sky-200 dark:text-sky-300 dark:border-sky-800',
     trackClass: 'bg-black/5 dark:bg-white/10',
@@ -249,6 +246,11 @@ const ranking = ref([])
 const isLoadingCount = ref(false)
 const isLoadingRanking = ref(false)
 const showRankingModal = ref(false)
+
+// 通知父页面弹窗显隐，以便锁定/恢复页面滚动，避免滚动穿透
+watch(showRankingModal, (visible) => {
+  emit('modal-visibility-change', visible)
+})
 
 const currentPreset = computed(() => modePresetMap[mode.value] || modePresetMap[DEFAULT_MODE])
 const formattedTime = computed(() => formatSeconds(remainingSeconds.value))
@@ -460,8 +462,6 @@ const openRankingModal = async () => {
   ])
 }
 
-const handleRankingModalTouchMove = () => {}
-
 const switchMode = async (nextMode) => {
   if (!modePresetMap[nextMode] || mode.value === nextMode) {
     return
@@ -612,13 +612,6 @@ const getRankBadgeClass = (index) => {
   if (index === 1) return 'bg-brand-soft text-brand'
   if (index === 2) return 'bg-warning-soft text-warning'
   return 'bg-surface-muted text-fg-muted'
-}
-
-const getRankingRowClass = (index) => {
-  if (index === 0) return 'bg-warning-soft'
-  if (index === 1) return 'bg-brand-soft'
-  if (index === 2) return 'bg-warning-soft'
-  return 'bg-surface'
 }
 
 watch(

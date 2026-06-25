@@ -23,39 +23,38 @@
         </view>
       </view>
 
-      <view class="bg-surface rounded-2xl p-4 shadow-sm space-y-3">
+      <view class="bg-surface rounded-2xl p-4 shadow-sm space-y-4">
         <template v-if="!mode">
+          <!-- 标题 -->
           <view class="flex items-center justify-between">
             <view>
-              <view class="text-base font-medium text-fg">复习设置</view>
-              <view class="text-xs text-fg-subtle mt-1">选择模式、题目来源和顺序</view>
+              <view class="text-base font-semibold text-fg">复习设置</view>
+              <view class="text-xs text-fg-subtle mt-1">选择题目来源、顺序与练习模式</view>
             </view>
             <!-- 清空错题本按钮 -->
-            <view v-if="useWrongBook && wrongBookIds.length > 0">
-              <view
-                class="px-3 py-1 text-xs rounded-full border border-danger text-danger bg-danger-soft active:scale-[0.98] transition-all duration-150"
-                @tap="clearWrongBook"
-              >
-                清空错题本
-              </view>
+            <view
+              v-if="useWrongBook && wrongBookIds.length > 0"
+              class="px-3 py-1 text-xs rounded-full border border-danger text-danger active:scale-[0.98] transition-all duration-150"
+              @tap="clearWrongBook"
+            >
+              清空错题本
             </view>
           </view>
 
-          <view class="flex items-center justify-between mt-3">
-            <view>
-              <view class="text-xs text-fg-muted">题目来源</view>
-            </view>
-            <view class="flex gap-2">
+          <!-- 题目来源 -->
+          <view class="flex items-center justify-between gap-3">
+            <text class="text-sm text-fg-muted shrink-0">题目来源</text>
+            <view class="flex bg-page rounded-xl p-1 w-40">
               <view
-                class="px-3 py-1 text-xs rounded-full border"
-                :class="!useWrongBook ? 'border-brand text-brand bg-indigo-50' : 'border-line text-fg-muted'"
+                class="flex-1 text-center text-xs py-1.5 rounded-lg transition-all duration-150"
+                :class="!useWrongBook ? 'bg-surface text-brand font-medium shadow-sm' : 'text-fg-muted'"
                 @tap="setSource(false)"
               >
                 全部题
               </view>
               <view
-                class="px-3 py-1 text-xs rounded-full border"
-                :class="useWrongBook ? 'border-brand text-brand bg-indigo-50' : 'border-line text-fg-muted'"
+                class="flex-1 text-center text-xs py-1.5 rounded-lg transition-all duration-150"
+                :class="useWrongBook ? 'bg-surface text-brand font-medium shadow-sm' : 'text-fg-muted'"
                 @tap="setSource(true)"
               >
                 错题本
@@ -63,72 +62,85 @@
             </view>
           </view>
 
-          <view class="flex items-center justify-between mt-3">
-            <view>
-              <view class="text-xs text-fg-muted">出题顺序</view>
-            </view>
-            <view class="flex gap-2">
+          <!-- 出题顺序 -->
+          <view class="flex items-center justify-between gap-3">
+            <text class="text-sm text-fg-muted shrink-0">出题顺序</text>
+            <view class="flex bg-page rounded-xl p-1 w-40">
               <view
-                class="px-3 py-1 text-xs rounded-full border"
-                :class="randomOrder ? 'border-line text-fg-muted' : 'border-brand text-brand bg-indigo-50'"
+                class="flex-1 text-center text-xs py-1.5 rounded-lg transition-all duration-150"
+                :class="!randomOrder ? 'bg-surface text-brand font-medium shadow-sm' : 'text-fg-muted'"
                 @tap="setRandom(false)"
               >
                 顺序
               </view>
               <view
-                class="px-3 py-1 text-xs rounded-full border"
-                :class="randomOrder ? 'border-brand text-brand bg-indigo-50' : 'border-line text-fg-muted'"
+                class="flex-1 text-center text-xs py-1.5 rounded-lg transition-all duration-150"
+                :class="randomOrder ? 'bg-surface text-brand font-medium shadow-sm' : 'text-fg-muted'"
                 @tap="setRandom(true)"
               >
                 乱序
               </view>
             </view>
           </view>
+
+          <!-- 模式选择 -->
           <view class="grid grid-cols-2 gap-3">
             <view
-              class="rounded-2xl border px-4 py-5 active:scale-[0.98] transition-all duration-150"
+              class="rounded-2xl border px-4 py-4 active:scale-[0.98] transition-all duration-150"
               :class="mode === 'study' ? 'border-success bg-success-soft' : 'border-line bg-page'"
               @tap="startSession('study')"
             >
-              <view class="text-sm font-semibold text-fg">学习模式</view>
-              <view class="text-xs text-fg-muted mt-1">
+              <view class="flex items-center gap-1.5">
+                <text class="i-lucide-book-open w-4 h-4 text-success"></text>
+                <view class="text-sm font-semibold text-fg">学习模式</view>
+              </view>
+              <view class="text-xs text-fg-muted mt-1.5 leading-relaxed">
                 直接展示答案，点击正确选项进入下一题
               </view>
             </view>
             <view
-              class="rounded-2xl border px-4 py-5 active:scale-[0.98] transition-all duration-150"
-              :class="mode === 'practice' ? 'border-brand bg-indigo-50' : 'border-line bg-page'"
+              class="rounded-2xl border px-4 py-4 active:scale-[0.98] transition-all duration-150"
+              :class="mode === 'practice' ? 'border-brand bg-brand-soft' : 'border-line bg-page'"
               @tap="startSession('practice')"
             >
-              <view class="text-sm font-semibold text-fg">考试模式</view>
-              <view class="text-xs text-fg-muted mt-1">
+              <view class="flex items-center gap-1.5">
+                <text class="i-lucide-pencil-line w-4 h-4 text-brand"></text>
+                <view class="text-sm font-semibold text-fg">考试模式</view>
+              </view>
+              <view class="text-xs text-fg-muted mt-1.5 leading-relaxed">
                 不展示答案，需要作答后显示答案
               </view>
             </view>
           </view>
 
-          <!-- 接续进度 -->
-          <view v-if="savedProgressList.length > 0" class="mt-3 space-y-2">
-            <view class="text-xs text-fg-muted mb-2">暂存记录</view>
-            <view
-              v-for="(progress, index) in savedProgressList"
-              :key="index"
-              class="rounded-2xl border px-4 py-3 active:scale-[0.98] transition-all duration-150"
-              :class="getProgressCardClass(progress.type)"
-            >
-              <view class="flex items-center justify-between">
-                <view class="flex-1" @tap="resumeProgress(progress)">
-                  <view class="text-sm font-semibold" :class="getProgressTitleClass(progress.type)">
-                    {{ getProgressTypeLabel(progress.type) }}
+          <!-- 暂存记录 -->
+          <view v-if="savedProgressList.length > 0" class="border-t border-line pt-3">
+            <view class="text-xs text-fg-muted mb-1">暂存记录</view>
+            <view class="divide-y divide-line">
+              <view
+                v-for="(progress, index) in savedProgressList"
+                :key="index"
+                class="flex items-center justify-between py-3 active:opacity-70 transition-opacity"
+                @tap="resumeProgress(progress)"
+              >
+                <view class="flex-1 min-w-0">
+                  <view class="flex items-center gap-1.5">
+                    <text class="i-lucide-history w-3.5 h-3.5 text-fg-subtle shrink-0"></text>
+                    <text class="text-sm font-medium text-fg">{{ getProgressTypeLabel(progress.type) }}</text>
                   </view>
-                  <view class="text-xs mt-1" :class="getProgressInfoClass(progress.type)">
+                  <view class="text-xs text-fg-muted mt-1 line-clamp-1">
                     {{ getProgressInfo(progress) }}
                   </view>
                 </view>
-                <view class="flex items-center gap-2">
-
+                <view class="flex items-center gap-1 shrink-0 ml-2">
                   <view
-                    class="w-6 h-6 flex items-center justify-center rounded-full text-fg-subtle hover:text-danger hover:bg-danger-soft transition-colors"
+                    class="px-3 py-1 text-xs rounded-full border border-brand text-brand active:scale-95 transition-transform"
+                    @tap.stop="resumeProgress(progress)"
+                  >
+                    继续
+                  </view>
+                  <view
+                    class="w-7 h-7 flex items-center justify-center rounded-full text-fg-subtle active:bg-danger-soft active:text-danger transition-colors"
                     @tap.stop="deleteProgress(progress.type, progress.isOldVersion)"
                   >
                     <text class="i-lucide-trash-2 w-4 h-4"></text>
@@ -172,8 +184,8 @@
             :value="(isSliding ? sliderIndex : currentIndex) + 1"
             block-size="16"
             track-size="8"
-            activeColor="#6366F1"
-            backgroundColor="#E5E7EB"
+            :activeColor="sliderActiveColor"
+            :backgroundColor="sliderBackgroundColor"
             @changing="handleSliderChanging"
             @change="handleSliderChange"
           />
@@ -234,7 +246,7 @@
           :class="loadingQuestion ? 'pointer-events-none opacity-60' : ''"
         >
           <view class="flex items-center justify-between">
-            <view class="px-3 py-1 rounded-full text-xs bg-indigo-50 text-brand">
+            <view class="px-3 py-1 rounded-full text-xs bg-brand-soft text-brand">
               {{ questionTypeText }}
             </view>
             <view class="text-xs text-fg-subtle">
@@ -397,6 +409,10 @@ const themeStore = useThemePage()
 defineOptions({
   name: "FinalReviewDetail",
 });
+
+// 进度条颜色跟随主题（slider 原生组件需要十六进制颜色值）
+const sliderActiveColor = computed(() => themeStore.tokens.themeBrand);
+const sliderBackgroundColor = computed(() => themeStore.tokens.themeLine);
 
 const router = Taro.useRouter();
 const decodeParam = (value = "") => {
@@ -572,58 +588,6 @@ const getProgressInfo = (progress) => {
     // 学习模式和考试模式：显示题目来源
     const sourceText = progress.useWrongBook ? "错题本" : "全部题";
     return `${orderText} · ${sourceText} · 进度 ${current}/${total}`;
-  }
-};
-
-const getProgressCardClass = (type) => {
-  switch (type) {
-    case 'study':
-      return 'border-success bg-success-soft';
-    case 'practice':
-      return 'border-indigo-200 bg-indigo-50';
-    case 'wrongbook':
-      return 'border-warning bg-warning-soft';
-    default:
-      return 'border-line bg-page';
-  }
-};
-
-const getProgressTitleClass = (type) => {
-  switch (type) {
-    case 'study':
-      return 'text-green-900';
-    case 'practice':
-      return 'text-indigo-900';
-    case 'wrongbook':
-      return 'text-orange-900';
-    default:
-      return 'text-fg';
-  }
-};
-
-const getProgressInfoClass = (type) => {
-  switch (type) {
-    case 'study':
-      return 'text-success';
-    case 'practice':
-      return 'text-brand';
-    case 'wrongbook':
-      return 'text-warning';
-    default:
-      return 'text-fg-muted';
-  }
-};
-
-const getProgressButtonClass = (type) => {
-  switch (type) {
-    case 'study':
-      return 'bg-success text-white';
-    case 'practice':
-      return 'bg-brand text-white';
-    case 'wrongbook':
-      return 'bg-warning text-white';
-    default:
-      return 'bg-fg-subtle text-white';
   }
 };
 
@@ -1057,7 +1021,7 @@ const handleOptionTap = (optionKey, question, subId = null) => {
 const getOptionClass = (question, optionKey, subId = null) => {
   const status = getOptionStatus(question, optionKey, subId);
   const base = "border-line bg-surface text-fg";
-  const selected = "border-indigo-400 bg-indigo-50 text-indigo-700";
+  const selected = "border-brand bg-brand-soft text-brand";
   const correct = "border-success bg-success-soft text-success";
   const wrong = "border-danger bg-danger-soft text-danger";
 

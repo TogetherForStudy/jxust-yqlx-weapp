@@ -7,7 +7,7 @@
   />
   <view
     class="min-h-screen bg-page flex flex-col text-fg"
-    :class="[themeStore.rootClass, { 'h-screen overflow-hidden': isWordDetailVisible }]"
+    :class="[themeStore.rootClass, { 'h-screen overflow-hidden': isWordDetailVisible || isChildModalVisible }]"
   >
     <!-- 顶部栏 -->
     <view v-if="authStore.isLoggedIn" class="flex items-center justify-between px-4 py-1 bg-surface border-b border-line">
@@ -30,6 +30,7 @@
         v-for="card in orderedCards"
         :key="card.name"
         :is="card.component"
+        @modal-visibility-change="onChildModalVisibilityChange"
       />
     </view>
 
@@ -215,6 +216,11 @@ const dailyWord = computed(() => {
 })
 const isWordDetailVisible = ref(false)
 const isRefreshingWord = ref(false)
+// 子组件（如番茄钟排行榜）弹窗显隐，用于锁定页面滚动，避免滚动穿透
+const isChildModalVisible = ref(false)
+const onChildModalVisibilityChange = (visible) => {
+  isChildModalVisible.value = visible
+}
 const wordTouchState = ref({
   startX: 0,
   startY: 0,

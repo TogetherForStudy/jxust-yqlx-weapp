@@ -27,17 +27,28 @@
   --color-overlay: var(--theme-overlay);
 }
 
+/* shadcn 风格：卡片不用阴影，纯 1px 边框 + 背景色区分轮廓。
+   仅给需要脱离内容层的浮层（popover/dialog/下拉）保留极淡阴影。 */
+@theme {
+  --shadow-xs: 0 0 #0000;
+  --shadow-sm: 0 0 #0000;
+  --shadow-md: 0 1px 2px 0 rgb(15 23 42 / 0.04);
+  --shadow-lg: 0 4px 12px -2px rgb(15 23 42 / 0.08), 0 2px 6px -2px rgb(15 23 42 / 0.05);
+  --shadow-xl: 0 8px 24px -4px rgb(15 23 42 / 0.10), 0 4px 8px -3px rgb(15 23 42 / 0.06);
+  --shadow-2xl: 0 12px 32px -6px rgb(15 23 42 / 0.14);
+}
+
 page {
-  --theme-page: #f7f7f8;
+  --theme-page: #f8fafc;
   --theme-surface: #ffffff;
-  --theme-surface-muted: #efeff1;
+  --theme-surface-muted: #f1f5f9;
   --theme-elevated: #ffffff;
-  --theme-fg: #1f1f22;
-  --theme-fg-muted: #5c5c61;
-  --theme-fg-subtle: #9b9ba1;
-  --theme-line: #e6e6e9;
-  --theme-brand: #3b82f6;
-  --theme-brand-soft: #eef3ff;
+  --theme-fg: #020817;
+  --theme-fg-muted: #64748b;
+  --theme-fg-subtle: #94a3b8;
+  --theme-line: #e2e8f0;
+  --theme-brand: #2563eb;
+  --theme-brand-soft: #e8efff;
   --theme-danger: #e5484d;
   --theme-danger-soft: #fdecec;
   --theme-success: #2f9e44;
@@ -45,9 +56,9 @@ page {
   --theme-warning: #e8830c;
   --theme-warning-soft: #fdf1e3;
   --theme-overlay: rgba(0, 0, 0, 0.45);
-  --theme-skeleton-from: #efeff1;
-  --theme-skeleton-via: #e4e4e7;
-  --theme-skeleton-to: #efeff1;
+  --theme-skeleton-from: #f1f5f9;
+  --theme-skeleton-via: #e2e8f0;
+  --theme-skeleton-to: #f1f5f9;
   background-color: var(--theme-page);
   color: var(--theme-fg);
 }
@@ -62,8 +73,8 @@ page {
     --theme-fg-muted: #a1a1a6;
     --theme-fg-subtle: #6e6e74;
     --theme-line: #2e2e33;
-    --theme-brand: #5b9bff;
-    --theme-brand-soft: #243a5e;
+    --theme-brand: #60a5fa;
+    --theme-brand-soft: #1e335e;
     --theme-danger: #f0666b;
     --theme-danger-soft: #3a1e1f;
     --theme-success: #4cba6a;
@@ -78,26 +89,26 @@ page {
 }
 
 .theme-light {
-  --theme-page: #f7f7f8;
+  --theme-page: #f8fafc;
   --theme-surface: #ffffff;
-  --theme-surface-muted: #efeff1;
+  --theme-surface-muted: #f1f5f9;
   --theme-elevated: #ffffff;
-  --theme-fg: #1f1f22;
-  --theme-fg-muted: #5c5c61;
-  --theme-fg-subtle: #9b9ba1;
-  --theme-line: #e6e6e9;
-  --theme-brand: #3b82f6;
-  --theme-brand-soft: #eef3ff;
+  --theme-fg: #020817;
+  --theme-fg-muted: #64748b;
+  --theme-fg-subtle: #94a3b8;
+  --theme-line: #e2e8f0;
+  --theme-brand: #2563eb;
+  --theme-brand-soft: #eff6ff;
   --theme-danger: #e5484d;
-  --theme-danger-soft: #fdecec;
+  --theme-danger-soft: #fef2f2;
   --theme-success: #2f9e44;
-  --theme-success-soft: #ebf6ee;
+  --theme-success-soft: #f0fdf4;
   --theme-warning: #e8830c;
-  --theme-warning-soft: #fdf1e3;
+  --theme-warning-soft: #fffbeb;
   --theme-overlay: rgba(0, 0, 0, 0.45);
-  --theme-skeleton-from: #efeff1;
-  --theme-skeleton-via: #e4e4e7;
-  --theme-skeleton-to: #efeff1;
+  --theme-skeleton-from: #f1f5f9;
+  --theme-skeleton-via: #e2e8f0;
+  --theme-skeleton-to: #f1f5f9;
 }
 
 .theme-dark {
@@ -109,8 +120,8 @@ page {
   --theme-fg-muted: #a1a1a6;
   --theme-fg-subtle: #6e6e74;
   --theme-line: #2e2e33;
-  --theme-brand: #5b9bff;
-  --theme-brand-soft: #243a5e;
+  --theme-brand: #60a5fa;
+  --theme-brand-soft: #1e335e;
   --theme-danger: #f0666b;
   --theme-danger-soft: #3a1e1f;
   --theme-success: #4cba6a;

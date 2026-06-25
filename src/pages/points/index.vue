@@ -7,40 +7,47 @@
   />
   <view class="h-screen bg-page flex flex-col text-fg" :class="[themeStore.rootClass]">
     <!-- 积分概览卡片 -->
-    <view class="bg-gradient-to-br from-blue-500 to-indigo-600 pt-6 pb-6 px-6 flex-shrink-0">
-      <view class="flex items-center justify-between">
-        <!-- 左侧：积分和排名 -->
-        <view class="flex-1">
-          <text class="text-white/80 text-sm block mb-1">当前积分</text>
-          <view class="flex items-baseline space-x-3 mb-2">
-            <text class="text-white text-3xl font-bold">{{ pointsStats.points ?? 0 }}</text>
-            <view v-if="pointsStats.rank" class="flex items-center space-x-1">
-              <text class="text-white/80 text-xs">排名</text>
-              <text class="text-white text-base font-semibold">#{{ pointsStats.rank }}</text>
+    <view class="px-4 pt-4 pb-2 flex-shrink-0">
+      <view class="bg-surface rounded-2xl shadow-sm p-5">
+        <view class="flex items-center justify-between">
+          <!-- 左侧：积分和排名 -->
+          <view class="flex-1 min-w-0">
+            <view class="flex items-center gap-1.5 mb-2">
+              <text class="i-lucide-coins w-4 h-4 text-brand"></text>
+              <text class="text-fg-muted text-sm">当前积分</text>
+            </view>
+            <view class="flex items-baseline gap-3">
+              <text class="text-fg text-4xl font-bold tabular-nums">{{ pointsStats.points ?? 0 }}</text>
+              <view v-if="pointsStats.rank" class="flex items-center gap-1 px-2 py-0.5 rounded-full bg-brand-soft">
+                <text class="text-brand text-xs">排名</text>
+                <text class="text-brand text-sm font-semibold">#{{ pointsStats.rank }}</text>
+              </view>
             </view>
           </view>
-        </view>
-        <!-- 右侧：统计按钮 -->
-        <view class="flex items-center space-x-2">
-          <view
-            class="px-4 py-2 bg-surface/20 rounded-full active:bg-surface/30"
-            @tap="showSourceStatsModal"
-          >
-            <text class="text-white text-sm">统计</text>
-          </view>
-          <view
-            class="px-4 py-2 bg-surface/20 rounded-full active:bg-surface/30"
-            @tap="handleRedeem"
-          >
-            <text class="text-white text-sm">兑换</text>
+          <!-- 右侧：操作按钮 -->
+          <view class="flex flex-col gap-2 shrink-0">
+            <view
+              class="px-4 py-1.5 border border-line rounded-full active:bg-surface-muted transition-colors flex items-center gap-1"
+              @tap="showSourceStatsModal"
+            >
+              <text class="i-lucide-chart-pie w-3.5 h-3.5 text-fg-muted"></text>
+              <text class="text-fg text-sm">统计</text>
+            </view>
+            <view
+              class="px-4 py-1.5 bg-brand rounded-full active:opacity-90 transition-opacity flex items-center gap-1"
+              @tap="handleRedeem"
+            >
+              <text class="i-lucide-gift w-3.5 h-3.5 text-white"></text>
+              <text class="text-white text-sm">兑换</text>
+            </view>
           </view>
         </view>
       </view>
     </view>
 
     <!-- 积分流水 -->
-    <view class="px-4 -mt-4 mb-4 flex-1 h-[1px] flex flex-col">
-      <view class="bg-surface rounded-xl shadow-sm flex-1 flex flex-col overflow-hidden">
+    <view class="px-4 mb-4 flex-1 h-[1px] flex flex-col">
+      <view class="bg-surface rounded-2xl shadow-sm flex-1 flex flex-col overflow-hidden">
         <!-- 标题栏 -->
         <view class="px-4 py-3 border-b border-line flex items-center justify-between flex-shrink-0">
           <text class="text-fg font-medium">积分流水</text>

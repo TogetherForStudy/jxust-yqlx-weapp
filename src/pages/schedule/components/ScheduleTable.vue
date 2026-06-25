@@ -69,7 +69,7 @@
                 <!-- 课程卡片 -->
                 <view
                   v-if="getCourse(timeSlot.period, dayIndex)"
-                  class="h-full w-full min-w-0 flex flex-col shrink-0 rounded-md p-2 shadow-sm overflow-hidden transform transition-transform duration-200 active:scale-95"
+                  class="relative h-full w-full min-w-0 flex flex-col shrink-0 rounded-md p-2 shadow-sm overflow-hidden transform transition-transform duration-200 active:scale-95"
                   :class="[
                     getCourseColorConfig(getCourse(timeSlot.period, dayIndex))?.backgroundColor,
                     getCourseColorConfig(getCourse(timeSlot.period, dayIndex))?.textColor

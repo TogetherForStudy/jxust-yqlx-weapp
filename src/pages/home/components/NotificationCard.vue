@@ -32,7 +32,7 @@
       </view>
 
       <!-- 通知列表 -->
-      <view v-else class="divide-y divide-gray-100">
+      <view v-else class="divide-y divide-line">
         <view
           v-for="(notification) in notifications"
           :key="notification.id"

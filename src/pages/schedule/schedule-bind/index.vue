@@ -25,7 +25,7 @@
         <view class="text-sm font-medium text-fg">搜索结果</view>
       </view>
 
-      <view class="divide-y divide-gray-100">
+      <view class="divide-y divide-line">
         <view v-for="classItem in searchResults" :key="classItem.class_id" class="p-4 flex items-center justify-between"
           @tap="selectClass(classItem)">
           <view class="flex-1">
