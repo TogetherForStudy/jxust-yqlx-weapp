@@ -85,7 +85,9 @@ export const useThemeStore = defineStore('theme', {
     },
 
     pageStyle() {
-      return getTokenStyle(this.tokens)
+      // 显式写出背景色与前景色，确保 page-meta 在首帧即把 page 元素背景定为
+      // 当前主题，而不是等待 app.css 的级联或 useDidShow 的原生纠正，避免闪烁。
+      return `${getTokenStyle(this.tokens)} background-color: ${this.tokens.themePage}; color: ${this.tokens.themeFg};`
     },
 
     rootClass() {
