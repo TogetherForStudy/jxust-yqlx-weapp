@@ -75,20 +75,6 @@
 
         <view
           class="px-4 py-3 border-b border-line text-base flex items-center justify-between active:bg-page"
-          @tap="handleThemeModeSelect"
-        >
-          <view class="flex items-center space-x-3">
-            <text class="i-lucide-moon"></text>
-            <text class="text-fg">显示模式</text>
-          </view>
-          <view class="flex items-center space-x-2">
-            <text class="text-fg-muted">{{ themeStore.modeLabel }}</text>
-            <text class="i-lucide-chevron-right text-fg-subtle"></text>
-          </view>
-        </view>
-
-        <view
-          class="px-4 py-3 border-b border-line text-base flex items-center justify-between active:bg-page"
           @tap="goToTermsOfService"
         >
           <view class="flex items-center space-x-3">
@@ -256,22 +242,6 @@ const handleLogout = () => {
       }
     },
   });
-};
-
-const handleThemeModeSelect = async () => {
-  const modes = ['system', 'light', 'dark'];
-  const labels = ['跟随系统', '浅色', '深色'];
-
-  try {
-    const { tapIndex } = await Taro.showActionSheet({
-      itemList: labels,
-    });
-
-    themeStore.setMode(modes[tapIndex]);
-  } catch (error) {
-    if (error?.errMsg?.includes('cancel')) return;
-    console.error('切换显示模式失败:', error);
-  }
 };
 
 const goToTermsOfService = () => {

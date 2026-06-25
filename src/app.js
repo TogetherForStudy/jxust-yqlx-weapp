@@ -2,7 +2,6 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { useAuthStore } from './stores/auth'
 import { useThemeStore } from './stores/theme'
-import Taro from '@tarojs/taro'
 
 import './app.css'
 
@@ -13,21 +12,11 @@ const App = createApp({
     const themeStore = useThemeStore()
     const authStore = useAuthStore()
 
-    // 冷启动尽早应用原生主题，让首个页面在显示前原生背景 / 导航栏 / TabBar
-    // 就是用户选择的主题，而不是跟随系统的静态占位值。
+    // 主题跟随系统：系统深浅色切换会触发小程序重载，重新走 onLaunch，
+    // 因此只需在启动时初始化一次即可，无需监听 onThemeChange / onShow。
     themeStore.initTheme()
-    themeStore.applyNativeTheme()
-
-    Taro.onThemeChange(({ theme }) => {
-      themeStore.handleSystemThemeChange(theme)
-    })
 
     authStore.initAuth()
-  },
-  onShow() {
-    const themeStore = useThemeStore()
-    themeStore.syncSystemTheme()
-    themeStore.applyNativeTheme()
   },
 })
 

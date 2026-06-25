@@ -2,9 +2,6 @@ import { defineStore } from 'pinia'
 import Taro from '@tarojs/taro'
 import themeTokens from '../theme.json'
 
-const STORAGE_KEY = 'themeMode'
-const THEME_MODES = ['system', 'light', 'dark']
-
 const CSS_VAR_MAP = {
   themePage: '--theme-page',
   themeSurface: '--theme-surface',
@@ -37,17 +34,6 @@ const TAB_ITEMS = [
 
 const normalizeTheme = (theme) => theme === 'dark' ? 'dark' : 'light'
 
-const normalizeMode = (mode) => THEME_MODES.includes(mode) ? mode : 'system'
-
-const getStoredMode = () => {
-  try {
-    return normalizeMode(Taro.getStorageSync(STORAGE_KEY))
-  } catch (error) {
-    console.warn('读取主题偏好失败:', error)
-    return 'system'
-  }
-}
-
 const getSystemTheme = () => {
   try {
     return normalizeTheme(Taro.getSystemInfoSync()?.theme)
@@ -64,7 +50,6 @@ const getTokenStyle = (tokens) => {
 }
 
 const getInitialThemeState = () => ({
-  mode: getStoredMode(),
   systemTheme: getSystemTheme()
 })
 
@@ -72,9 +57,9 @@ export const useThemeStore = defineStore('theme', {
   state: () => getInitialThemeState(),
 
   getters: {
-    effectiveTheme: (state) => {
-      return state.mode === 'system' ? state.systemTheme : state.mode
-    },
+    // 主题始终跟随系统：原生窗口底色与内容层主题永远一致，从根本上避免
+    // 切换页面时闪烁上一套主题色。
+    effectiveTheme: (state) => state.systemTheme,
 
     isDark() {
       return this.effectiveTheme === 'dark'
@@ -92,15 +77,6 @@ export const useThemeStore = defineStore('theme', {
 
     rootClass() {
       return this.isDark ? 'dark theme-dark' : 'theme-light'
-    },
-
-    modeLabel: (state) => {
-      const labels = {
-        system: '跟随系统',
-        light: '浅色',
-        dark: '深色'
-      }
-      return labels[state.mode] || labels.system
     },
 
     nativeTheme() {
@@ -121,28 +97,8 @@ export const useThemeStore = defineStore('theme', {
 
   actions: {
     initTheme() {
-      const initialThemeState = getInitialThemeState()
-      this.mode = initialThemeState.mode
-      this.systemTheme = initialThemeState.systemTheme
-      this.applyNativeTheme()
-    },
-
-    syncSystemTheme() {
       this.systemTheme = getSystemTheme()
-    },
-
-    setMode(mode) {
-      this.mode = normalizeMode(mode)
-      Taro.setStorageSync(STORAGE_KEY, this.mode)
-      this.syncSystemTheme()
       this.applyNativeTheme()
-    },
-
-    handleSystemThemeChange(theme) {
-      this.systemTheme = normalizeTheme(theme)
-      if (this.mode === 'system') {
-        this.applyNativeTheme()
-      }
     },
 
     applyNativeTheme() {

@@ -1209,13 +1209,6 @@ watch(selectedChartItem, () => {
   }
 }, { deep: true })
 
-watch(() => themeStore.effectiveTheme, async () => {
-  if (activeSection.value === 'data') {
-    await nextTick()
-    drawChart()
-  }
-})
-
 onMounted(async () => {
   await loadPageData()
 })
