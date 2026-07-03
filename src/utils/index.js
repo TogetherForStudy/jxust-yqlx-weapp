@@ -1,5 +1,6 @@
 import { REVIEW_ATTITUDES, REVIEW_STATUS, USER_ROLES } from './constants'
 import { formatDateTime } from './time'
+import Taro from '@tarojs/taro'
 
 // 导出图片相关工具方法
 export {
@@ -11,6 +12,22 @@ export {
   getLocalCacheStats,
   cleanExpiredLocalCache
 } from './image'
+
+/**
+ * 安全返回：导航栈 > 1 时正常返回，否则跳转到 fallback 页面
+ * @param {string} fallbackUrl - 无法返回时的跳转路径
+ * @param {boolean} isTab - fallback 是否为 TabBar 页面
+ */
+export const safeNavigateBack = (fallbackUrl, isTab = false) => {
+  const pages = Taro.getCurrentPages()
+  if (pages.length > 1) {
+    Taro.navigateBack()
+  } else if (isTab) {
+    Taro.switchTab({ url: fallbackUrl })
+  } else {
+    Taro.redirectTo({ url: fallbackUrl })
+  }
+}
 
 /**
  * 格式化日期

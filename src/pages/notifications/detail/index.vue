@@ -167,6 +167,7 @@ import { ref, computed, onMounted } from 'vue'
 import Taro from '@tarojs/taro'
 import { useNotificationStore } from '../../../stores/notifications'
 import SkeletonDetail from '../../../components/SkeletonDetail.vue'
+import { safeNavigateBack } from '../../../utils/index'
 
 const themeStore = useThemePage()
 
@@ -308,7 +309,7 @@ const formatDateTime = (dateString) => {
 }
 
 const goBack = () => {
-  Taro.navigateBack()
+  safeNavigateBack('/pages/notifications/index')
 }
 
 Taro.useShareAppMessage((res) => {

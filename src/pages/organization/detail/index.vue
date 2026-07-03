@@ -74,6 +74,7 @@ import { useThemePage } from '../../../composables/useThemePage'
 import { onMounted, ref } from 'vue'
 import Taro from '@tarojs/taro'
 import { organizationAPI } from '../../../api'
+import { safeNavigateBack } from '../../../utils/index'
 
 const themeStore = useThemePage()
 
@@ -155,7 +156,7 @@ const copyContact = async () => {
 }
 
 const goBack = () => {
-  Taro.navigateBack()
+  safeNavigateBack('/pages/organization/index')
 }
 
 onMounted(() => {
