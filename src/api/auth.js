@@ -5,6 +5,8 @@ export const authAPI = {
     return post('/api/v0/auth/wechat-login', { code }, {
       skipAuthRefresh: true,
       retryOnAuthFailure: false,
+      handleAuthFailure: false,
+      silent: true,
       ...options
     })
   },
@@ -15,6 +17,7 @@ export const authAPI = {
     }, {
       skipAuthRefresh: true,
       retryOnAuthFailure: false,
+      handleAuthFailure: false,
       ...options
     })
   },
