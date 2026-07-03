@@ -1133,8 +1133,8 @@ const measureChartWidth = () => new Promise((resolve) => {
       return
     }
 
-    const systemInfo = Taro.getSystemInfoSync()
-    chartWidth.value = Math.max(280, Math.floor((systemInfo.windowWidth || 375) - 56))
+    const windowInfo = Taro.getWindowInfo()
+    chartWidth.value = Math.max(280, Math.floor((windowInfo.windowWidth || 375) - 56))
     resolve(chartWidth.value)
   })
 })

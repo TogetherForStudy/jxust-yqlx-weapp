@@ -852,8 +852,8 @@ const loadQuestionDetail = async (index, shouldScroll = false) => {
 const scrollToQuestion = () => {
   try {
     // 获取系统信息
-    const systemInfo = Taro.getSystemInfoSync();
-    const windowHeight = systemInfo.windowHeight || 667; // 默认值作为备用
+    const windowInfo = Taro.getWindowInfo();
+    const windowHeight = windowInfo.windowHeight || 667; // 默认值作为备用
 
     // 创建选择器查询
     const query = Taro.createSelectorQuery();
