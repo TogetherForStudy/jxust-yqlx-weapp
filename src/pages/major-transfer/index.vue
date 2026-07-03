@@ -711,7 +711,7 @@ const handleAttachmentTap = async (notice) => {
   try {
     await Taro.setClipboardData({ data: copyText })
     Taro.showToast({
-      title: '网址已复制成功',
+      title: '已复制',
       icon: 'success',
       duration: 2000,
     })
@@ -1133,8 +1133,8 @@ const measureChartWidth = () => new Promise((resolve) => {
       return
     }
 
-    const systemInfo = Taro.getSystemInfoSync()
-    chartWidth.value = Math.max(280, Math.floor((systemInfo.windowWidth || 375) - 56))
+    const windowInfo = Taro.getWindowInfo()
+    chartWidth.value = Math.max(280, Math.floor((windowInfo.windowWidth || 375) - 56))
     resolve(chartWidth.value)
   })
 })

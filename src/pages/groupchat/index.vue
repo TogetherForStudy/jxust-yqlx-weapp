@@ -116,7 +116,7 @@ const copyGroupId = async (groupId, groupName) => {
     });
 
     Taro.showToast({
-      title: `${groupName} 群号已复制`,
+      title: '群号已复制',
       icon: "success",
       duration: 2000
     });

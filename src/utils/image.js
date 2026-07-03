@@ -339,7 +339,7 @@ export async function getSignedImageUrl(uri, expireSeconds = 600, useCache = tru
     return signed_url
   } catch (error) {
     console.error('获取图片签名URL失败:', error)
-    throw new Error(`获取图片签名失败: ${error.message}`)
+    throw new Error('获取图片签名失败')
   }
 }
 

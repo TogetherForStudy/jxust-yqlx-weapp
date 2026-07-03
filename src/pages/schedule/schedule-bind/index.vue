@@ -101,6 +101,7 @@ import Taro from '@tarojs/taro'
 import { useScheduleStore } from '../../../stores/schedule'
 import { useAuthStore } from '../../../stores/auth'
 import { courseTableAPI } from '../../../api/index'
+import { safeNavigateBack } from '../../../utils/index'
 
 const themeStore = useThemePage()
 
@@ -173,7 +174,7 @@ const handleSearch = () => {
 const search = async () => {
   if (!searchKeyword.value.trim()) {
     Taro.showToast({
-      title: '请输入班级名称',
+      title: '请输入班级',
       icon: 'error'
     })
     return
@@ -262,7 +263,7 @@ const confirmBind = async () => {
     setTimeout(() => {
       // 传递消息通知课表页刷新
       Taro.eventCenter.trigger('reloadSchedule')
-      Taro.navigateBack()
+      safeNavigateBack('/pages/schedule/index', true)
     }, 1000)
 
   } catch (error) {
@@ -295,7 +296,7 @@ const handleResetSchedule = () => {
           setTimeout(() => {
             // 传递消息通知课表页刷新
             Taro.eventCenter.trigger('reloadSchedule')
-            Taro.navigateBack()
+            safeNavigateBack('/pages/schedule/index', true)
           }, 1000)
 
         } catch (error) {

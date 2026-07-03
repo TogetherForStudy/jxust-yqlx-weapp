@@ -1,5 +1,4 @@
 export default {
-  enablePageMeta: true,
   navigationBarTitleText: '选课助手',
   backgroundColor: '@pageBgColor',
   enableShareAppMessage: true,

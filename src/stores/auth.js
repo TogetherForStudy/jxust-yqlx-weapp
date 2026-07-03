@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import Taro from '@tarojs/taro'
 import { authAPI, userAPI } from '../api'
+import { getSafeErrorMessage, isTechnicalErrorMessage } from '../utils/errorMessage'
 
 const STORAGE_KEYS = {
   token: 'token',
@@ -23,6 +24,17 @@ const normalizeTimestampToMs = (timestamp) => {
 }
 
 let ongoingRefreshPromise = null
+const DEFAULT_AUTH_EXPIRED_TITLE = '请重新登录'
+
+const normalizeExpireTokenTitle = (title) => {
+  const normalizedTitle = typeof title === 'string' ? title.trim() : ''
+
+  if (!normalizedTitle || isTechnicalErrorMessage(normalizedTitle)) {
+    return DEFAULT_AUTH_EXPIRED_TITLE
+  }
+
+  return normalizedTitle
+}
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -95,9 +107,11 @@ export const useAuthStore = defineStore('auth', {
       } catch (error) {
         console.error('微信登录失败:', error)
 
-        Taro.showToast({
-          title: error.message || '登录失败',
-          icon: 'error'
+        await Taro.showModal({
+          title: '登录失败',
+          content: getSafeErrorMessage(error, '登录失败，请稍后重试'),
+          showCancel: false,
+          confirmText: '知道了'
         })
 
         throw error
@@ -267,10 +281,11 @@ export const useAuthStore = defineStore('auth', {
         : options
 
       const {
-        title = '请重新登录',
+        title = DEFAULT_AUTH_EXPIRED_TITLE,
         showToast = true,
         navigate = true
       } = normalizedOptions
+      const safeTitle = normalizeExpireTokenTitle(title)
 
       if (!this.isLoggedIn && !this.token && !this.refreshToken) {
         return
@@ -283,7 +298,7 @@ export const useAuthStore = defineStore('auth', {
 
         if (showToast) {
           Taro.showToast({
-            title,
+            title: safeTitle,
             icon: 'error'
           })
         }

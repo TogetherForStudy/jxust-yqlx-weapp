@@ -809,7 +809,7 @@ const toggleTaskStatus = async (taskId) => {
     await studyTaskStore.updateStudyTask(taskId, updateData);
 
     Taro.showToast({
-      title: "状态更新成功",
+      title: "已更新",
       icon: "success",
       duration: 1000,
     });

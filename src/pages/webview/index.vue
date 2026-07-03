@@ -38,7 +38,7 @@ onMounted(() => {
     }
   } else {
     Taro.showToast({
-      title: 'URL参数错误',
+      title: '参数错误',
       icon: 'error'
     })
   }

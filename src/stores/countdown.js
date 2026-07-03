@@ -67,7 +67,7 @@ export const useCountdownStore = defineStore('countdown', {
         this.isFetchData = true
         return data
       } catch (error) {
-        this.error = error.message || '获取倒数日列表失败'
+        this.error = '获取倒数日列表失败，请稍后重试'
         console.error('获取倒数日列表失败:', error)
         throw error
       } finally {

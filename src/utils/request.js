@@ -1,6 +1,7 @@
 /* global API_BASE_URL */
 import Taro from '@tarojs/taro'
 import { useAuthStore } from '../stores/auth'
+import { getSafeRequestErrorMessage } from './errorMessage'
 
 // API基础配置
 const BASE_URL = API_BASE_URL.replace(/\/$/, '')
@@ -145,24 +146,24 @@ const createRequestError = (message, extra = {}) => {
 }
 
 let isRequestErrorModalVisible = false
-let queuedRequestErrorMessage = null
+let queuedRequestError = null
 
 const buildRequestErrorContent = (error) => {
-  const message = error?.message || error?.errMsg || '网络错误'
+  const message = getSafeRequestErrorMessage(error)
   const requestId = error?.requestId
 
   if (!requestId) {
     return message
   }
 
-  return `${message}\n\n请求ID: ${requestId}`
+  return `${message}\n\n问题编号：${requestId}`
 }
 
 const showRequestErrorModal = async (error) => {
   const content = buildRequestErrorContent(error)
 
   if (isRequestErrorModalVisible) {
-    queuedRequestErrorMessage = content
+    queuedRequestError = error
     return
   }
 
@@ -170,7 +171,7 @@ const showRequestErrorModal = async (error) => {
 
   try {
     await Taro.showModal({
-      title: '请求失败',
+      title: '操作失败',
       content,
       showCancel: false,
       confirmText: '知道了'
@@ -178,12 +179,15 @@ const showRequestErrorModal = async (error) => {
   } finally {
     isRequestErrorModalVisible = false
 
-    if (queuedRequestErrorMessage && queuedRequestErrorMessage !== content) {
-      const nextMessage = queuedRequestErrorMessage
-      queuedRequestErrorMessage = null
-      await showRequestErrorModal({ message: nextMessage })
+    if (queuedRequestError) {
+      const nextError = queuedRequestError
+      queuedRequestError = null
+
+      if (buildRequestErrorContent(nextError) !== content) {
+        await showRequestErrorModal(nextError)
+      }
     } else {
-      queuedRequestErrorMessage = null
+      queuedRequestError = null
     }
   }
 }
@@ -417,8 +421,10 @@ export const request = async (options) => {
       }
     }
 
-    if (finalError?.isAuthError && handleAuthFailure) {
-      useAuthStore().expireToken(finalError.message || '请重新登录')
+    if (finalError?.isAuthError) {
+      if (handleAuthFailure) {
+        useAuthStore().expireToken()
+      }
     } else if (!silent) {
       await showRequestErrorModal(finalError)
     }

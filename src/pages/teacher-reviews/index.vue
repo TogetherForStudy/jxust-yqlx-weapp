@@ -208,19 +208,11 @@
     </view>
 
     <!-- 新增评价弹窗 -->
-    <view
-      v-if="showAddModal"
-      class="fixed inset-0 bg-overlay flex items-center justify-center z-50"
-      @tap="hideAddReviewModal"
-    >
-      <view
-        @tap.stop=""
-        class="bg-surface rounded-2xl w-[90%] max-w-md mx-4 max-h-[80vh] flex flex-col overflow-hidden"
-      >
+    <view v-if="showAddModal" class="fixed inset-0 bg-overlay flex items-center justify-center z-50"
+      @tap="hideAddReviewModal">
+      <view @tap.stop="" class="bg-surface rounded-2xl w-[90%] max-w-md mx-4 max-h-[80vh] flex flex-col overflow-hidden">
         <!-- 弹窗头部 -->
-        <view
-          class="flex justify-between items-center px-4 py-2 border-b border-line"
-        >
+        <view class="flex justify-between items-center px-4 py-2 border-b border-line">
           <text class="text-lg font-semibold">写评价</text>
           <view @tap="hideAddReviewModal" class="p-1">
             <text class="i-lucide-x w-5 h-5 text-fg-subtle"></text>
@@ -228,15 +220,15 @@
         </view>
 
         <!-- 弹窗内容 -->
-        <scroll-view scroll-y class="flex-1 min-h-0" style="max-height: 60vh;">
-          <view class="p-4 space-y-2">
+        <scroll-view :scroll-y="true" class="flex-1 min-h-0" style="max-height: 60vh;">
+            <view class="p-4 space-y-4">
             <!-- 教师姓名 -->
             <view class="flex flex-col gap-2">
               <text class="text-sm font-medium text-fg">教师姓名</text>
               <input
                 v-model="newReview.teacher_name"
                 placeholder="请输入教师姓名"
-                class="border-solid border-[1px] border-line rounded-lg p-2"
+                class="border border-line rounded-lg p-3"
               />
             </view>
 
@@ -246,7 +238,7 @@
               <input
                 v-model="newReview.course_name"
                 placeholder="请输入课程名称"
-                class="border-solid border-[1px] border-line rounded-lg p-2"
+                class="border border-line rounded-lg p-3"
               />
             </view>
 
@@ -258,19 +250,13 @@
                 :range="campusOptions"
                 @change="onCampusChange"
               >
-                <view
-                  class="flex items-center justify-between border-solid border-[1px] border-line rounded-lg p-2"
-                >
+                <view class="flex items-center justify-between border border-line rounded-lg p-3">
                   <text
-                    :class="
-                      newReview.campus ? 'text-fg' : 'text-fg-subtle'
-                    "
+                    :class="newReview.campus ? 'text-fg' : 'text-fg-subtle'"
                   >
                     {{ newReview.campus || "请选择校区" }}
                   </text>
-                  <text
-                    class="i-lucide-chevron-down w-4 h-4 text-fg-subtle"
-                  ></text>
+                  <text class="i-lucide-chevron-down w-4 h-4 text-fg-subtle"></text>
                 </view>
               </picker>
             </view>
@@ -283,18 +269,16 @@
                   v-for="attitude in attitudeOptions"
                   :key="attitude.value"
                   @tap="selectAttitude(attitude.value)"
-                  :class="[
-                    'flex-1 rounded-md p-2 text-center',
-                    newReview.attitude === attitude.value
-                      ? attitude.value === REVIEW_ATTITUDES.RECOMMEND
-                        ? 'bg-success text-white border-success'
-                        : attitude.value === REVIEW_ATTITUDES.NEUTRAL
-                        ? 'bg-brand text-white border-brand'
-                        : attitude.value === REVIEW_ATTITUDES.AVOID
-                        ? 'bg-danger text-white border-danger'
-                        : 'bg-page text-fg-muted border-line'
-                      : 'bg-page text-fg-muted border-line',
-                  ]"
+                  class="flex-1 py-2.5 rounded-lg border flex items-center justify-center gap-1.5 text-sm font-medium"
+                  :class="newReview.attitude === attitude.value
+                    ? attitude.value === REVIEW_ATTITUDES.RECOMMEND
+                      ? 'bg-success text-white border-success'
+                      : attitude.value === REVIEW_ATTITUDES.NEUTRAL
+                      ? 'bg-brand text-white border-brand'
+                      : attitude.value === REVIEW_ATTITUDES.AVOID
+                      ? 'bg-danger text-white border-danger'
+                      : 'bg-page text-fg-muted border-line'
+                    : 'border-line text-fg-muted bg-surface'"
                 >
                   {{ attitude.label }}
                 </view>
@@ -307,34 +291,30 @@
               <textarea
                 v-model="newReview.content"
                 placeholder="请描述您对这位教师的上课体验，包括教学风格、课程难度、考试情况等"
-                class="border-solid border-[1px] border-line rounded-lg p-2 box-border w-full"
+                class="border border-line rounded-lg p-2 box-border w-full"
                 maxlength="500"
               />
-              <text class="text-xs text-fg-subtle mt-1"
-                >{{ newReview.content.length }}/500</text
-              >
+              <text class="text-xs text-fg-subtle">{{ newReview.content.length }}/500</text>
             </view>
-          </view>
-        </scroll-view>
+            </view>
+          </scroll-view>
 
         <!-- 弹窗底部 -->
-        <view class="p-4 border-t border-line shrink-0">
-          <view class="flex space-x-3">
-            <view
-              @tap="hideAddReviewModal"
-              class="flex-1 py-3 px-4 bg-surface-muted text-fg-muted rounded-lg text-center font-medium"
-            >
-              取消
-            </view>
-            <view
-              @tap="submitReview"
-              :class="[
-                'flex-1 py-3 px-4 rounded-lg text-center text-white font-medium',
-                canSubmit ? 'bg-brand' : 'bg-line',
-              ]"
-            >
-              {{ submitting ? "提交中..." : "提交评价" }}
-            </view>
+        <view class="p-4 border-t border-line flex space-x-3 shrink-0">
+          <view
+            @tap="hideAddReviewModal"
+            class="flex-1 py-3 px-4 bg-surface-muted text-fg-muted rounded-lg text-center font-medium"
+          >
+            取消
+          </view>
+          <view
+            @tap="submitReview"
+            :class="[
+              'flex-1 py-3 px-4 rounded-lg text-center text-white font-medium',
+              canSubmit ? 'bg-brand' : 'bg-line',
+            ]"
+          >
+            {{ submitting ? "提交中..." : "提交评价" }}
           </view>
         </view>
       </view>

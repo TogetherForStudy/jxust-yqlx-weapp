@@ -22,7 +22,7 @@ export const courseTableAPI = {
   },
 
   deleteSchedule(semester) {
-    if (!semester) return Promise.reject(new Error('semester is required'))
+    if (!semester) return Promise.reject(new Error('缺少学期信息'))
     return del(`/api/v0/coursetable/schedule?semester=${encodeURIComponent(semester)}`)
   }
 }

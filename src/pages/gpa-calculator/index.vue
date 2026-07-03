@@ -369,15 +369,17 @@
         </view>
 
         <!-- 数据列表 -->
-        <scroll-view :scroll-y="true" class="-mx-2 px-2 mb-3" style="max-height: 300px;">
-          <view
-            v-for="(major, index) in graduateMajorData"
-            :key="index"
-            class="grid grid-cols-[2fr_1fr_1fr] gap-2 py-2 border-b border-line"
-          >
-            <text class="text-fg text-xs leading-tight">{{ major.name }}</text>
-            <text class="text-brand text-xs font-medium text-center">{{ major.gpa }}</text>
-            <text class="text-fg-muted text-xs text-center">{{ major.bonus }}</text>
+        <scroll-view :scroll-y="true" class="-mx-2 mb-3" style="max-height: 300px;">
+          <view class="px-2">
+            <view
+              v-for="(major, index) in graduateMajorData"
+              :key="index"
+              class="grid grid-cols-[2fr_1fr_1fr] gap-2 py-2 border-b border-line"
+            >
+              <text class="text-fg text-xs leading-tight">{{ major.name }}</text>
+              <text class="text-brand text-xs font-medium text-center">{{ major.gpa }}</text>
+              <text class="text-fg-muted text-xs text-center">{{ major.bonus }}</text>
+            </view>
           </view>
         </scroll-view>
 
@@ -915,7 +917,7 @@ const switchToLocalData = () => {
   closeBackupModal()
 
   Taro.showToast({
-    title: '已切回本地数据',
+    title: '已切回本地',
     icon: 'success'
   })
 }
@@ -1104,7 +1106,7 @@ const uploadCurrentLocalBackup = async () => {
     await gpaAPI.createBackup(buildBackupPayload())
     await loadBackupList()
     Taro.showToast({
-      title: '备份上传成功',
+      title: '上传成功',
       icon: 'success'
     })
   } catch (error) {
@@ -1187,7 +1189,7 @@ const deleteBackupItem = async (backupId) => {
     }
 
     Taro.showToast({
-      title: '备份已删除',
+      title: '已删除',
       icon: 'success'
     })
   } catch (error) {
@@ -1233,7 +1235,7 @@ const restoreBackupItem = async (backupId, { overwriteLocal = false } = {}) => {
     closeBackupModal()
 
     Taro.showToast({
-      title: overwriteLocal ? '已覆盖本地数据' : '已切换到备份',
+      title: overwriteLocal ? '已覆盖' : '已切换',
       icon: 'success'
     })
   } catch (error) {
