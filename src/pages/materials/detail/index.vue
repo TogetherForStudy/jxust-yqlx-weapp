@@ -288,7 +288,7 @@ const openExternalLink = () => {
     data: material.value.external_link,
     success: () => {
       Taro.showToast({
-        title: '请到浏览器粘贴使用',
+        title: '已复制链接',
         icon: 'success'
       })
     }

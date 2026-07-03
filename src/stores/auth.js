@@ -107,9 +107,11 @@ export const useAuthStore = defineStore('auth', {
       } catch (error) {
         console.error('微信登录失败:', error)
 
-        Taro.showToast({
-          title: getSafeErrorMessage(error, '登录失败，请稍后重试'),
-          icon: 'error'
+        await Taro.showModal({
+          title: '登录失败',
+          content: getSafeErrorMessage(error, '登录失败，请稍后重试'),
+          showCancel: false,
+          confirmText: '知道了'
         })
 
         throw error

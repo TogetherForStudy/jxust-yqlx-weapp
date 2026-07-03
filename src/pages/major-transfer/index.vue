@@ -711,7 +711,7 @@ const handleAttachmentTap = async (notice) => {
   try {
     await Taro.setClipboardData({ data: copyText })
     Taro.showToast({
-      title: '网址已复制成功',
+      title: '已复制',
       icon: 'success',
       duration: 2000,
     })

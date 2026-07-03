@@ -917,7 +917,7 @@ const switchToLocalData = () => {
   closeBackupModal()
 
   Taro.showToast({
-    title: '已切回本地数据',
+    title: '已切回本地',
     icon: 'success'
   })
 }
@@ -1106,7 +1106,7 @@ const uploadCurrentLocalBackup = async () => {
     await gpaAPI.createBackup(buildBackupPayload())
     await loadBackupList()
     Taro.showToast({
-      title: '备份上传成功',
+      title: '上传成功',
       icon: 'success'
     })
   } catch (error) {
@@ -1189,7 +1189,7 @@ const deleteBackupItem = async (backupId) => {
     }
 
     Taro.showToast({
-      title: '备份已删除',
+      title: '已删除',
       icon: 'success'
     })
   } catch (error) {
@@ -1235,7 +1235,7 @@ const restoreBackupItem = async (backupId, { overwriteLocal = false } = {}) => {
     closeBackupModal()
 
     Taro.showToast({
-      title: overwriteLocal ? '已覆盖本地数据' : '已切换到备份',
+      title: overwriteLocal ? '已覆盖' : '已切换',
       icon: 'success'
     })
   } catch (error) {

@@ -170,7 +170,7 @@ ${currentCourse.value.class ? `班级：${currentCourse.value.class}` : ''}
     data: info,
     success: () => {
       Taro.showToast({
-        title: '已复制到剪贴板',
+        title: '已复制',
         icon: 'success'
       })
     }

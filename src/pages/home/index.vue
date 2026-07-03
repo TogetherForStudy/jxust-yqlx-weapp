@@ -345,7 +345,7 @@ const saveOrder = () => {
 const resetOrder = () => {
   sortableCards.value = [...defaultCards]
   Taro.showToast({
-    title: '已恢复默认顺序',
+    title: '已恢复默认',
     icon: 'success'
   })
 }

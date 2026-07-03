@@ -174,7 +174,7 @@ const handleSearch = () => {
 const search = async () => {
   if (!searchKeyword.value.trim()) {
     Taro.showToast({
-      title: '请输入班级名称',
+      title: '请输入班级',
       icon: 'error'
     })
     return
