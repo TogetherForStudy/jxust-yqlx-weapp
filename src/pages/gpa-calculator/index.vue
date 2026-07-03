@@ -369,15 +369,17 @@
         </view>
 
         <!-- 数据列表 -->
-        <scroll-view :scroll-y="true" class="-mx-2 px-2 mb-3" style="max-height: 300px;">
-          <view
-            v-for="(major, index) in graduateMajorData"
-            :key="index"
-            class="grid grid-cols-[2fr_1fr_1fr] gap-2 py-2 border-b border-line"
-          >
-            <text class="text-fg text-xs leading-tight">{{ major.name }}</text>
-            <text class="text-brand text-xs font-medium text-center">{{ major.gpa }}</text>
-            <text class="text-fg-muted text-xs text-center">{{ major.bonus }}</text>
+        <scroll-view :scroll-y="true" class="-mx-2 mb-3" style="max-height: 300px;">
+          <view class="px-2">
+            <view
+              v-for="(major, index) in graduateMajorData"
+              :key="index"
+              class="grid grid-cols-[2fr_1fr_1fr] gap-2 py-2 border-b border-line"
+            >
+              <text class="text-fg text-xs leading-tight">{{ major.name }}</text>
+              <text class="text-brand text-xs font-medium text-center">{{ major.gpa }}</text>
+              <text class="text-fg-muted text-xs text-center">{{ major.bonus }}</text>
+            </view>
           </view>
         </scroll-view>
 
