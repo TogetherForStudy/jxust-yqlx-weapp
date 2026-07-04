@@ -13,7 +13,7 @@
 鉴权说明：
 - 公开接口：无 Token
 - 需认证：`Authorization: Bearer <JWT_TOKEN>`
-- 需管理员：在“需认证”的基础上，用户 `role=admin`
+- 需管理员：在“需认证”的基础上，用户具备 `admin` 角色标签
 
 基础路径：`/api/v0`
 
@@ -84,7 +84,7 @@ Body(dto): request.UpdateProfileRequest
 ### 评价
 - 公开获取教师评价
 ```http
-GET /api/v0/reviews/teacher?teacher_name=xx&page=1&size=10
+GET /api/v0/admin/reviews/teacher?teacher_name=xx&page=1&size=10
 
 Result: utils.PageResponse{data=[]models.TeacherReview}
 ```
@@ -107,7 +107,7 @@ Body(dto): request.CreateReviewRequest
 
 - 获取我的评价记录（需认证）
 ```http
-GET /api/v0/reviews/user?page=1&size=10
+GET /api/v0/admin/reviews/user?page=1&size=10
 Authorization: Bearer <JWT_TOKEN>
 
 Result: utils.PageResponse{data=[]models.TeacherReview}
@@ -115,7 +115,7 @@ Result: utils.PageResponse{data=[]models.TeacherReview}
 
 - 管理员获取评价列表（需管理员）
 ```http
-GET /api/v0/reviews/?page=1&size=10&teacher_name=xx&status=1
+GET /api/v0/admin/reviews/?page=1&size=10&teacher_name=xx&status=1
 Authorization: Bearer <JWT_TOKEN>
 
 Result: utils.PageResponse{data=[]models.TeacherReview}
@@ -123,7 +123,7 @@ Result: utils.PageResponse{data=[]models.TeacherReview}
 
 - 审核通过（需管理员）
 ```http
-POST /api/v0/reviews/{id}/approve
+POST /api/v0/admin/reviews/{id}/approve
 Authorization: Bearer <JWT_TOKEN>
 Content-Type: application/json
 
@@ -132,7 +132,7 @@ Body(dto): { "admin_note": "string" }
 
 - 审核拒绝（需管理员）
 ```http
-POST /api/v0/reviews/{id}/reject
+POST /api/v0/admin/reviews/{id}/reject
 Authorization: Bearer <JWT_TOKEN>
 Content-Type: application/json
 
@@ -141,7 +141,7 @@ Body(dto): { "admin_note": "string(必填)" }
 
 - 删除评价（需管理员）
 ```http
-DELETE /api/v0/reviews/{id}
+DELETE /api/v0/admin/reviews/{id}
 Authorization: Bearer <JWT_TOKEN>
 ```
 
@@ -227,7 +227,7 @@ Result: []string
 
 - 搜索英雄（管理员，支持分页，仅显示 is_show=true 的英雄）
 ```http
-GET /api/v0/heroes/search?q=搜索关键词&page=1&size=10
+GET /api/v0/admin/heroes/search?q=搜索关键词&page=1&size=10
 
 Parameters:
 - q: 搜索关键词（可选，空则返回全部）
@@ -254,7 +254,7 @@ Result: response.PageResponse
 
 - 创建（需管理员）
 ```http
-POST /api/v0/heroes/
+POST /api/v0/admin/heroes/
 Authorization: Bearer <JWT_TOKEN>
 Content-Type: application/json
 
@@ -264,7 +264,7 @@ Body(dto): request.CreateHeroRequest
 
 - 更新（需管理员）
 ```http
-PUT /api/v0/heroes/{id}
+PUT /api/v0/admin/heroes/{id}
 Authorization: Bearer <JWT_TOKEN>
 Content-Type: application/json
 
@@ -274,7 +274,7 @@ Body(dto): request.UpdateHeroRequest
 
 - 删除（需管理员）
 ```http
-DELETE /api/v0/heroes/{id}
+DELETE /api/v0/admin/heroes/{id}
 Authorization: Bearer <JWT_TOKEN>
 ```
 
@@ -288,7 +288,7 @@ Result: { "key": "string", "value": "string", "value_type": "string", "descripti
 
 - 搜索配置项（管理，支持分页）
 ```http
-GET /api/v0/configs/search?q=搜索关键词&page=1&size=10
+GET /api/v0/admin/config/search?q=搜索关键词&page=1&size=10
 
 Parameters:
 - q: 搜索关键词（可选，空则返回全部，支持按key和description搜索）
@@ -316,7 +316,7 @@ Result: response.PageResponse
 
 - 创建（需管理员）
 ```http
-POST /api/v0/config/
+POST /api/v0/admin/config/
 Authorization: Bearer <JWT_TOKEN>
 Content-Type: application/json
 
@@ -326,7 +326,7 @@ Body(dto): request.CreateConfigRequest
 
 - 更新（需管理员）
 ```http
-PUT /api/v0/config/{key}
+PUT /api/v0/admin/config/{key}
 Authorization: Bearer <JWT_TOKEN>
 Content-Type: application/json
 
@@ -336,6 +336,6 @@ Body(dto): request.UpdateConfigRequest
 
 - 删除（需管理员）
 ```http
-DELETE /api/v0/config/{key}
+DELETE /api/v0/admin/config/{key}
 Authorization: Bearer <JWT_TOKEN>
 ```

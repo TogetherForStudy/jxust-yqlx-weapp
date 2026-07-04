@@ -1,4 +1,4 @@
-import { REVIEW_ATTITUDES, REVIEW_STATUS, USER_ROLES } from './constants'
+import { REVIEW_ATTITUDES, REVIEW_STATUS } from './constants'
 import { formatDateTime } from './time'
 import Taro from '@tarojs/taro'
 
@@ -91,7 +91,6 @@ export const getAttitudeText = (attitude) => {
       return '未知'
   }
 }
-
 
 
 

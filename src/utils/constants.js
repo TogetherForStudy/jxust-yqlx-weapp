@@ -1,10 +1,3 @@
-// 用户角色
-export const USER_ROLES = {
-  NORMAL: 1,      // 普通用户
-  ADMIN: 2,       // 管理员
-  OPERATOR: 3     // 运营者
-}
-
 // 用户状态
 export const USER_STATUS = {
   NORMAL: 1,      // 正常
