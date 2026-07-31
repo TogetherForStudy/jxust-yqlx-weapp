@@ -43,7 +43,7 @@
 		"@tarojs/plugin-platform-jd": "4.2.0",
 		"@tarojs/plugin-platform-qq": "4.2.0",
 		"@tarojs/plugin-platform-swan": "4.2.0",
-		"@tarojs/plugin-platform-tt": "4.2.0",
+		"@tarojs/plugin-platform-tt": "4.2.1",
 		"@tarojs/plugin-platform-weapp": "4.2.0",
 		"@tarojs/runtime": "4.2.0",
 		"@tarojs/shared": "4.2.0",
