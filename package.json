@@ -67,6 +67,6 @@
 		"tailwindcss": "^4.3.1",
 		"terser": "^5.16.8",
 		"vite": "^4.2.0",
-		"weapp-tailwindcss": "^5.1.0"
+		"weapp-tailwindcss": "^5.2.4"
 	}
 }
